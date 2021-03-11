@@ -510,8 +510,8 @@ function text:new(n, p)
 	
 	function t:setText(txt)
 		assert(txt ~= nil, "[" .. self.name .. "] FAILURE: text:setText() :: Missing param[text]")
-		assert(type(txt) == "string", "[" .. self.name .. "] FAILURE: text:setText() :: Incorrect param[text] - expecting boolean and got " .. type(txt))
-		self.text = text
+		assert(type(txt) == "string", "[" .. self.name .. "] FAILURE: text:setText() :: Incorrect param[text] - expecting string and got " .. type(txt))
+		self.text = txt
 		self.typewriterText, self.fancy = text:split(txt)
 	end
 	

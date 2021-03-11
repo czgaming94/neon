@@ -10,6 +10,7 @@ local myBox = Neon:addBox("myBox")
 Neon:addBox("myBox2")
 local myCheckbox = Neon:addCheckbox("myCheckbox")
 local myDropdown = Neon:addDropdown("myDropdown")
+local myTextfield = Neon:addTextfield("myTextfield")
 local myBox3 = Neon2:addBox("myBox3")
 local myBox4 = Neon2:addBox("myBox4")
 
@@ -17,7 +18,7 @@ local myText = Neon2:addText("continue")
 
 local myFont = lg.newFont("res/font/thicktext.otf", 24)
 
-local colors = myGui.color
+local colors = Neon.color
 
 function love.load()
 	-- Add color to global GUI
@@ -110,6 +111,14 @@ function love.load()
 		round = true, radius = 6,
 		closeOnUnfocus = true
 	})
+	myTextfield:setData({
+		w = 150, h = 125, x = 100, y = 50, z = 2,
+		textColor = colors("green"),
+		padding = {5,5,5,5}, fixPadding = true,
+		color = colors("eggshell"),
+		useBorder = true, borderColor = colors("yellow"),
+		round = true, radius = 6,
+	})
 	myBox4:setData({
 		w = 50, h = 250, x = 105, y = 200, 
 		color = colors("purple"), 
@@ -143,6 +152,10 @@ end
 
 function love.draw()
 	Neon:draw()
+end
+
+function love.keypressed(key,scancode,isrepeat)
+	Neon:keypressed(key,scancode,isrepeat)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)

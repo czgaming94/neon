@@ -26,13 +26,13 @@
 
 
 
-local box = require("gui.box")
-local checkbox = require("gui.checkbox")
-local dropdown = require("gui.dropdown")
-local text = require("gui.text")
-local textfield = require("gui.textfield")
-local radial = require("gui.radial")
-local slider = require("gui.slider")
+local box = require("neon.box")
+local checkbox = require("neon.checkbox")
+local dropdown = require("neon.dropdown")
+local text = require("neon.text")
+local textfield = require("neon.textfield")
+local radial = require("neon.radial")
+local slider = require("neon.slider")
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
 
@@ -253,7 +253,7 @@ end
 function gui:addTextfield(n)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addTextfield() :: Missing param[name]")
-	assert(type(n) == "FAILURE: gui:addTextfield() :: Incorrect param[name] - expecting string and got " .. type(n))
+	assert(type(n) == "string", "FAILURE: gui:addTextfield() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
 	self.items[id] = textfield:new(n, self)
 	return self.items[id]
@@ -488,6 +488,18 @@ function gui:removeGlobalEvent(n, o, i)
 	end
 end
 
+function gui:keypressed(key, scan, isRepeat)
+	if not self.enabled then return false end
+	local event = {key=key, scancode=scan, isRepeat=isRepeat}
+	for _,v in ipairs(items) do
+		if v.enabled then
+			for _,i in ipairs(v.items) do
+				if i.keypressed then i:keypressed(event) end
+			end
+		end
+	end
+end
+
 function gui:mousemoved(x, y, dx, dy, istouch)
 	if not self.enabled then return false end
 	local event = {x=x, y=y, dx=dx, dy=dy, istouch=istouch}
@@ -495,7 +507,7 @@ function gui:mousemoved(x, y, dx, dy, istouch)
 		if v.enabled then
 			for _,i in ipairs(v.items) do 
 				if not i.hidden then 
-					if i.mousemoved then i:mousemoved({x, y, dx, dy, istouch}) end
+					if i.mousemoved then i:mousemoved(event) end
 					if i.held then
 						if i.type == "text" and i.typewriter then
 							for k,t in ipairs(i.typewriterText) do
@@ -632,21 +644,19 @@ end
 
 function gui:hardRemove(n)
 	if not self.enabled then return false end
-	assert(n, "FAILURE: gui:remove() :: Missing param[name]")
-	if type(n) ~= "string" and type(n) ~= "number" then
-		assert(type(n) == "string" or type(n) == "number", "FAILURE: gui:remove() :: Incorrect param[name] - expecting string or number and got " .. type(n))
-	end
+	assert(n, "FAILURE: gui:hardRemove() :: Missing param[name]")
+	assert(type(n) == "string" or type(n) == "number", "FAILURE: gui:hardRemove() :: Incorrect param[name] - expecting string or number and got " .. type(n))
 	
 	for _,v in ipairs(items) do
-		for _,e in ipairs(v.items) do
+		for k,e in ipairs(v.items) do
 			if type(n) == "number" then
 				if e.id == n then 
-					e = nil 
+					v.items[k] = nil 
 					return
 				end
 			else
 				if e.name == n then 
-					e = nil
+					v.items[k] = nil
 					return
 				end
 			end

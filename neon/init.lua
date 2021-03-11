@@ -1,2 +1,2 @@
-local gui = require("gui.gui")
+local gui = require("neon.gui")
 return gui:new()
