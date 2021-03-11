@@ -118,6 +118,7 @@ function love.load()
 		color = colors("eggshell"),
 		useBorder = true, borderColor = colors("yellow"),
 		round = true, radius = 6,
+		moveable = true
 	})
 	myBox4:setData({
 		w = 50, h = 250, x = 105, y = 200, 

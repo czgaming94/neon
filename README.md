@@ -2,6 +2,8 @@
 This API's goal is to make laying out your application GUI simple and efficient. The secondary goal of this API 
 is to be as easy to grasp as possible for beginners, as well as users coming from other scripting languages. 
 There are a few different tools brought with this API...<br>
+#### [A Fast Example](https://github.com/czgaming94/love2d-gui/blob/main/docs/examples/MainMenu.md)
+If you aren't quite understanding how to use the API, check out this quick starters guide!
 ### [Boxes](https://github.com/czgaming94/love2d-gui/blob/main/docs/Box.md)
 ![Box Image](https://github.com/czgaming94/love2d-gui/blob/main/docs/examples/box.png)<br>
 The goal of the box object is for backgrounds, buttons, and HUD containers. This is the most commonly used type of object in a GUI.
