@@ -6,7 +6,7 @@ local lg = love.graphics
 local Neon = require("neon")
 local Neon2 = Neon:new()
 
-local myBox = Neon:addBox("myBox")
+local myBox = Neon:add("box", "myBox")
 Neon:addBox("myBox2")
 local myCheckbox = Neon:addCheckbox("myCheckbox")
 local myDropdown = Neon:addDropdown("myDropdown")

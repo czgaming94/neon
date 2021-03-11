@@ -47,7 +47,15 @@ local colors = {
 	yellow = {1,1,0,1},
 	purple = {1,0,1,1}
 }
-
+gui.handles = {
+	box = box,
+	checkbox = checkbox,
+	dropdown = dropdown,
+	text = text,
+	textfield = textfield,
+	radial = radial,
+	slider = slider
+}
 gui.items = {}
 gui.z = 0
 gui.use255 = false
@@ -204,6 +212,7 @@ function gui:animateToOpacity(obj, o, s)
 	obj.animateOpacity = true
 end
 
+
 function gui:addColor(c, n)
 	if not self.enabled then return false end
 	assert(c, "FAILURE: gui:addColor() :: Missing param[color]")
@@ -212,6 +221,16 @@ function gui:addColor(c, n)
 	assert(n, "FAILURE: gui:addColor() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addColor() :: Incorrect param[name] - expecting string and got " .. type(n))
 	colors[n] = c
+end
+
+function gui:add(t, n)
+	assert(t, "FAILURE: gui:addBox() :: Missing param[type]")
+	assert(type(t) == "string", "FAILURE: gui:addBox() :: Incorrect param[type] - expecting string and got " .. type(t))
+	assert(n, "FAILURE: gui:addBox() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addBox() :: Incorrect param[name] - expecting string and got " .. type(n))
+	local id = #self.items + 1
+	self.items[id] = self.handles[t]:new(n, self)
+	return self.items[id]
 end
 
 function gui:addBox(n)
@@ -533,12 +552,12 @@ end
 function gui:mousepressed(x, y, button, istouch, presses)
 	if not self.enabled then return false end
 	local event = {x=x, y=y, button=button, istouch=istouch, presses=presses}
-	local objs = self:copy(items)
+	local objs = self:copy(items, "handles")
 	table.sort(objs, function(a, b) return a.z > b.z end)
 	local hitTarget = false
 	for _,o in ipairs(objs) do
 		if o.enabled then
-			local obj = self:copy(o)
+			local obj = self:copy(o, "handles")
 			table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
 			for k,v in ipairs(obj.items) do
 				local i = self:child(v.name)
@@ -610,12 +629,12 @@ end
 
 function gui:touchpressed(event)
 	if not self.enabled then return false end
-	local objs = self:copy(items)
+	local objs = self:copy(items, "handles")
 	table.sort(objs, function(a, b) return a.z > b.z end)
 	local hitTarget = false
 	for _,o in ipairs(objs) do
 		if o.enabled then
-			local obj = self:copy(o)
+			local obj = self:copy(o, "handles")
 			table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
 			for k,v in ipairs(obj.items) do
 				local i = self:child(v.name)
