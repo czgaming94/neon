@@ -159,6 +159,10 @@ function love.keypressed(key,scancode,isrepeat)
 	Neon:keypressed(key,scancode,isrepeat)
 end
 
+function love.keyreleased(key, scancode)
+	Neon:keyreleased(key, scancode)
+end
+
 function love.mousepressed(x, y, button, istouch, presses)
 	Neon:mousepressed(x, y, button, istouch, presses)
 	if button == 2 then

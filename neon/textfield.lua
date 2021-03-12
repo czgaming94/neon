@@ -27,8 +27,9 @@
 
 
 local lg, lt = love.graphics, love.timer
-local min, max = math.min, math.max
+local min, max, abs = math.min, math.max, math.abs
 local textfield = {}
+local keyIsDown = false
 
 textfield.items = {}
 textfield.guis = {}
@@ -53,9 +54,9 @@ function textfield:new(n, p)
 	t.y = t.pos.y
 	t.z = t.pos.z
 	t.keys = {
-		"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",
-		"1","2","3","4","5","6","7","8","9","0",",",".","/",";","'","[","]","`","-","=","\"","\\",
-		"!","@","#","$","%","^","&","*","(",")","{","}",":","<",">","?","~","backspace","return","enter"
+		"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"," ",
+		"1","2","3","4","5","6","7","8","9","0",",",".","/",";","'","[","]","`","-","=","\"","\\","!","@","#","$",
+		"%","^","&","*","(",")","{","}",":","<",">","?","~","backspace","return","enter","up","down","left","right"
 	}
 	t.timerEvent = nil
 	t.color = {1,1,1,1}
@@ -65,6 +66,7 @@ function textfield:new(n, p)
 	t.currentLine = 1
 	t.showCursor = true
 	t.cursorTime = 0
+	t.cursorOffset = 0
 	t.font = love.graphics.getFont()
 	t.fonts = {}
 	t.hovered = false
@@ -213,7 +215,14 @@ function textfield:new(n, p)
 		end
 		if self.active and self.showCursor then
 			lg.setColor(.05,.05,.05,1)
-			lg.line(self.pos.x + self.font:getWidth(self.display[self.currentLine]) + 7,self.pos.y + (self.font:getHeight() * (self.currentLine - 1)) + 5, self.pos.x + self.font:getWidth(self.display[self.currentLine]) + 7, self.pos.y + (self.font:getHeight() * self.currentLine) + 5)
+			if self.cursorOffset == #self.display[self.currentLine] then
+				lg.line(self.pos.x + self.font:getWidth(self.display[self.currentLine]) + 7,self.pos.y + (self.font:getHeight() * (self.currentLine - 1)) + 5, self.pos.x + self.font:getWidth(self.display[self.currentLine]) + 7, self.pos.y + (self.font:getHeight() * self.currentLine) + 5)
+			else
+				lg.line(self.pos.x + (self.font:getWidth(self.display[self.currentLine]) + 5) - self.font:getWidth(string.sub(self.display[self.currentLine], 1, #self.display[self.currentLine] - self.cursorOffset)),
+						self.pos.y + (self.font:getHeight() * (self.currentLine - 1)) + 5,
+						self.pos.x + (self.font:getWidth(self.display[self.currentLine]) + 5) - self.font:getWidth(string.sub(self.display[self.currentLine], 1, #self.display[self.currentLine] - self.cursorOffset)),
+						self.pos.y + (self.font:getHeight() * self.currentLine) + 5)
+			end
 		end
 		
 		lg.setColor(1,1,1,1)
@@ -297,7 +306,13 @@ function textfield:new(n, p)
 		return self.hovered
 	end
 	
+	function t:keyreleased(event)
+		keyIsDown = false
+	end
+	
 	function t:keypressed(event)
+		if keyIsDown then return false end
+		keyIsDown = true
 		if self.active then
 			local allowKey = false
 			for _,v in ipairs(self.keys) do
@@ -308,24 +323,91 @@ function textfield:new(n, p)
 					if self.currentLine == 1 then
 						if self.display[self.currentLine] ~= "" then
 							self.display[self.currentLine] = self.display[self.currentLine]:sub(1,-2)
+							self.cursorOffset = self.cursorOffset - 1
 						end
 					else
 						if self.display[self.currentLine] == "" then
 							self.currentLine = self.currentLine - 1
+							self.cursorOffset = #self.display[self.currentLine]
+						else
+							self.cursorOffset = self.cursorOffset - 1
 						end
 						self.display[self.currentLine] = self.display[self.currentLine]:sub(1,-2)
 					end
 				elseif event.key == "return" or event.key == "enter" then
-					self.currentLine = self.currentLine + 1
+					self.currentself.display[self.currentLine] = self.currentLine + 1
 					if not self.display[self.currentLine] then self.display[self.currentLine] = "" end
-				else
-					if self.font:getWidth(self.display[self.currentLine]) > (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) then
-						self.currentLine = self.currentLine + 1
-						if not self.display[self.currentLine] then self.display[self.currentLine] = "" end
-						self.display[self.currentLine] = self.display[self.currentLine] .. event.key
-					else
-						self.display[self.currentLine] = self.display[self.currentLine] .. event.key
+				elseif event.key == "up" then
+					if self.currentLine ~= 1 then
+						self.currentLine = self.currentLine - 1
 					end
+				elseif event.key == "down" then
+					if self.display[self.currentLine + 1] then 
+						self.currentLine = self.currentLine + 1
+					end
+				elseif event.key == "left" then
+					if self.cursorOffset >= 1 then
+						self.cursorOffset = self.cursorOffset - 1
+					else
+						if self.currentLine ~= 1 then
+							self.currentself.display[self.currentLine] = self.currentLine - 1
+							self.cursorOffset = #self.display[self.currentLine]
+						end
+					end
+				elseif event.key == "right" then
+					if self.cursorOffset < #self.display[self.currentLine] then
+						self.cursorOffset = self.cursorOffset + 1
+					else
+						if self.display[self.currentLine + 1] then
+							self.currentself.display[self.currentLine] = self.currentLine + 1
+							self.cursorOffset = 0
+						end
+					end
+				else
+					if self.cursorOffset == #self.display[self.currentLine] then
+						if self.font:getWidth(self.display[self.currentLine] .. event.key) > (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) then
+							self.cursorOffset = 1
+							self.currentLine = self.currentLine + 1
+							if not self.display[self.currentLine] then self.display[self.currentLine] = "" end
+							self.display[self.currentLine] = self.display[self.currentLine] .. event.key
+						else
+							self.display[self.currentLine] = self.display[self.currentLine] .. event.key
+							self.cursorOffset = self.cursorOffset + 1
+						end
+					else
+						if self.cursorOffset == 0 then
+							if not self.display[self.currentLine + 1] then self.display[self.currentLine + 1] = "" end
+							self.display[self.currentLine] = event.key .. self.display[self.currentLine]
+							self.cursorOffset = self.cursorOffset + 1
+						else
+							if self.font:getWidth(self.display[self.currentLine] .. event.key) > (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) then
+								if self.cursorOffset == #self.display[self.currentLine] then
+									self.cursorOffset = 0
+									self.currentself.display[self.currentLine] = self.currentLine + 1
+									self.display[self.currentLine] = string.sub(self.display[self.currentLine], 1, self.cursorOffset) .. event.key .. string.sub(self.display[self.currentLine], self.cursorOffset + 1, #self.display[self.currentLine])
+									self.cursorOffset = self.cursorOffset + 1
+								else
+									local i = self.currentLine
+									local foundHome = false
+									while not foundHome do
+										if self.font:getWidth(self.display[i] .. event.key) > (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) then
+											i = i + 1
+											if not self.display[i] then self.display[i] = "" end
+											self.display[i] = string.sub(self.display[i - 1], #self.display[i - 1], #self.display[i - 1]) .. self.display[i]
+											self.display[i - 1] = string.sub(self.display[i - 1], 1, #self.display[i - 1] - 1)
+										else
+											foundHome = true
+										end
+									end
+									self.display[self.currentLine] = string.sub(self.display[self.currentLine], 1, self.cursorOffset) .. event.key .. string.sub(self.display[self.currentLine], self.cursorOffset + 1, #self.display[self.currentLine])
+									return
+								end
+							else
+								self.display[self.currentLine] = string.sub(self.display[self.currentLine], 1, self.cursorOffset) .. event.key .. string.sub(self.display[self.currentLine], self.cursorOffset + 1, #self.display[self.currentLine])
+								self.cursorOffset = self.cursorOffset + 1
+							end
+						end
+					end	
 				end
 			end
 		end

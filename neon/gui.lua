@@ -519,6 +519,18 @@ function gui:keypressed(key, scan, isRepeat)
 	end
 end
 
+function gui:keyreleased(key, scan)
+	if not self.enabled then return false end
+	local event = {key=key, scancode=scan}
+	for _,v in ipairs(items) do
+		if v.enabled then
+			for _,i in ipairs(v.items) do
+				if i.keyreleased then i:keyreleased(event) end
+			end
+		end
+	end
+end
+
 function gui:mousemoved(x, y, dx, dy, istouch)
 	if not self.enabled then return false end
 	local event = {x=x, y=y, dx=dx, dy=dy, istouch=istouch}
