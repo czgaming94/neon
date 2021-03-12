@@ -10,7 +10,8 @@ local box = Neon:addBox("myBox")
 Neon:add("box", "myBox")
 ```
 Here, we have created a box object in both cases, with the name of `myBox`<br>
-> In this example, we will be using the `box` local variable to modify the element.<br>
+> In this example, we will be using the `box` local variable to modify the element.
+
 The next step, we will set some data for the box, so that it can display itself.
 ```lua
 box:setData({
