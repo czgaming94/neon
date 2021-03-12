@@ -326,13 +326,13 @@ function textfield:new(n, p)
 							self.cursorOffset = self.cursorOffset - 1
 						end
 					else
+						self.display[self.currentLine] = self.display[self.currentLine]:sub(1,-2)
 						if self.display[self.currentLine] == "" or self.cursorOffset == 0 then
 							self.currentLine = self.currentLine - 1
 							self.cursorOffset = #self.display[self.currentLine]
 						else
 							self.cursorOffset = self.cursorOffset - 1
 						end
-						self.display[self.currentLine] = self.display[self.currentLine]:sub(1,-2)
 					end
 				elseif event.key == "return" or event.key == "enter" then
 					self.currentLine = self.currentLine + 1
