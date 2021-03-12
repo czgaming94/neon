@@ -122,6 +122,7 @@ function dropdown:new(n, p)
 		self.colorAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animateColor = true
+		return self
 	end
 	
 	function d:animateBorderToColor(t, s)
@@ -135,6 +136,7 @@ function dropdown:new(n, p)
 		self.borderColorAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animateBorderColor = true
+		return self
 	end
 	
 	function d:animateToPosition(x, y, s)
@@ -150,6 +152,7 @@ function dropdown:new(n, p)
 		self.positionAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animatePosition = true
+		return self
 	end
 	
 	function d:animateToOpacity(o, s)
@@ -162,6 +165,7 @@ function dropdown:new(n, p)
 		self.opacityAnimateSpeed = s
 		self.inAnimation = true
 		self.animateOpacity = true
+		return self
 	end
 	
 	function d:isAnimating()
@@ -170,10 +174,12 @@ function dropdown:new(n, p)
 	
 	function d:startAnimation()
 		self.inAnimation = true
+		return self
 	end
 	
 	function d:stopAnimation()
 		self.inAnimation = false
+		return self
 	end
 	
 	function d:setBorderColor(bC)
@@ -181,6 +187,7 @@ function dropdown:new(n, p)
 		assert(type(bC) == "table", "[" .. self.name .. "] FAILURE: dropdown:setBorderColor() :: Incorrect param[color] - expecting table and got " .. type(bC))
 		assert(#bC == 4, "[" .. self.name .. "] FAILURE: dropdown:setBorderColor() :: Incorrect param[color] - table length 4 expected and got " .. #bC)
 		self.borderColor = bC
+		return self
 	end
 	
 	function d:getBorderColor()
@@ -191,6 +198,7 @@ function dropdown:new(n, p)
 		assert(t ~= nil, "[" .. self.name .. "] FAILURE: dropdown:setClickable() :: Missing param[clickable]")
 		assert(type(t) == "boolean", "[" .. self.name .. "] FAILURE: dropdown:setClickable() :: Incorrect param[clickable] - expecting boolean and got " .. type(t))
 		self.clickable = t
+		return self
 	end
 	
 	function d:isClickable()
@@ -202,6 +210,7 @@ function dropdown:new(n, p)
 		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: dropdown:setColor() :: Incorrect param[color] - expecting table and got " .. type(t))
 		assert(#t == 4, "[" .. self.name .. "] FAILURE: dropdown:setColor() :: Incorrect param[color] - table length 4 expected and got " .. #t)
 		self.color = t
+		return self
 	end
 	
 	function d:getColor()
@@ -314,6 +323,7 @@ function dropdown:new(n, p)
 	
 	function d:disable()
 		self.hidden = true
+		return self
 	end
 	
 	function d:draw()
@@ -382,6 +392,7 @@ function dropdown:new(n, p)
 	
 	function d:enable()
 		self.hidden = false
+		return self
 	end
 	
 	function d:fadeIn()
@@ -404,6 +415,7 @@ function dropdown:new(n, p)
 				e.fn(self, e.target)
 			end
 		end
+		return self
 	end
 	
 	function d:fadeOut(p, h)
@@ -427,12 +439,14 @@ function dropdown:new(n, p)
 				e.fn(self, e.target)
 			end
 		end
+		return self
 	end
 	
 	function d:setFont(f)
 		assert(f, "[" .. self.name .. "] FAILURE: dropdown:setFont() :: Missing param[font]")
 		assert(type(f) == "userdata", "[" .. self.name .. "] FAILURE: dropdown:setFont() :: Incorrect param[font] - expecting font userdata and got " .. type(f))
 		self.font = f
+		return self
 	end
 	
 	function d:getFont()
@@ -443,6 +457,7 @@ function dropdown:new(n, p)
 		assert(h, "[" .. self.name .. "] FAILURE: dropdown:setHeight() :: Missing param[height]")
 		assert(type(h) == "number", "[" .. self.name .. "] FAILURE: dropdown:setHeight() :: Incorrect param[height] - expecting number and got " .. type(h))
 		self.h = h
+		return self
 	end
 	
 	function d:getHeight(h)
@@ -453,6 +468,7 @@ function dropdown:new(n, p)
 		assert(h ~= nil, "[" .. self.name .. "] FAILURE: dropdown:setHollow() :: Missing param[hollow]")
 		assert(type(h) == "boolean", "[" .. self.name .. "] FAILURE: dropdown:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
 		self.hollow = h
+		return self
 	end
 	
 	function d:isHollow()
@@ -496,6 +512,7 @@ function dropdown:new(n, p)
 		assert(o, "[" .. self.name .. "] FAILURE: dropdown:setUseBorder() :: Missing param[opacity]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: dropdown:setUseBorder() :: Incorrect param[opacity] - expecting number and got " .. type(o))
 		self.color[4] = o
+		return self
 	end
 	
 	function d:getOpacity()
@@ -513,6 +530,7 @@ function dropdown:new(n, p)
 			x,y = self.paddingLeft + self.options[#self.options].x + self.font:getWidth(o) + self.paddingRight, self.paddingTop + self.pos.y + self.paddingBottom
 		end
 		self.options[#self.options + 1] = {text = o, x = x, y = y}
+		return self
 	end
 	
 	function d:removeOption(o)
@@ -521,6 +539,7 @@ function dropdown:new(n, p)
 		for k,v in ipairs(self.options) do
 			if v.text == o then self.options[k] = nil end
 		end
+		return self
 	end
 	
 	function d:setOptionColor(t)
@@ -528,6 +547,7 @@ function dropdown:new(n, p)
 		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: dropdown:setOverlayColor() :: Incorrect param[color] - expecting table and got " .. type(t))
 		assert(#t == 4, "[" .. self.name .. "] FAILURE: dropdown:setOverlayColor() :: Incorrect param[color] - table length 4 expected and got " .. #t)
 		self.optionsColor = t
+		return self
 	end
 	
 	function d:getOptionColor()
@@ -546,30 +566,35 @@ function dropdown:new(n, p)
 		else
 			self.optionPaddingTop, self.optionPaddingRight, self.optionPaddingBottom, self.optionPaddingTop = unpack(p)
 		end
+		return self
 	end
 	
 	function d:setOptionPaddingBottom(p)
 		assert(p, "[" .. self.name .. "] FAILURE: dropdown:setOptionPaddingBottom() :: Missing param[padding]")
 		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: dropdown:setOptionPaddingBottom() :: Incorrect param[padding] - expecting number and got " .. type(p))
 		self.OptionaddingBottom = p
+		return self
 	end
 	
 	function d:setOptionPaddingLeft(p)
 		assert(p, "[" .. self.name .. "] FAILURE: dropdown:setOptionPaddingLeft() :: Missing param[padding]")
 		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: dropdown:setOptionPaddingLeft() :: Incorrect param[padding] - expecting number and got " .. type(p))
 		self.OptionaddingLeft = p
+		return self
 	end
 	
 	function d:setOptionPaddingRight(p)
 		assert(p, "[" .. self.name .. "] FAILURE: dropdown:setOptionPaddingRight() :: Missing param[padding]")
 		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: dropdown:setOptionPaddingRight() :: Incorrect param[padding] - expecting number and got " .. type(p))
 		self.OptionaddingRight = p
+		return self
 	end
 	
 	function d:setOptionPaddingTop(p)
 		assert(p, "[" .. self.name .. "] FAILURE: dropdown:setOptionPaddingTop() :: Missing param[padding]")
 		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: dropdown:setOptionPaddingTop() :: Incorrect param[padding] - expecting number and got " .. type(p))
 		self.OptionaddingTop = p
+		return self
 	end
 	
 	function d:setOverlayColor(t)
@@ -577,6 +602,7 @@ function dropdown:new(n, p)
 		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: dropdown:setOverlayColor() :: Incorrect param[color] - expecting table and got " .. type(t))
 		assert(#t == 4, "[" .. self.name .. "] FAILURE: dropdown:setOverlayColor() :: Incorrect param[color] - table length 4 expected and got " .. #t)
 		self.overlayColor = t
+		return self
 	end
 	
 	function d:getOverlayColor()
@@ -608,6 +634,7 @@ function dropdown:new(n, p)
 				table.remove(events[n], k)
 			end
 		end
+		return self
 	end
 	
 	function d:touchmoved(id, x, y, dx, dy, pressure)
@@ -642,6 +669,7 @@ function dropdown:new(n, p)
 		assert(w, "[" .. self.name .. "] FAILURE: dropdown:setWidth() :: Missing param[width]")
 		assert(type(w) == "number", "[" .. self.name .. "] FAILURE: dropdown:setWidth() :: Incorrect param[width] - expecting number and got " .. type(w))
 		self.w = w
+		return self
 	end
 	
 	function d:getWidth()
@@ -652,6 +680,7 @@ function dropdown:new(n, p)
 		assert(x, "[" .. self.name .. "] FAILURE: dropdown:setX() :: Missing param[x]")
 		assert(type(x) == "number", "[" .. self.name .. "] FAILURE: dropdown:setX() :: Incorrect param[x] - expecting number and got " .. type(x))
 		self.pos.x = x
+		return self
 	end
 	
 	function d:getX()
@@ -662,6 +691,7 @@ function dropdown:new(n, p)
 		assert(y, "[" .. self.name .. "] FAILURE: dropdown:setY() :: Missing param[y]")
 		assert(type(y) == "number", "[" .. self.name .. "] FAILURE: dropdown:setY() :: Incorrect param[y] - expecting number and got " .. type(y))
 		self.pos.y = y
+		return self
 	end
 	
 	function d:getY()
@@ -672,6 +702,7 @@ function dropdown:new(n, p)
 		assert(z, "[" .. self.name .. "] FAILURE: dropdown:setZ() :: Missing param[z]")
 		assert(type(z) == "number", "[" .. self.name .. "] FAILURE: dropdown:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
 		self.pos.z = z
+		return self
 	end
 	
 	function d:getZ()

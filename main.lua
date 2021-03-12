@@ -138,7 +138,7 @@ function love.load()
 	Neon:child("myBox2"):registerEvent("onClick", function(self, a) a:fadeOut(true, true) end, myBox3)
 	myBox3:registerEvent("onFadeOut", function(self) print("Faded") end)
 	myBox3:registerEvent("onMove", function(self) print("x", self.x, "y", self.y) end)
-	Neon:registerEvent("onClick", Neon:child("myBox2"), function(self) Neon:child("myBox2"):animateBorderToColor(colors("red")) end)
+	Neon:registerEvent("onClick", Neon:child("myBox2"), function(self) Neon:enableAll() Neon:child("myBox2"):animateBorderToColor(colors("red")) end)
 	Neon:registerEvent("onClick", Neon:child("myBox2"), function(self) Neon:child("myBox2"):animateToColor(colors("black")) end)
 	
 	

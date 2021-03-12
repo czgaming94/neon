@@ -145,6 +145,7 @@ function gui:setUse255(u)
 	assert(u ~= nil, "FAILURE: gui:setUse255() :: Missing param[use255]")
 	assert(type(u) == "boolean", "FAILURE: gui:setUse255() :: Incorrect param[use255] - expecting boolean and got " .. type(u))
 	self.use255 = u
+	return self
 end
 
 function gui:animateToColor(o, c, s)
@@ -161,6 +162,7 @@ function gui:animateToColor(o, c, s)
 	o.colorAnimateTime = lt.getTime()
 	o.inAnimation = true
 	o.animateColor = true
+	return o
 end
 
 function gui:animateBorderToColor(o, c, s)
@@ -177,6 +179,7 @@ function gui:animateBorderToColor(o, c, s)
 	o.borderColorAnimateTime = lt.getTime()
 	o.inAnimation = true
 	o.animateBorderColor = true
+	return o
 end
 	
 function gui:animateToPosition(o, x, y, s)
@@ -195,6 +198,7 @@ function gui:animateToPosition(o, x, y, s)
 	o.positionAnimateTime = lt.getTime()
 	o.inAnimation = true
 	o.animatePosition = true
+	return o
 end
 
 function gui:animateToOpacity(obj, o, s)
@@ -210,6 +214,7 @@ function gui:animateToOpacity(obj, o, s)
 	obj.opacityAnimateSpeed = s
 	obj.inAnimation = true
 	obj.animateOpacity = true
+	return obj
 end
 
 
@@ -221,6 +226,7 @@ function gui:addColor(c, n)
 	assert(n, "FAILURE: gui:addColor() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addColor() :: Incorrect param[name] - expecting string and got " .. type(n))
 	colors[n] = c
+	return self
 end
 
 function gui:add(t, n)
@@ -418,10 +424,12 @@ end
 
 function gui:enable()
 	self.enabled = true
+	return self
 end
 
 function gui:disable()
 	self.enabled = false
+	return self
 end
 
 function gui:draw()
@@ -454,6 +462,31 @@ end
 function gui:getHeld()
 	if not self.enabled then return false end
 	return self.held
+end
+
+function gui:enableAll()
+	for _,v in ipairs(items) do
+		if not v.enabled then v.enabled = true end
+		for _,i in ipairs(v.items) do
+			if i.hidden then i.hidden = false end
+		end
+	end
+	return self
+end
+
+function gui:disableAllElements(only)
+	if only then
+		for _,v in ipairs(self.items) do
+			if v.enabled then v.enabled = false end
+		end
+	else
+		for _,v in ipairs(items) do
+			for _,i in ipairs(v.items) do
+				if not i.hidden then i.hidden = true end
+			end
+		end
+	end
+	return self
 end
 
 function gui:registerEvent(n, o, f, t, i)
@@ -505,6 +538,7 @@ function gui:removeGlobalEvent(n, o, i)
 			table.remove(events[n], k)
 		end
 	end
+	return self
 end
 
 function gui:keypressed(key, scan, isRepeat)
@@ -601,6 +635,9 @@ function gui:mousepressed(x, y, button, istouch, presses)
 					end
 					if not optionHit then i.open = false end
 				end
+				if i.type == "textfield" and i.active and not i.hovered then
+					i.active = false
+				end
 			end
 			obj = nil
 		end
@@ -693,6 +730,7 @@ function gui:hardRemove(n)
 			end
 		end
 	end
+	return self
 end
 
 function gui:remove(n)
@@ -712,6 +750,7 @@ function gui:remove(n)
 	else
 		self.items[n] = nil
 	end
+	return self
 end
 
 function gui:setZ(z)
@@ -719,6 +758,11 @@ function gui:setZ(z)
 	assert(z, "FAILURE: gui:setZ() :: Missing param[z]")
 	assert(type(z) == "number", "FAILURE: gui:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
 	self.z = z
+	return self
+end
+
+function gui:getZ()
+	return self.z
 end
 
 return gui

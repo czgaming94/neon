@@ -117,6 +117,7 @@ function text:new(n, p)
 		self.colorAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animateColor = true
+		return self
 	end
 	
 	function t:animateToPosition(x, y, s)
@@ -132,6 +133,7 @@ function text:new(n, p)
 		self.positionAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animatePosition = true
+		return self
 	end
 	
 	function t:animateToOpacity(o, s)
@@ -144,6 +146,7 @@ function text:new(n, p)
 		self.opacityAnimateSpeed = s
 		self.inAnimation = true
 		self.animateOpacity = true
+		return self
 	end
 	
 	function t:isAnimating()
@@ -154,6 +157,7 @@ function text:new(n, p)
 		assert(c ~= nil, "[" .. self.name .. "] FAILURE: text:setClickable() :: Missing param[clickable]")
 		assert(type(c) == "boolean", "[" .. self.name .. "] FAILURE: text:setClickable() :: Incorrect param[clickable] - expecting boolean and got " .. type(c))
 		self.clickable = c
+		return self
 	end
 	
 	function t:isClickable()
@@ -165,6 +169,7 @@ function text:new(n, p)
 		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: text:setColor() :: Incorrect param[color] - expecting table and got " .. type(c))
 		assert(#c == 4, "[" .. self.name .. "] FAILURE: text:setColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
 		self.color = c
+		return self
 	end
 	
 	function t:getColor()
@@ -246,6 +251,7 @@ function text:new(n, p)
 	
 	function t:disable()
 		self.hidden = true
+		return self
 	end
 	
 	function t:draw()
@@ -290,6 +296,7 @@ function text:new(n, p)
 	
 	function t:enable()
 		self.hidden = false
+		return self
 	end
 	
 	function t:fadeIn()
@@ -312,6 +319,7 @@ function text:new(n, p)
 				e.fn(self, e.target)
 			end
 		end
+		return self
 	end
 	
 	function t:fadeOut(p, h)
@@ -334,6 +342,7 @@ function text:new(n, p)
 			for _,e in ipairs(self.events.onFadeOut) do
 				e.fn(self, e.target)
 			end
+		return self
 		end
 	end
 	
@@ -343,12 +352,14 @@ function text:new(n, p)
 		assert(n, "[" .. self.name .. "] FAILURE: text:addFont() :: Missing param[name]")
 		assert(type(n) == "string", "[" .. self.name .. "] FAILURE: text:addFont() :: Incorrect param[name] - expecting string and got " .. type(n))
 		self.fonts[n] = f
+		return self
 	end
 	
 	function t:setFont(n)
 		assert(n, "[" .. self.name .. "] FAILURE: text:setFont() :: Missing param[name]")
 		assert(type(n) == "string", "[" .. self.name .. "] FAILURE: text:setFont() :: Incorrect param[name] - expecting string and got " .. type(n))
 		self.font = self.fonts[n]
+		return self
 	end
 	
 	function t:isHovered()
@@ -359,6 +370,7 @@ function text:new(n, p)
 		assert(h ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Missing param[hollow]")
 		assert(type(h) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
 		self.hollow = h
+		return self
 	end
 	
 	function t:isHollow()
@@ -369,6 +381,7 @@ function text:new(n, p)
 		assert(s, "[" .. self.name .. "] FAILURE: text:setTypewriterSpeed() :: Missing param[speed]")
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:setTypewriterSpeed() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		self.typewriterSpeed = n
+		return self
 	end
 	
 	function t:getTypewriterSpeed()
@@ -377,10 +390,12 @@ function text:new(n, p)
 	
 	function t:startAnimation()
 		self.inAnimation = true
+		return self
 	end
 	
 	function t:stopAnimation()
 		self.inAnimation = false
+		return self
 	end
 	
 	function t:update(dt)		
@@ -450,6 +465,7 @@ function text:new(n, p)
 		assert(o, "[" .. self.name .. "] FAILURE: text:setUseBorder() :: Missing param[opacity]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: text:setUseBorder() :: Incorrect param[opacity] - expecting number and got " .. type(o))
 		self.color[4] = o
+		return self
 	end
 	
 	function t:getOpacity()
@@ -481,6 +497,7 @@ function text:new(n, p)
 				table.remove(events[n], k)
 			end
 		end
+		return self
 	end
 	
 	function t:touchmoved(id, x, y, dx, dy, pressure)
@@ -506,6 +523,7 @@ function text:new(n, p)
 		self.typewriterFinished = false
 		self.typewriterStopped = false
 		self.typewriterPaused = false
+		return self
 	end
 	
 	function t:setText(txt)
@@ -513,6 +531,7 @@ function text:new(n, p)
 		assert(type(txt) == "string", "[" .. self.name .. "] FAILURE: text:setText() :: Incorrect param[text] - expecting string and got " .. type(txt))
 		self.text = txt
 		self.typewriterText, self.fancy = text:split(txt)
+		return self
 	end
 	
 	function t:getText()
@@ -523,6 +542,7 @@ function text:new(n, p)
 		assert(aT ~= nil, "[" .. self.name .. "] FAILURE: text:setAsTypewriter() :: Missing param[useBorder]")
 		assert(type(aT) == "boolean", "[" .. self.name .. "] FAILURE: text:setAsTypewriter() :: Incorrect param[useBorder] - expecting boolean and got " .. type(aT))
 		self.typewriter = aT
+		return self
 	end
 	
 	function t:isTypewriter()
@@ -533,6 +553,7 @@ function text:new(n, p)
 		assert(x, "[" .. self.name .. "] FAILURE: text:setX() :: Missing param[x]")
 		assert(type(x) == "number", "[" .. self.name .. "] FAILURE: text:setX() :: Incorrect param[x] - expecting number and got " .. type(x))
 		self.pos.x = x
+		return self
 	end
 	
 	function t:getX()
@@ -543,6 +564,7 @@ function text:new(n, p)
 		assert(y, "[" .. self.name .. "] FAILURE: text:setY() :: Missing param[y]")
 		assert(type(y) == "number", "[" .. self.name .. "] FAILURE: text:setY() :: Incorrect param[y] - expecting number and got " .. type(y))
 		self.pos.y = y
+		return self
 	end
 	
 	function t:getY()
@@ -553,6 +575,7 @@ function text:new(n, p)
 		assert(z, "[" .. self.name .. "] FAILURE: text:setZ() :: Missing param[z]")
 		assert(type(z) == "number", "[" .. self.name .. "] FAILURE: text:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
 		self.pos.z = z
+		return self
 	end
 	
 	function t:getZ()
@@ -616,7 +639,6 @@ function text:split(s)
 									end
 								end
 								t[id].offset = offsets
-								print(offsets[1], offsets[2])
 							end
 						end
 					end

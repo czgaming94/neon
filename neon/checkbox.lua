@@ -119,6 +119,7 @@ function checkbox:new(n, p)
 		self.colorAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animateColor = true
+		return self
 	end
 	
 	function c:animateBorderToColor(t, s)
@@ -132,6 +133,7 @@ function checkbox:new(n, p)
 		self.borderColorAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animateBorderColor = true
+		return self
 	end
 	
 	function c:animateToPosition(x, y, s)
@@ -147,6 +149,7 @@ function checkbox:new(n, p)
 		self.positionAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animatePosition = true
+		return self
 	end
 	
 	function c:animateToOpacity(o, s)
@@ -159,6 +162,7 @@ function checkbox:new(n, p)
 		self.opacityAnimateSpeed = s
 		self.inAnimation = true
 		self.animateOpacity = true
+		return self
 	end
 	
 	function c:isAnimating()
@@ -167,10 +171,12 @@ function checkbox:new(n, p)
 	
 	function c:startAnimation()
 		self.inAnimation = true
+		return self
 	end
 	
 	function c:stopAnimation()
 		self.inAnimation = false
+		return self
 	end
 	
 	function c:setBorderColor(bC)
@@ -178,6 +184,7 @@ function checkbox:new(n, p)
 		assert(type(bC) == "table", "[" .. self.name .. "] FAILURE: checkbox:setBorderColor() :: Incorrect param[color] - expecting table and got " .. type(bC))
 		assert(#bC == 4, "[" .. self.name .. "] FAILURE: checkbox:setBorderColor() :: Incorrect param[color] - table length 4 expected and got " .. #bC)
 		self.borderColor = bC
+		return self
 	end
 	
 	function c:getBorderColor()
@@ -188,6 +195,7 @@ function checkbox:new(n, p)
 		assert(t ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setClickable() :: Missing param[clickable]")
 		assert(type(t) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setClickable() :: Incorrect param[clickable] - expecting boolean and got " .. type(t))
 		self.clickable = t
+		return self
 	end
 	
 	function c:isClickable()
@@ -199,6 +207,7 @@ function checkbox:new(n, p)
 		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: checkbox:setColor() :: Incorrect param[color] - expecting table and got " .. type(t))
 		assert(#t == 4, "[" .. self.name .. "] FAILURE: checkbox:setColor() :: Incorrect param[color] - table length 4 expected and got " .. #t)
 		self.color = t
+		return self
 	end
 	
 	function c:getColor()
@@ -320,6 +329,7 @@ function checkbox:new(n, p)
 	
 	function c:disable()
 		self.hidden = true
+		return self
 	end
 	
 	function c:draw()
@@ -378,6 +388,7 @@ function checkbox:new(n, p)
 	
 	function c:enable()
 		self.hidden = false
+		return self
 	end
 	
 	function c:fadeIn()
@@ -400,6 +411,7 @@ function checkbox:new(n, p)
 				e.fn(self, e.target)
 			end
 		end
+		return self
 	end
 	
 	function c:fadeOut(p, h)
@@ -423,12 +435,14 @@ function checkbox:new(n, p)
 				e.fn(self, e.target)
 			end
 		end
+		return self
 	end
 	
 	function c:fixPadding(f)
 		assert(f ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Missing param[hollow]")
 		assert(type(f) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(f))
 		self.fixPadding = f
+		return self
 	end
 	
 	function c:getFixPadding()
@@ -439,6 +453,7 @@ function checkbox:new(n, p)
 		assert(f, "[" .. self.name .. "] FAILURE: checkbox:setFont() :: Missing param[font]")
 		assert(type(f) == "userdata", "[" .. self.name .. "] FAILURE: checkbox:setFont() :: Incorrect param[font] - expecting font userdata and got " .. type(f))
 		self.font = f
+		return self
 	end
 	
 	function c:getFont()
@@ -449,6 +464,7 @@ function checkbox:new(n, p)
 		assert(h, "[" .. self.name .. "] FAILURE: checkbox:setHeight() :: Missing param[height]")
 		assert(type(h) == "number", "[" .. self.name .. "] FAILURE: checkbox:setHeight() :: Incorrect param[height] - expecting number and got " .. type(h))
 		self.h = h
+		return self
 	end
 	
 	function c:getHeight(h)
@@ -459,6 +475,7 @@ function checkbox:new(n, p)
 		assert(h ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Missing param[hollow]")
 		assert(type(h) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
 		self.hollow = h
+		return self
 	end
 	
 	function c:isHollow()
@@ -473,6 +490,7 @@ function checkbox:new(n, p)
 		assert(l, "[" .. self.name .. "] FAILURE: checkbox:setLabel() :: Missing param[label]")
 		assert(type(l) == "string", "[" .. self.name .. "] FAILURE: checkbox:setLabel() :: Incorrect param[label] - expecting string and got " .. type(l))
 		self.label = l
+		return self
 	end
 	
 	function c:getLabel()
@@ -484,6 +502,7 @@ function checkbox:new(n, p)
 		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: checkbox:setLabelColor() :: Incorrect param[color] - expecting table and got " .. type(t))
 		assert(#t == 4, "[" .. self.name .. "] FAILURE: checkbox:setLabelColor() :: Incorrect param[color] - table length 4 expected and got " .. #t)
 		self.labelColor = t
+		return self
 	end
 	
 	function c:getLabelColor()
@@ -494,6 +513,7 @@ function checkbox:new(n, p)
 		assert(f, "[" .. self.name .. "] FAILURE: checkbox:setLabelFont() :: Missing param[font]")
 		assert(type(f) == "userdata", "[" .. self.name .. "] FAILURE: checkbox:setLabelFont() :: Incorrect param[font] - expecting font userdata and got " .. type(f))
 		self.labelFont = f
+		return self
 	end
 	
 	function c:getLabelFont()
@@ -509,6 +529,7 @@ function checkbox:new(n, p)
 		else
 			self.labelPosition.x, self.labelPosition.y, self.labelPosition.z = unpack(t)
 		end
+		return self
 	end
 	
 	function c:getLabelPosition()
@@ -545,6 +566,7 @@ function checkbox:new(n, p)
 		assert(o, "[" .. self.name .. "] FAILURE: checkbox:setUseBorder() :: Missing param[opacity]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: checkbox:setUseBorder() :: Incorrect param[opacity] - expecting number and got " .. type(o))
 		self.color[4] = o
+		return self
 	end
 	
 	function c:getOpacity()
@@ -562,6 +584,7 @@ function checkbox:new(n, p)
 			x,y = self.paddingLeft + self.options[#self.options].x + self.font:getWidth(o) + self.paddingRight, self.paddingTop + self.pos.y + self.paddingBottom
 		end
 		self.options[#self.options + 1] = {text = o, x = x, y = y}
+		return self
 	end
 	
 	function c:removeOption(o)
@@ -570,6 +593,7 @@ function checkbox:new(n, p)
 		for k,v in ipairs(self.options) do
 			if v.text == o then self.options[k] = nil end
 		end
+		return self
 	end
 	
 	function c:setOptionColor(t)
@@ -577,6 +601,7 @@ function checkbox:new(n, p)
 		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: checkbox:setOverlayColor() :: Incorrect param[color] - expecting table and got " .. type(t))
 		assert(#t == 4, "[" .. self.name .. "] FAILURE: checkbox:setOverlayColor() :: Incorrect param[color] - table length 4 expected and got " .. #t)
 		self.optionsColor = t
+		return self
 	end
 	
 	function c:getOptionColor()
@@ -595,30 +620,35 @@ function checkbox:new(n, p)
 		else
 			self.optionPaddingTop, self.optionPaddingRight, self.optionPaddingBottom, self.optionPaddingTop = unpack(p)
 		end
+		return self
 	end
 	
 	function c:setOptionPaddingBottom(p)
 		assert(p, "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingBottom() :: Missing param[padding]")
 		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingBottom() :: Incorrect param[padding] - expecting number and got " .. type(p))
 		self.OptionaddingBottom = p
+		return self
 	end
 	
 	function c:setOptionPaddingLeft(p)
 		assert(p, "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingLeft() :: Missing param[padding]")
 		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingLeft() :: Incorrect param[padding] - expecting number and got " .. type(p))
 		self.OptionaddingLeft = p
+		return self
 	end
 	
 	function c:setOptionPaddingRight(p)
 		assert(p, "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingRight() :: Missing param[padding]")
 		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingRight() :: Incorrect param[padding] - expecting number and got " .. type(p))
 		self.OptionaddingRight = p
+		return self
 	end
 	
 	function c:setOptionPaddingTop(p)
 		assert(p, "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingTop() :: Missing param[padding]")
 		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: checkbox:setOptionPaddingTop() :: Incorrect param[padding] - expecting number and got " .. type(p))
 		self.OptionaddingTop = p
+		return self
 	end
 	
 	function c:setOverlayColor(t)
@@ -626,6 +656,7 @@ function checkbox:new(n, p)
 		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: checkbox:setOverlayColor() :: Incorrect param[color] - expecting table and got " .. type(t))
 		assert(#t == 4, "[" .. self.name .. "] FAILURE: checkbox:setOverlayColor() :: Incorrect param[color] - table length 4 expected and got " .. #t)
 		self.overlayColor = t
+		return self
 	end
 	
 	function c:getOverlayColor()
@@ -657,6 +688,7 @@ function checkbox:new(n, p)
 				table.remove(events[n], k)
 			end
 		end
+		return self
 	end
 	
 	function c:touchmoved(id, x, y, dx, dy, pressure)
@@ -682,6 +714,7 @@ function checkbox:new(n, p)
 		assert(w, "[" .. self.name .. "] FAILURE: checkbox:setWidth() :: Missing param[width]")
 		assert(type(w) == "number", "[" .. self.name .. "] FAILURE: checkbox:setWidth() :: Incorrect param[width] - expecting number and got " .. type(w))
 		self.w = w
+		return self
 	end
 	
 	function c:getWidth()
@@ -692,6 +725,7 @@ function checkbox:new(n, p)
 		assert(x, "[" .. self.name .. "] FAILURE: checkbox:setX() :: Missing param[x]")
 		assert(type(x) == "number", "[" .. self.name .. "] FAILURE: checkbox:setX() :: Incorrect param[x] - expecting number and got " .. type(x))
 		self.pos.x = x
+		return self
 	end
 	
 	function c:getX()
@@ -702,6 +736,7 @@ function checkbox:new(n, p)
 		assert(y, "[" .. self.name .. "] FAILURE: checkbox:setY() :: Missing param[y]")
 		assert(type(y) == "number", "[" .. self.name .. "] FAILURE: checkbox:setY() :: Incorrect param[y] - expecting number and got " .. type(y))
 		self.pos.y = y
+		return self
 	end
 	
 	function c:getY()
@@ -712,6 +747,7 @@ function checkbox:new(n, p)
 		assert(z, "[" .. self.name .. "] FAILURE: checkbox:setZ() :: Missing param[z]")
 		assert(type(z) == "number", "[" .. self.name .. "] FAILURE: checkbox:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
 		self.pos.z = z
+		return self
 	end
 	
 	function c:getZ()

@@ -110,6 +110,7 @@ function textfield:new(n, p)
 		self.colorAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animateColor = true
+		return self
 	end
 	
 	function t:animateToPosition(x, y, s)
@@ -125,6 +126,7 @@ function textfield:new(n, p)
 		self.positionAnimateTime = lt.getTime()
 		self.inAnimation = true
 		self.animatePosition = true
+		return self
 	end
 	
 	function t:animateToOpacity(o, s)
@@ -137,6 +139,7 @@ function textfield:new(n, p)
 		self.opacityAnimateSpeed = s
 		self.inAnimation = true
 		self.animateOpacity = true
+		return self
 	end
 	
 	function t:isAnimating()
@@ -147,6 +150,7 @@ function textfield:new(n, p)
 		assert(c ~= nil, "[" .. self.name .. "] FAILURE: textfield:setClickable() :: Missing param[clickable]")
 		assert(type(c) == "boolean", "[" .. self.name .. "] FAILURE: textfield:setClickable() :: Incorrect param[clickable] - expecting boolean and got " .. type(c))
 		self.clickable = c
+		return self
 	end
 	
 	function t:isClickable()
@@ -158,6 +162,7 @@ function textfield:new(n, p)
 		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: textfield:setColor() :: Incorrect param[color] - expecting table and got " .. type(c))
 		assert(#c == 4, "[" .. self.name .. "] FAILURE: textfield:setColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
 		self.color = c
+		return self
 	end
 	
 	function t:getColor()
@@ -193,6 +198,7 @@ function textfield:new(n, p)
 	
 	function t:disable()
 		self.hidden = true
+		self.active = false
 		return self
 	end
 	
@@ -231,6 +237,7 @@ function textfield:new(n, p)
 	
 	function t:enable()
 		self.hidden = false
+		return self
 	end
 	
 	function t:fadeIn()
@@ -253,6 +260,7 @@ function textfield:new(n, p)
 				e.fn(self, e.target)
 			end
 		end
+		return self
 	end
 	
 	function t:fadeOut(p, h)
@@ -276,6 +284,7 @@ function textfield:new(n, p)
 				e.fn(self, e.target)
 			end
 		end
+		return self
 	end
 	
 	function t:addFont(f, n)
@@ -284,17 +293,20 @@ function textfield:new(n, p)
 		assert(n, "[" .. self.name .. "] FAILURE: textfield:addFont() :: Missing param[name]")
 		assert(type(n) == "string", "[" .. self.name .. "] FAILURE: textfield:addFont() :: Incorrect param[name] - expecting string and got " .. type(n))
 		self.fonts[n] = f
+		return self
 	end
 	
 	function t:setFont(n)
 		assert(n, "[" .. self.name .. "] FAILURE: textfield:setFont() :: Missing param[name]")
 		assert(type(n) == "string", "[" .. self.name .. "] FAILURE: textfield:setFont() :: Incorrect param[name] - expecting string and got " .. type(n))
 		self.font = self.fonts[n]
+		return self
 	end
 	
 	function t:setHollow(h)
 		assert(h ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Missing param[hollow]")
-		assert(type(h) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
+		assert(type(h) == "b
+		return selfoolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
 		self.hollow = h
 	end
 	
@@ -426,10 +438,12 @@ function textfield:new(n, p)
 	
 	function t:startAnimation()
 		self.inAnimation = true
+		return self
 	end
 	
 	function t:stopAnimation()
 		self.inAnimation = false
+		return self
 	end
 	
 	function t:update(dt)		
@@ -446,6 +460,7 @@ function textfield:new(n, p)
 		assert(o, "[" .. self.name .. "] FAILURE: textfield:setUseBorder() :: Missing param[opacity]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: textfield:setUseBorder() :: Incorrect param[opacity] - expecting number and got " .. type(o))
 		self.color[4] = o
+		return self
 	end
 	
 	function t:getOpacity()
@@ -477,6 +492,7 @@ function textfield:new(n, p)
 				table.remove(events[n], k)
 			end
 		end
+		return self
 	end
 	
 	function t:touchmoved(id, x, y, dx, dy, pressure)
@@ -499,6 +515,7 @@ function textfield:new(n, p)
 		assert(txt ~= nil, "[" .. self.name .. "] FAILURE: textfield:setText() :: Missing param[text]")
 		assert(type(txt) == "string", "[" .. self.name .. "] FAILURE: textfield:setText() :: Incorrect param[text] - expecting string and got " .. type(txt))
 		self.text = txt
+		return self
 	end
 	
 	function t:getText()
@@ -509,6 +526,7 @@ function textfield:new(n, p)
 		assert(x, "[" .. self.name .. "] FAILURE: textfield:setX() :: Missing param[x]")
 		assert(type(x) == "number", "[" .. self.name .. "] FAILURE: textfield:setX() :: Incorrect param[x] - expecting number and got " .. type(x))
 		self.pos.x = x
+		return self
 	end
 	
 	function t:getX()
@@ -519,6 +537,7 @@ function textfield:new(n, p)
 		assert(y, "[" .. self.name .. "] FAILURE: textfield:setY() :: Missing param[y]")
 		assert(type(y) == "number", "[" .. self.name .. "] FAILURE: textfield:setY() :: Incorrect param[y] - expecting number and got " .. type(y))
 		self.pos.y = y
+		return self
 	end
 	
 	function t:getY()
@@ -529,6 +548,7 @@ function textfield:new(n, p)
 		assert(z, "[" .. self.name .. "] FAILURE: textfield:setZ() :: Missing param[z]")
 		assert(type(z) == "number", "[" .. self.name .. "] FAILURE: textfield:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
 		self.pos.z = z
+		return self
 	end
 	
 	function t:getZ()
