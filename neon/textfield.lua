@@ -326,7 +326,7 @@ function textfield:new(n, p)
 							self.cursorOffset = self.cursorOffset - 1
 						end
 					else
-						if self.display[self.currentLine] == "" then
+						if self.display[self.currentLine] == "" or self.cursorOffset == 0 then
 							self.currentLine = self.currentLine - 1
 							self.cursorOffset = #self.display[self.currentLine]
 						else
@@ -335,7 +335,7 @@ function textfield:new(n, p)
 						self.display[self.currentLine] = self.display[self.currentLine]:sub(1,-2)
 					end
 				elseif event.key == "return" or event.key == "enter" then
-					self.currentself.display[self.currentLine] = self.currentLine + 1
+					self.currentLine = self.currentLine + 1
 					if not self.display[self.currentLine] then self.display[self.currentLine] = "" end
 				elseif event.key == "up" then
 					if self.currentLine ~= 1 then
@@ -350,7 +350,7 @@ function textfield:new(n, p)
 						self.cursorOffset = self.cursorOffset - 1
 					else
 						if self.currentLine ~= 1 then
-							self.currentself.display[self.currentLine] = self.currentLine - 1
+							self.currentLine = self.currentLine - 1
 							self.cursorOffset = #self.display[self.currentLine]
 						end
 					end
@@ -359,7 +359,7 @@ function textfield:new(n, p)
 						self.cursorOffset = self.cursorOffset + 1
 					else
 						if self.display[self.currentLine + 1] then
-							self.currentself.display[self.currentLine] = self.currentLine + 1
+							self.currentLine = self.currentLine + 1
 							self.cursorOffset = 0
 						end
 					end
