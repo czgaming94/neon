@@ -54,7 +54,7 @@ function textfield:new(n, p)
 	t.y = t.pos.y
 	t.z = t.pos.z
 	t.keys = {
-		"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"," ",
+		"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","space",
 		"1","2","3","4","5","6","7","8","9","0",",",".","/",";","'","[","]","`","-","=","\"","\\","!","@","#","$",
 		"%","^","&","*","(",")","{","}",":","<",">","?","~","backspace","return","enter","up","down","left","right"
 	}
@@ -376,6 +376,7 @@ function textfield:new(n, p)
 						end
 					end
 				else
+					if event.key == "space" then event.key = " " end
 					if self.cursorOffset == #self.display[self.currentLine] then
 						if self.font:getWidth(self.display[self.currentLine] .. event.key) > (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) then
 							self.cursorOffset = 1
