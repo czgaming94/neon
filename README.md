@@ -28,7 +28,7 @@ function gui:generate(item, copies, skip)
     return copy
 end
 ```
-#### [If you aren't quite understanding how to use the API, check out this quick starters guide!](https://github.com/czgaming94/love2d-gui/blob/main/docs/examples/MainMenu.md)
+#### [If you aren't quite understanding how to start using the API, check out this quick starters guide!](https://github.com/czgaming94/love2d-gui/blob/main/docs/examples/MainMenu.md)
 There are several different commonly used GUI tools brought with this API, as well as a few special ones.
 ### [Boxes](https://github.com/czgaming94/love2d-gui/blob/main/docs/Box.md)
 ![Box Image](https://github.com/czgaming94/love2d-gui/blob/main/docs/examples/box.png)<br>
