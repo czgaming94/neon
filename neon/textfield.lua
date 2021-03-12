@@ -305,9 +305,9 @@ function textfield:new(n, p)
 	
 	function t:setHollow(h)
 		assert(h ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Missing param[hollow]")
-		assert(type(h) == "b
-		return selfoolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
+		assert(type(h) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
 		self.hollow = h
+		return self
 	end
 	
 	function t:isHollow()
