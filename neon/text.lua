@@ -419,6 +419,8 @@ function text:new(n, p)
 								while v.timeWaited >= v.time and v.textPos <= #v.text do
 									v.timeWaited = v.timeWaited - v.time
 									v.textPos = v.textPos + 1
+									if not v.toShow then v.toShow = "" end
+									if not v.text[v.textPos] then v.text[v.textPos] = 0 end
 									v.toShow = v.toShow .. v.text[v.textPos]
 								end
 								if v.textPos >= #v.text then

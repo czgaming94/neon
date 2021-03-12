@@ -75,6 +75,7 @@ function textfield:new(n, p)
 	t.hollow = false
 	t.clickable = true
 	t.active = false
+	t.useable = true
 	t.faded = false
 	t.fadedByFunc = false
 	t.moveable = false
@@ -323,6 +324,7 @@ function textfield:new(n, p)
 	end
 	
 	function t:keypressed(event)
+		if not self.useable then return false end
 		if keyIsDown then return false end
 		keyIsDown = true
 		if self.active then
@@ -377,53 +379,64 @@ function textfield:new(n, p)
 					end
 				else
 					if event.key == "space" then event.key = " " end
-					if self.cursorOffset == #self.display[self.currentLine] then
-						if self.font:getWidth(self.display[self.currentLine] .. event.key) > (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) then
-							self.cursorOffset = 1
-							self.currentLine = self.currentLine + 1
-							if not self.display[self.currentLine] then self.display[self.currentLine] = "" end
-							self.display[self.currentLine] = self.display[self.currentLine] .. event.key
-						else
-							self.display[self.currentLine] = self.display[self.currentLine] .. event.key
-							self.cursorOffset = self.cursorOffset + 1
-						end
-					else
-						if self.cursorOffset == 0 then
-							if not self.display[self.currentLine + 1] then self.display[self.currentLine + 1] = "" end
-							self.display[self.currentLine] = event.key .. self.display[self.currentLine]
-							self.cursorOffset = self.cursorOffset + 1
-						else
-							if self.font:getWidth(self.display[self.currentLine] .. event.key) > (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) then
-								if self.cursorOffset == #self.display[self.currentLine] then
-									self.cursorOffset = 0
-									self.currentself.display[self.currentLine] = self.currentLine + 1
-									self.display[self.currentLine] = string.sub(self.display[self.currentLine], 1, self.cursorOffset) .. event.key .. string.sub(self.display[self.currentLine], self.cursorOffset + 1, #self.display[self.currentLine])
-									self.cursorOffset = self.cursorOffset + 1
-								else
-									local i = self.currentLine
-									local foundHome = false
-									while not foundHome do
-										if self.font:getWidth(self.display[i] .. event.key) > (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) then
-											i = i + 1
-											if not self.display[i] then self.display[i] = "" end
-											self.display[i] = string.sub(self.display[i - 1], #self.display[i - 1], #self.display[i - 1]) .. self.display[i]
-											self.display[i - 1] = string.sub(self.display[i - 1], 1, #self.display[i - 1] - 1)
-										else
-											foundHome = true
-										end
+					local foundHome = false
+					local i = self.currentLine
+					local tooWide = self.font:getWidth(self.display[i] .. event.key) > (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7)
+					if self.cursorOffset == 0 then
+						if tooWide then
+							self.display[self.currentLine] = string.sub(self.display[self.currentLine], 1, self.cursorOffset) .. event.key .. string.sub(self.display[self.currentLine], self.cursorOffset + 1, #self.display[self.currentLine])
+							while not foundHome do
+								if self.font:getWidth(self.display[i]) > (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) then
+									i = i + 1
+									if not self.display[i] then self.display[i] = "" end
+									while self.font:getWidth(self.display[self.currentLine]) >= (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) or self.font:getWidth(self.display[i] .. event.key) >= (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) do
+										self.display[i] = string.sub(self.display[i - 1], #self.display[i - 1], #self.display[i - 1]) .. self.display[i]
+										self.display[i - 1] = string.sub(self.display[i - 1], 1, #self.display[i - 1] - 1)
 									end
-									self.display[self.currentLine] = string.sub(self.display[self.currentLine], 1, self.cursorOffset) .. event.key .. string.sub(self.display[self.currentLine], self.cursorOffset + 1, #self.display[self.currentLine])
-									return
+								else
+									foundHome = true
 								end
-							else
-								self.display[self.currentLine] = string.sub(self.display[self.currentLine], 1, self.cursorOffset) .. event.key .. string.sub(self.display[self.currentLine], self.cursorOffset + 1, #self.display[self.currentLine])
+							end
+							if self.cursorOffset == #self.display[self.currentLine] then
+								self.currentLine = self.currentLine + 1
+								self.cursorOffset = 1
+							end
+						else
+							if self.cursorOffset == #self.display[i] then
 								self.cursorOffset = self.cursorOffset + 1
 							end
+							self.display[i] = string.sub(self.display[i], 1, self.cursorOffset) .. event.key .. string.sub(self.display[i], self.cursorOffset + 1, #self.display[i])
 						end
-					end	
+					else
+						if tooWide then
+							self.display[self.currentLine] = string.sub(self.display[self.currentLine], 1, self.cursorOffset) .. event.key .. string.sub(self.display[self.currentLine], self.cursorOffset + 1, #self.display[self.currentLine])
+							while not foundHome do
+								if self.font:getWidth(self.display[i]) >= (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) then
+									i = i + 1
+									if not self.display[i] then self.display[i] = "" end
+									while self.font:getWidth(self.display[self.currentLine]) >= (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) or self.font:getWidth(self.display[i] .. event.key) >= (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) do
+										self.display[i] = string.sub(self.display[i - 1], #self.display[i - 1], #self.display[i - 1]) .. self.display[i]
+										self.display[i - 1] = string.sub(self.display[i - 1], 1, #self.display[i - 1] - 1)
+									end
+								else
+									foundHome = true
+								end
+							end
+							if self.cursorOffset == #self.display[self.currentLine] then
+								self.currentLine = self.currentLine + 1
+								self.cursorOffset = 1
+							end
+						else
+							if self.cursorOffset == #self.display[i] then
+								self.cursorOffset = self.cursorOffset + 1
+							end
+							self.display[i] = string.sub(self.display[i], 1, self.cursorOffset) .. event.key .. string.sub(self.display[i], self.cursorOffset + 1, #self.display[i])
+						end
+					end
 				end
 			end
 		end
+		keyIsDown = false
 	end
 	
 	function t:mousepressed(event)
@@ -521,6 +534,28 @@ function textfield:new(n, p)
 	
 	function t:getText()
 		return self.textfield
+	end
+	
+	function t:setUseable(u)
+		assert(u ~= nil, "[" .. self.name .. "] FAILURE: textfield:setX() :: Missing param[useable]")
+		assert(type(u) == "boolean", "[" .. self.name .. "] FAILURE: textfield:setX() :: Incorrect param[useable] - expecting boolean and got " .. type(u))
+		self.useable = u
+		return self
+	end
+	
+	function t:getUseable()
+		return self.getUseable
+	end
+	
+	function t:val()
+		local result = ""
+		for k,v in ipairs(self.options) do
+			if #v == 1 and v == " " then
+				v = "\n"
+			end
+			result = result .. v
+		end
+		return result
 	end
 	
 	function t:setX(x)
