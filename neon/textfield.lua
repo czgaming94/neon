@@ -393,22 +393,17 @@ function textfield:new(n, p)
 						local tooWide = self.font:getWidth(self.display[i] .. event.key) > (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7)
 						
 						if tooWide then
-							self.display[self.currentLine] = string.sub(self.display[self.currentLine], 1, self.cursorOffset) .. event.key .. string.sub(self.display[self.currentLine], self.cursorOffset + 1, #self.display[self.currentLine])
+							self.display[i] = string.sub(self.display[i], 1, self.cursorOffset) .. event.key .. string.sub(self.display[i], self.cursorOffset + 1, #self.display[i])
 							while not foundHome do
 								local pop = string.sub(self.display[i], #self.display[i], #self.display[i])
 								if self.font:getWidth(self.display[i]) >= (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) then
-									i = i + 1
 									if not self.display[i] then self.display[i] = "" end
-									while self.font:getWidth(self.display[self.currentLine]) >= (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) do
-										self.display[i] = pop .. self.display[i]
-										self.display[i - 1] = string.sub(self.display[i - 1], 1, #self.display[i - 1] - 1)
-									end
-									local k = i
-									while self.font:getWidth(self.display[k]) >= (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) do
-										k = k + 1
-										if not self.display[k] then self.display[k] = "" end
-										self.display[k] = string.sub(self.display[k - 1], #self.display[k - 1], #self.display[k - 1]) .. self.display[k]
-										self.display[k - 1] = string.sub(self.display[k - 1], 1, #self.display[k - 1] - 1)
+									for k,v in ipairs(self.display) do 
+										while self.font:getWidth(self.display[k]) >= (self.w - (self.paddingLeft + 7)) - (self.paddingRight + 7) do
+											if not self.display[k + 1] then self.display[k + 1] = "" end
+											self.display[k + 1] = pop .. self.display[k + 1]
+											self.display[k] = string.sub(self.display[k], 1, #self.display[k] - 1)
+										end
 									end
 								else
 									foundHome = true
