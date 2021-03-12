@@ -29,7 +29,8 @@ box:registerEvent("onClick", function(self, target, event)
 end, nil, "boxClick")
 ```
 Let's break this down. `box:registerEvent("onClick",` defines the event to happen only when you click.
-```function(self, target, event)
+```lua
+function(self, target, event)
 	print(self.name, event.x, event.y)
 end,```
 This section tells the event what to do when it is fired.<Br>
