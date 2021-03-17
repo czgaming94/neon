@@ -608,7 +608,6 @@ function gui:mousepressed(x, y, button, istouch, presses)
 			table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
 			for k,v in ipairs(obj.items) do
 				local i = self:child(v.name)
-				if button == 1 then
 				if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
 					if i.moveable then
 						i.held = true
