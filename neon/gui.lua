@@ -437,7 +437,7 @@ function gui:draw()
 	table.sort(items, function(a, b) return a.z < b.z end)
 	for _,v in ipairs(items) do
 		if v.enabled then
-			table.sort(v.items, function(a, b) return a.pos.z < b.pos.z end)
+			table.sort(v.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z < b.pos.z end)
 			for _,i in ipairs(v.items) do 
 				if not i.hidden then i:draw(dt) end
 			end
@@ -489,6 +489,7 @@ function gui:disableAllElements(only)
 	return self
 end
 
+-- string name, table object, func function, table target, string identifier
 function gui:registerEvent(n, o, f, t, i)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:registerEvent() :: Missing param[eventName]")
@@ -607,6 +608,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 			table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
 			for k,v in ipairs(obj.items) do
 				local i = self:child(v.name)
+				if button == 1 then
 				if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
 					if i.moveable then
 						i.held = true
@@ -614,15 +616,30 @@ function gui:mousepressed(x, y, button, istouch, presses)
 						self.held[heldID] = {id = heldID, obj = i}
 					end
 					if i.mousepressed then i:mousepressed(event) end
-					if i.events.onClick then 
-						for j,e in ipairs(i.events.onClick) do
-							e.fn(i, e.target, event)
-						end
-					end
-					if events.onClick then
-						for _,e in ipairs(events.onClick) do
-							if e.o == i.type then
+					if button == 1 then
+						if i.events.onClick then 
+							for j,e in ipairs(i.events.onClick) do
 								e.fn(i, e.target, event)
+							end
+						end
+						if events.onClick then
+							for _,e in ipairs(events.onClick) do
+								if e.o == i.type then
+									e.fn(i, e.target, event)
+								end
+							end
+						end
+					else
+						if i.events.onRightClick then 
+							for j,e in ipairs(i.events.onRightClick) do
+								e.fn(i, e.target, event)
+							end
+						end
+						if events.onRightClick then
+							for _,e in ipairs(events.onRightClick) do
+								if e.o == i.type then
+									e.fn(i, e.target, event)
+								end
 							end
 						end
 					end
@@ -689,15 +706,30 @@ function gui:touchpressed(event)
 				local i = self:child(v.name)
 				if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
 					if i.touchpressed then i:touchpressed(event) end
-					if i.events.onTouch then 
-						for j,e in ipairs(i.events.onTouch) do
-							e.fn(e.target, event)
-						end
-					end
-					if events.onTouch then
-						for j,e in ipairs(events.onTouch) do
-							if e.o == i.type then
+					if button == 1 then
+						if i.events.onTouch then 
+							for j,e in ipairs(i.events.onTouch) do
 								e.fn(i, e.target, event)
+							end
+						end
+						if events.onTouch then
+							for _,e in ipairs(events.onTouch) do
+								if e.o == i.type then
+									e.fn(i, e.target, event)
+								end
+							end
+						end
+					else
+						if i.events.onRightTouch then 
+							for j,e in ipairs(i.events.onRightTouch) do
+								e.fn(i, e.target, event)
+							end
+						end
+						if events.onRightTouch then
+							for _,e in ipairs(events.onRightTouch) do
+								if e.o == i.type then
+									e.fn(i, e.target, event)
+								end
 							end
 						end
 					end

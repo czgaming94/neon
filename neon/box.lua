@@ -65,6 +65,9 @@ function box:new(n, p)
 	b.events = {}
 	b.images = {}
 	b.image = nil
+	b.iX = 0
+	b.iY = 0
+	b.keepBackground = false
 	b.paddingLeft = 0
 	b.paddingRight = 0
 	b.paddingTop = 0
@@ -216,8 +219,20 @@ function box:new(n, p)
 		self.image = self.images[t.image] or self.image
 		self.clickable = t.clickable and t.clickable or self.clickable
 		self.color[4] = t.opacity or self.color[4]
+		self.keepBackground = t.keepBackground and t.keepBackground or self.keepBackground
 		if t.padding then
-			self.paddingTop, self.paddingRight, self.paddingBottom, self.paddingLeft = unpack(t.padding)
+			if t.padding.top then
+				self.paddingTop, self.paddingRight, self.paddingBottom, self.paddingLeft = t.padding.top, t.padding.right, t.padding.bottom, t.padding.left
+			else
+				self.paddingTop, self.paddingRight, self.paddingBottom, self.paddingLeft = unpack(t.padding)
+			end
+		end
+		if t.imageOffset then
+			if t.imageOffset.x then
+				self.iX, self.iY = t.imageOffset.x, t.imageOffset.y
+			else
+				self.iX, self.iY = unpack(t.imageOffset)
+			end
 		end
 		self.moveable = t.moveable and t.moveable or self.moveable
 		return self
@@ -246,7 +261,10 @@ function box:new(n, p)
 		end
 		if self.image then 
 			assert(type(self.image) == "userdata", "[" .. self.name .. "] FAILURE: box:draw(" .. self.name .. ") :: Incorrect param[image] - expecting image userdata and got " .. type(self.image))
-			lg.draw(self.image, self.pos.x, self.pos.y)
+			if self.keepBackground then
+				lg.rectangle("fill", self.pos.x, self.pos.y, self.w, self.h)
+			end
+			lg.draw(self.image, self.pos.x + self.iX, self.pos.y + self.iY)
 		else
 			lg.rectangle("fill", self.pos.x, self.pos.y, self.w, self.h)
 		end
@@ -329,7 +347,7 @@ function box:new(n, p)
 	function b:setImage(i)
 		assert(i, "[" .. self.name .. "] FAILURE: box:setImage() :: Missing param[img]")
 		local t = type(i)
-		assert(t == "string" or t == "userdata", "[" .. self.name .. "] FAILURE: box:setImage() :: Incorrect param[img] - expecting string or image userdata and got " .. t)
+		assert(t == "string" or t == "userdata", "[" .. self.name .. "] FAILURE: box:setImage() :: Incorrect param[img] - expecting string or image userdata and got " .. type(t))
 		
 		if t == "string" then
 			if self.parent then
@@ -342,6 +360,20 @@ function box:new(n, p)
 	
 	function b:getImage()
 		return self.image
+	end
+	
+	function b:setImageOffset(o)
+		assert(o, "[" .. self.name .. "] FAILURE: box:setImageOffset() :: Missing param[offset]")
+		assert(o == "table", "[" .. self.name .. "] FAILURE: box:setImageOffset() :: Incorrect param[offset] - expecting table and got " .. type(o))
+		if o.x then
+			self.iX, self.iY = o.x, o.y
+		else
+			self.iX, self.iY = unpack(o)
+		end
+	end
+	
+	function b:getImageOffset()
+		return {x = self.iX, y = self.iY}
 	end
 	
 	function b:setPadding(p)
