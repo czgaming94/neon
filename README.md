@@ -1,7 +1,7 @@
 # NEON [Newbie, Experienced, or Neither]
 This API's goal is to make laying out your application GUI simple and efficient. The secondary goal of this API 
 is to be as easy to grasp as possible for beginners, as well as users coming from other scripting languages. <br>
-This API is based off of a modified version of the [standard metatable table.deepcopy function.](http://lua-users.org/wiki/CopyTable).<br>
+This API is based off of a modified version of the [standard metatable table.deepcopy function](http://lua-users.org/wiki/CopyTable).<br>
 > The deepcopy function creates a special instance of a table, allowing the user to create multiple instance
 > without overwriting the original.
 ### GUI Handles
