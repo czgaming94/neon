@@ -193,9 +193,9 @@ function textfield:new(n, p)
 		self.w = d.w or d.width or self.font:getWidth(self.textfield)
 		self.h = d.h or d.height or self.font:getHeight(self.textfield)
 		self.font = d.font or self.font
-		self.clickable = d.clickable and d.clickable or self.clickable
-		self.moveable = d.moveable and d.moveable or self.moveable
-		self.hollow = d.hollow and d.hollow or self.hollow
+		if t.clickable ~= nil then self.clickable = t.clickable end
+		if t.moveable ~= nil then self.moveable = t.moveable end
+		if t.hollow ~= nil then self.hollow = t.hollow end
 		self.maxLines = floor((self.h - (10 + self.paddingTop + self.paddingBottom)) / self.font:getHeight())
 		print(self.maxLines, self.h, self.font:getHeight())
 		return self

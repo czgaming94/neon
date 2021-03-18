@@ -75,6 +75,7 @@ function text:new(n, p)
 	t.fancy = false
 	t.moveable = false
 	t.held = false
+	t.shadow = false
 	t.events = {}
 	t.paddingLeft = 0
 	t.paddingRight = 0
@@ -187,8 +188,10 @@ function text:new(n, p)
 		assert(type(d.y) == "number", "[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[y] - expecting number and got " .. type(d.y))
 		self.text = d.t or d.text or self.text
 		self.typewriterText, self.fancy = text:split(self.text)
-		self.typewriter = d.tw and d.tw or d.typewriter and d.typewriter or self.typewriter
-		self.typewriterRepeat = d.r and d.r or d.tRepeat and d.tRepeat or self.typewriterRepeat
+		if d.tw ~= nil then self.typewriter = d.tw end
+		if d.typewrite ~= nilr then self.typewriter = d.typewriter end
+		if d.r ~= nil then self.typewriterRepeat = d.r end
+		if d.tRepeat ~= nil then self.typewriterRepeat = d.tRepeat end
 		self.pos.x = d.x or self.pos.x
 		self.pos.y = d.y or self.pos.y
 		self.typewriterSpeed = d.s or d.speed or self.typewriterSpeed
@@ -243,9 +246,10 @@ function text:new(n, p)
 				end
 			end
 		end
-		self.clickable = d.clickable and d.clickable or self.clickable
-		self.moveable = d.moveable and d.moveable or self.moveable
-		self.hollow = d.hollow and d.hollow or self.hollow
+		if d.clickable ~= nil then self.clickable = d.clickable end
+		if d.moveable ~= nil then self.moveable = d.moveable end
+		if d.hollow ~= nil then self.hollow = d.hollow end
+		if d.shadow ~= nil then self.shadow = d.shadow end
 		return self
 	end
 	
@@ -275,8 +279,14 @@ function text:new(n, p)
 							lg.setFont(self.fonts[v.font])
 						end
 						if v.offset[1] then
+							if self.shadow then
+								lg.print({{0,0,0,.4}, v.toShow}, v.x + v.offset[1] + 1, v.y + v.offset[2] + 1)
+							end
 							lg.print(v.toShow, v.x + v.offset[1], v.y + v.offset[2])
 						else
+							if self.shadow then
+								lg.print({{0,0,0,.4}, v.toShow}, v.x + 1, v.y + 1)
+							end
 							lg.print(v.toShow, v.x, v.y)
 						end
 						lg.setColor(1,1,1,1)
@@ -285,10 +295,23 @@ function text:new(n, p)
 					end
 				end
 			else
+				if self.shadow then
+					lg.print({{0,0,0,.4}, self.typewriterPrint}, self.pos.x + 1, self.pos.y + 1)
+				end
 				lg.print({self.color, self.typewriterPrint}, self.pos.x, self.pos.y)
 			end
 		else
-			lg.print({self.color, self.text}, self.pos.x, self.pos.y)
+			if self.w ~= 0 then
+				if self.shadow then
+					lg.printf({{0,0,0,.4}, self.text}, self.pos.x + 1, self.pos.y + 1, self.w, "center")
+				end
+				lg.printf({self.color, self.text}, self.pos.x, self.pos.y, self.w, "center")
+			else
+				if self.shadow then
+					lg.print({{0,0,0,.4}, self.text}, self.pos.x + 1, self.pos.y + 1)
+				end
+				lg.print({self.color, self.text}, self.pos.x, self.pos.y)
+			end
 		end
 		
 		lg.setColor(1,1,1,1)

@@ -265,15 +265,17 @@ function dropdown:new(n, p)
 		self.pos.y = t.y or self.pos.y
 		self.pos.z = t.z or self.pos.z
 		self.color = t.color or self.color
-		self.border = t.useBorder and t.useBorder or self.border
+		if t.useBorder ~= nil then self.border = t.useBorder end
+		if t.clickable ~= nil then self.clickable = t.clickable end
+		if t.moveable ~= nil then self.moveable = t.moveable end
+		if t.hollow ~= nil then self.hollow = t.hollow end
+		if t.round ~= nil then self.round = t.round end
+		if t.closeOnUnfocus ~= nil then self.closeOnUnfocus = t.closeOnUnfocus end
 		self.borderColor = t.borderColor or self.borderColor
 		self.optionsColor = t.optionColor or self.optionsColor
 		self.font = t.font or self.font
 		self.optionFont = t.optionFont or self.optionFont
-		self.clickable = t.clickable and t.clickable or self.clickable
-		self.round = t.round and t.round or self.round
 		self.roundRadius = (t.roundRadius and t.roundRadius) or (t.radius and t.radius) or self.roundRadius
-		self.closeOnUnfocus = t.closeOnUnfocus and t.closeOnUnfocus or self.closeOnUnfocus
 		if t.options then
 			if not t.keepOptions then
 				self.options = {}

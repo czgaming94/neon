@@ -301,6 +301,7 @@ function gui:update(dt)
 				if not i.hidden then 
 					local x,y = love.mouse.getPosition()
 					local hover = (x >= i.pos.x + i.paddingLeft and x <= i.pos.x + i.w + i.paddingRight) and (y >= i.pos.y + i.paddingTop and y <= i.pos.y + i.h + i.paddingBottom)
+					local event = {x=x,y=y}
 					if i.type == "text" then
 						hover = (x >= i.pos.x and x <= i.pos.x + i.w) and (y >= i.pos.y and y <= i.pos.y + i.h)
 					elseif i.type == "dropdown" then
@@ -314,14 +315,21 @@ function gui:update(dt)
 						if i.hovered then
 							if i.events.whileHovering then 
 								for _,v in ipairs(i.events.whileHovering) do	
-									v.f(i, v.t)
+									v.fn(i, v.target, event)
 								end
 							end
 						end
 						if not i.hovered then
 							if i.events.onHoverEnter then 
 								for _,v in ipairs(i.events.onHoverEnter) do	
-									v.f(i, v.t)
+									v.fn(i, v.target, event)
+								end
+							end
+							if events.onHoverEnter then
+								for _,v in ipairs(events.onHoverEnter) do
+									if v.o == i.type then
+										v.fn(i, v.target, event)
+									end
 								end
 							end
 							i.hovered = true 
@@ -330,7 +338,14 @@ function gui:update(dt)
 						if i.hovered then 
 							if i.events.onHoverExit then 
 								for _,v in ipairs(i.events.onHoverExit) do	
-									v.f(i, v.t)
+									v.fn(i, v.target, event)
+								end
+							end
+							if events.onHoverExit then
+								for _,v in ipairs(events.onHoverExit) do
+									if v.o == i.type then
+										v.fn(i, v.target, event)
+									end
 								end
 							end
 							i.hovered = false 
@@ -428,7 +443,10 @@ function gui:draw()
 	table.sort(items, function(a, b) return a.z < b.z end)
 	for _,v in ipairs(items) do
 		if v.enabled then
-			table.sort(v.items, function(a,b) return a.pos.z == b.pos.z and (a.id > b.id) or a.pos.z < b.pos.z end)
+			table.sort(v.items, function(a,b) 
+				if not a or not b then return false end 
+				return a.pos.z == b.pos.z and (a.id > b.id) or a.pos.z < b.pos.z 
+			end)
 			for _,i in ipairs(v.items) do 
 				if not i.hidden then i:draw(dt) end
 			end
@@ -596,54 +614,59 @@ function gui:mousepressed(x, y, button, istouch, presses)
 	for _,o in ipairs(objs) do
 		if o.enabled then
 			local obj = self:copy(o, "handles")
-			table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
+			table.sort(obj.items, function(a,b) 
+				if not a or not b then return false end
+				return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z 
+			end)
 			for k,v in ipairs(obj.items) do
 				local i = self:child(v.name)
-				if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
-					if i.moveable then
-						i.held = true
-						local heldID = #self.held + 1
-						self.held[heldID] = {id = heldID, obj = i}
-					end
-					if i.mousepressed then i:mousepressed(event) end
-					if button == 1 then
-						if i.events.onClick then 
-							for j,e in ipairs(i.events.onClick) do
-								e.fn(i, e.target, event)
-							end
+				if i then
+					if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
+						if i.moveable then
+							i.held = true
+							local heldID = #self.held + 1
+							self.held[heldID] = {id = heldID, obj = i}
 						end
-						if events.onClick then
-							for _,e in ipairs(events.onClick) do
-								if e.o == i.type then
+						if i.mousepressed then i:mousepressed(event) end
+						if button == 1 then
+							if i.events.onClick then 
+								for j,e in ipairs(i.events.onClick) do
 									e.fn(i, e.target, event)
 								end
 							end
-						end
-					else
-						if i.events.onRightClick then 
-							for j,e in ipairs(i.events.onRightClick) do
-								e.fn(i, e.target, event)
+							if events.onClick then
+								for _,e in ipairs(events.onClick) do
+									if e.o == i.type then
+										e.fn(i, e.target, event)
+									end
+								end
 							end
-						end
-						if events.onRightClick then
-							for _,e in ipairs(events.onRightClick) do
-								if e.o == i.type then
+						else
+							if i.events.onRightClick then 
+								for j,e in ipairs(i.events.onRightClick) do
 									e.fn(i, e.target, event)
 								end
 							end
+							if events.onRightClick then
+								for _,e in ipairs(events.onRightClick) do
+									if e.o == i.type then
+										e.fn(i, e.target, event)
+									end
+								end
+							end
 						end
+						if not i.hollow then hitTarget = true end
 					end
-					if not i.hollow then hitTarget = true end
-				end
-				if i.type == "dropdown" and i.open and not i.hovered then
-					local optionHit = false
-					for k,v in ipairs(i.options) do
-						if v.hovered then optionHit = true end
+					if i.type == "dropdown" and i.open and not i.hovered then
+						local optionHit = false
+						for k,v in ipairs(i.options) do
+							if v.hovered then optionHit = true end
+						end
+						if not optionHit then i.open = false end
 					end
-					if not optionHit then i.open = false end
-				end
-				if i.type == "textfield" and i.active and not i.hovered then
-					i.active = false
+					if i.type == "textfield" and i.active and not i.hovered then
+						i.active = false
+					end
 				end
 			end
 			obj = nil
@@ -737,21 +760,26 @@ function gui:hardRemove(n)
 	assert(n, "FAILURE: gui:hardRemove() :: Missing param[name]")
 	assert(type(n) == "string" or type(n) == "number", "FAILURE: gui:hardRemove() :: Incorrect param[name] - expecting string or number and got " .. type(n))
 	
-	for _,v in ipairs(items) do
-		for k,e in ipairs(v.items) do
-			if type(n) == "number" then
-				if e.id == n then 
-					v.items[k] = nil 
-					return
-				end
-			else
-				if e.name == n then 
-					v.items[k] = nil
-					return
+	local c = coroutine.create(function(items)
+		for _,v in ipairs(items) do
+			for k,e in ipairs(v.items) do
+				if type(n) == "number" then
+					if e.id == n then
+						setmetatable(v.items[k], nil)
+						v.items[k] = nil 
+						return self
+					end
+				else
+					if e.name == n then 
+						setmetatable(v.items[k], nil)
+						v.items[k] = nil
+						return self
+					end
 				end
 			end
 		end
-	end
+	end)
+	coroutine.resume(c, items)
 	return self
 end
 
@@ -765,11 +793,13 @@ function gui:remove(n)
 	if type(n) == "string" then
 		for k,t in ipairs(self.items) do
 			if t.name == n then 
+				setmetatable(self.items[k], nil)
 				self.items[k] = nil
-				return
+				return self
 			end
 		end
 	else
+		setmetatable(self.items[n], nil)
 		self.items[n] = nil
 	end
 	return self

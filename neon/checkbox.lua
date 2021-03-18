@@ -249,17 +249,21 @@ function checkbox:new(n, p)
 		self.pos.y = d.y or self.pos.y
 		self.pos.z = d.z or self.pos.z
 		self.color = d.color or self.color
-		self.border = d.useBorder and d.useBorder or self.border
+		if d.useBorder ~= nil then self.border = d.useBorder end
+		if d.clickable ~= nil then self.clickable = d.clickable end
+		if d.moveable ~= nil then self.moveable = d.moveable end
+		if d.hollow ~= nil then self.hollow = d.hollow end
+		if d.round ~= nil then self.round = d.round end
+		if d.single ~= nil then self.single = d.single end
+		if d.singleSelection ~= nil then self.single = d.singleSelection end
+		if d.fixPadding ~= nil then self.fixPadding = d.fixPadding end
+		if d.fix ~= nil then self.fixPadding = d.fix end
 		self.borderColor = d.borderColor or self.borderColor
 		self.optionsColor = d.optionColor or self.optionsColor
 		self.overlayColor = d.overlayColor or self.overlayColor
 		self.font = d.font or self.font
 		self.labelFont = d.labelFont or self.labelFont
-		self.clickable = d.clickable and d.clickable or self.clickable
-		self.round = d.round and d.round or self.round
 		self.roundRadius = (d.roundRadius and d.roundRadius) or (d.radius and d.radius) or self.roundRadius
-		self.single = (d.singleSelection and d.singleSelection) or (d.single and d.single) or self.single
-		self.fixPadding = (d.fixPadding and d.fixPadding) or (d.fix and d.fix) or self.fixPadding
 		if d.options then
 			if not d.keepOptions then
 				self.options = {}

@@ -221,13 +221,15 @@ function box:new(n, p)
 		self.pos.x = t.x or self.pos.x
 		self.pos.y = t.y or self.pos.y
 		self.pos.z = t.z or self.pos.z
-		self.border = t.useBorder and t.useBorder or self.border
+		if t.useBorder then self.border = t.useBorder end
+		if t.clickable ~= nil then self.clickable = t.clickable end
+		if t.moveable ~= nil then self.moveable = t.moveable end
+		if t.hollow ~= nil then self.hollow = t.hollow end
+		if t.keepBackground then self.keepBackground = t.keepBackground end
 		self.borderColor = t.borderColor or self.borderColor
 		self.color = t.color or self.color
 		self.image = self.images[t.image] or self.image
-		self.clickable = t.clickable and t.clickable or self.clickable
 		self.color[4] = t.opacity or self.color[4]
-		self.keepBackground = t.keepBackground and t.keepBackground or self.keepBackground
 		if t.padding then
 			if t.padding.top then
 				self.paddingTop, self.paddingRight, self.paddingBottom, self.paddingLeft = t.padding.top, t.padding.right, t.padding.bottom, t.padding.left
@@ -242,7 +244,6 @@ function box:new(n, p)
 				self.iX, self.iY = unpack(t.imageOffset)
 			end
 		end
-		self.moveable = t.moveable and t.moveable or self.moveable
 		return self
 	end
 	
@@ -459,6 +460,17 @@ function box:new(n, p)
 	
 	function b:isMoveable()
 		return self.moveable
+	end
+	
+	function b:setName(n)
+		assert(n, "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Missing param[name]")
+		assert(type(n) == "string", "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Incorrect param[name] - expecting string and got " .. type(n))
+		self.name = n
+		return self
+	end
+	
+	function b:getName()
+		return self.name
 	end
 	
 	function b:setOpacity(o)
