@@ -32,7 +32,7 @@ Let's break this down. `box:registerEvent("onClick",` defines the event to happe
 ```lua
 function(self, target, event)
 	print(self.name, event.x, event.y)
-end,
+end
 ```
 This section tells the event what to do when it is fired.<Br>
 `self` is the object the event is fired on.<br>
