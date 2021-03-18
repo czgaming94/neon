@@ -7,7 +7,7 @@ This API is based off of a modified version of the [standard metatable table.dee
 ### GUI Handles
 The GUI lib brings a few handles and callbacks that allow the user to have full control.
 ##### :new()
-> Create a new instance of the GUI. This is used for when you do not when every element in one GUI.
+> Create a new instance of the GUI. This is used for when you do not want every element in one GUI.
 > An example of two GUIs would be a `mainMenu` and `pauseMenu`
 ##### :duplicate(item)
 > Creates a new instance of an already existing item.
