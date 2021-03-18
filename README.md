@@ -59,11 +59,11 @@ The GUI lib brings a few handles and callbacks that allow the user to have full 
 ##### :removeEvent(eventType, object, eventName)
 > Remove an event from an object.
 ##### :registerGlobalEvent(eventType, objectType, func, target, eventName)
-> Specify an callback to trigger on a specific event, on a specific target.
-> `eventType` will be such as `"onClick"` or `"onHoverEnter"`.
-> `objectType` is the type of element that the callback will happen on, such as "box".
-> `func` is the function defined by the user that will happen when the callback is triggered.
-> `target` is the arg sent to the callback as `target` to be used as the user wants.
+> Specify an callback to trigger on a specific event, on a specific target.<br>
+> `eventType` will be such as `"onClick"` or `"onHoverEnter"`.<br>
+> `objectType` is the type of element that the callback will happen on, such as "box".<br>
+> `func` is the function defined by the user that will happen when the callback is triggered.<br>
+> `target` is the arg sent to the callback as `target` to be used as the user wants.<br>
 > `eventName` allows the user to name a specific event, such as an `"onClick"` having a `"quitGame"` tag.
 ##### :removeGlobalEvent(eventType, object, eventName)
 > Remove an event from the global callback system.
