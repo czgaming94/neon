@@ -50,11 +50,11 @@ The GUI lib brings a few handles and callbacks that allow the user to have full 
 ##### :disableAllElements(only)
 > Fully disable every element, if only is true then it will only disable in the specific GUI.
 ##### :registerEvent(eventType, object, func, target, eventName)
-> Specify an callback to trigger on a specific event, on a specific target.
-> `eventType` will be such as `"onClick"` or `"onHoverEnter"`.
-> `object` is the element that the callback will happen on.
-> `func` is the function defined by the user that will happen when the callback is triggered.
-> `target` is the arg sent to the callback as `target` to be used as the user wants.
+> Specify an callback to trigger on a specific event, on a specific target.<br>
+> `eventType` will be such as `"onClick"` or `"onHoverEnter"`.<br>
+> `object` is the element that the callback will happen on.<br>
+> `func` is the function defined by the user that will happen when the callback is triggered.<br>
+> `target` is the arg sent to the callback as `target` to be used as the user wants.<br>
 > `eventName` allows the user to name a specific event, such as an `"onClick"` having a `"quitGame"` tag.
 ##### :removeEvent(eventType, object, eventName)
 > Remove an event from an object.
