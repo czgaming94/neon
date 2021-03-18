@@ -24,7 +24,7 @@ The GUI lib brings a few handles and callbacks that allow the user to have full 
 ##### :addColor(color, name)
 > Add a color to the global GUI interface with the given name. Call with `Neon.color("name")`
 ##### :add(type, name)
-> Add an element to the GUI interface with the given name. Call with `Neon:child("name")`
+> Add an element of the given type to the GUI interface with the given name. Call with `Neon:child("name")`
 ##### :addBox(name)
 > Add a box element to the GUI interface.
 ##### :addText(name)
@@ -64,7 +64,7 @@ The GUI lib brings a few handles and callbacks that allow the user to have full 
 > This is especially useful for creating multiple boxes, buttons, or texts that should all do the same thing when<br>
 > the user interacts with them.<br>
 > `eventType` will be such as `"onClick"` or `"onHoverEnter"`.<br>
-> `objectType` is the type of element that the callback will happen on, such as "box".<br>
+> `objectType` is the type of element that the callback will happen on, such as `"box"`.<br>
 > `func` is the function defined by the user that will happen when the callback is triggered.<br>
 > `target` is the arg sent to the callback as `target` to be used as the user wants.<br>
 > `eventName` allows the user to name a specific event, such as an `"onClick"` having a `"quitGame"` tag.
