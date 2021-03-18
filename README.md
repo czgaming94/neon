@@ -62,7 +62,7 @@ The GUI lib brings a few handles and callbacks that allow the user to have full 
 > Specify an callback to trigger on a specific event, on a specific target objectType.<br>
 > Any element that is defined by the same objectType, will trigger the callback when the event happens.<br>
 > This is especially useful for creating multiple boxes, buttons, or texts that should all do the same thing when<br>
-> the user interacts with them.
+> the user interacts with them.<br>
 > `eventType` will be such as `"onClick"` or `"onHoverEnter"`.<br>
 > `objectType` is the type of element that the callback will happen on, such as "box".<br>
 > `func` is the function defined by the user that will happen when the callback is triggered.<br>
