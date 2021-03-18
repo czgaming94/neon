@@ -35,7 +35,7 @@ The GUI lib brings a few handles and callbacks that allow the user to have full 
 > Add a dropdown element to the GUI interface.
 ##### :addSlider(name)
 > __Coming Soon__
-##### :addRadials(name)
+##### :addRadial(name)
 > __Coming Soon__
 ##### :addTextfield(name)
 > Add a textfield element to the GUI interface.
@@ -59,7 +59,10 @@ The GUI lib brings a few handles and callbacks that allow the user to have full 
 ##### :removeEvent(eventType, object, eventName)
 > Remove an event from an object.
 ##### :registerGlobalEvent(eventType, objectType, func, target, eventName)
-> Specify an callback to trigger on a specific event, on a specific target.<br>
+> Specify an callback to trigger on a specific event, on a specific target objectType.<br>
+> Any element that is defined by the same objectType, will trigger the callback when the event happens.<br>
+> This is especially useful for creating multiple boxes, buttons, or texts that should all do the same thing when<br>
+> the user interacts with them.
 > `eventType` will be such as `"onClick"` or `"onHoverEnter"`.<br>
 > `objectType` is the type of element that the callback will happen on, such as "box".<br>
 > `func` is the function defined by the user that will happen when the callback is triggered.<br>
