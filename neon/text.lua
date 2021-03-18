@@ -255,7 +255,8 @@ function text:new(n, p)
 	end
 	
 	function t:draw()
-		lg.push()		
+		lg.push()
+		lg.setColor({1,1,1,1})
 		lg.setFont(self.font)
 		if self.typewriter then
 			if self.fancy then

@@ -266,15 +266,6 @@ function gui:addDropdown(n)
 	return self.items[id]
 end
 
-function gui:addImage(i, n)
-	if not self.enabled then return false end
-	assert(i, "FAILURE: gui:addImage() :: Missing param[img]")
-	assert(type(i) == "userdata", "FAILURE: gui:addImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))
-	assert(n, "FAILURE gui:addImage() :: Missing param[name]")
-	assert(type(n) == "string", "FAILURE: gui:addImage() :: Incorrect param[img] - expecting string and got " .. type(n))
-	self.images[n] = i
-end
-
 function gui:addTextfield(n)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addTextfield() :: Missing param[name]")
@@ -437,7 +428,7 @@ function gui:draw()
 	table.sort(items, function(a, b) return a.z < b.z end)
 	for _,v in ipairs(items) do
 		if v.enabled then
-			table.sort(v.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z < b.pos.z end)
+			table.sort(v.items, function(a,b) return a.pos.z == b.pos.z and (a.id > b.id) or a.pos.z < b.pos.z end)
 			for _,i in ipairs(v.items) do 
 				if not i.hidden then i:draw(dt) end
 			end
@@ -445,12 +436,12 @@ function gui:draw()
 	end
 end
 
-function gui:child(n)
+function gui:child(n, i)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:child() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:child() :: Incorrect param[name] - expecting string and got " .. type(n))
 	for _,g in ipairs(items) do
-		if g.enabled then
+		if g.enabled or i then
 			for _,v in ipairs(g.items) do
 				if v.name == n then return v end
 			end

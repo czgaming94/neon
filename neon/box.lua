@@ -98,6 +98,7 @@ function box:new(n, p)
 		assert(type(n) == "string", "[" .. self.name .. "] FAILURE: box:addImage() :: Incorrect param[img] - expecting string and got " .. type(n))
 		self.images[n] = i
 		if a and a == true then self:setImage(n) end
+		return self
 	end
 	
 	function b:animateToColor(c, s)
@@ -113,6 +114,7 @@ function box:new(n, p)
 			self.inAnimation = true
 			self.animateColor = true
 		end
+		return self
 	end
 	
 	function b:animateBorderToColor(c, s)
@@ -128,6 +130,7 @@ function box:new(n, p)
 			self.inAnimation = true
 			self.animateBorderColor = true
 		end
+		return self
 	end
 	
 	function b:animateToPosition(x, y, s)
@@ -145,6 +148,7 @@ function box:new(n, p)
 			self.inAnimation = true
 			self.animatePosition = true
 		end
+		return self
 	end
 	
 	function b:animateToOpacity(o, s)
@@ -159,6 +163,7 @@ function box:new(n, p)
 			self.inAnimation = true
 			self.animateOpacity = true
 		end
+		return self
 	end
 	
 	function b:isAnimating()
@@ -170,6 +175,7 @@ function box:new(n, p)
 		assert(type(bC) == "table", "[" .. self.name .. "] FAILURE: box:setBorderColor() :: Incorrect param[color] - expecting table and got " .. type(bC))
 		assert(#bC == 4, "[" .. self.name .. "] FAILURE: box:setBorderColor() :: Incorrect param[color] - table length 4 expected and got " .. #bC)
 		self.borderColor = bC
+		return self
 	end
 	
 	function b:getBorderColor()
@@ -180,6 +186,7 @@ function box:new(n, p)
 		assert(c ~= nil, "[" .. self.name .. "] FAILURE: box:setClickable() :: Missing param[clickable]")
 		assert(type(c) == "boolean", "[" .. self.name .. "] FAILURE: box:setClickable() :: Incorrect param[clickable] - expecting boolean and got " .. type(c))
 		self.clickable = c
+		return self
 	end
 	
 	function b:isClickable()
@@ -191,6 +198,7 @@ function box:new(n, p)
 		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: box:setColor() :: Incorrect param[color] - expecting table and got " .. type(c))
 		assert(#c > 2, "[" .. self.name .. "] FAILURE: box:setColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 		self.color = c
+		return self
 	end
 	
 	function b:getColor()
@@ -240,6 +248,7 @@ function box:new(n, p)
 	
 	function b:disable()
 		self.hidden = true
+		return self
 	end
 	
 	function b:draw()
@@ -273,6 +282,7 @@ function box:new(n, p)
 	
 	function b:enable()
 		self.hidden = false
+		return self
 	end
 	
 	function b:fadeIn()
@@ -295,6 +305,7 @@ function box:new(n, p)
 				e.fn(self, e.target)
 			end
 		end
+		return self
 	end
 	
 	function b:fadeOut(p, h)
@@ -318,12 +329,14 @@ function box:new(n, p)
 				e.fn(self, e.target)
 			end
 		end
+		return self
 	end
 	
 	function b:setHeight(h)
 		assert(h, "[" .. self.name .. "] FAILURE: box:setHeight() :: Missing param[height]")
 		assert(type(h) == "number", "[" .. self.name .. "] FAILURE: box:setHeight() :: Incorrect param[height] - expecting number and got " .. type(h))
 		self.h = h
+		return self
 	end
 	
 	function b:getHeight(h)
@@ -338,6 +351,7 @@ function box:new(n, p)
 		assert(h ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Missing param[hollow]")
 		assert(type(h) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
 		self.hollow = h
+		return self
 	end
 	
 	function b:isHollow()
@@ -356,20 +370,27 @@ function box:new(n, p)
 				self.image = i or self.images[i]
 			end
 		else self.image = i end
+		return self
 	end
 	
 	function b:getImage()
 		return self.image
 	end
 	
+	function b:unsetImage()
+		self.image = nil
+		return self
+	end
+	
 	function b:setImageOffset(o)
 		assert(o, "[" .. self.name .. "] FAILURE: box:setImageOffset() :: Missing param[offset]")
-		assert(o == "table", "[" .. self.name .. "] FAILURE: box:setImageOffset() :: Incorrect param[offset] - expecting table and got " .. type(o))
+		assert(type(o) == "table", "[" .. self.name .. "] FAILURE: box:setImageOffset() :: Incorrect param[offset] - expecting table and got " .. type(o))
 		if o.x then
 			self.iX, self.iY = o.x, o.y
 		else
 			self.iX, self.iY = unpack(o)
 		end
+		return self
 	end
 	
 	function b:getImageOffset()
@@ -388,44 +409,52 @@ function box:new(n, p)
 		else
 			self.paddingTop, self.paddingRight, self.paddingBottom, self.paddingTop = unpack(p)
 		end
+		return self
 	end
 	
 	function b:setPaddingBottom(p)
 		assert(p, "[" .. self.name .. "] FAILURE: box:setPaddingBottom() :: Missing param[padding]")
 		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: box:setPaddingBottom() :: Incorrect param[padding] - expecting number and got " .. type(p))
 		self.paddingBottom = p
+		return self
 	end
 	
 	function b:setPaddingLeft(p)
 		assert(p, "[" .. self.name .. "] FAILURE: box:setPaddingLeft() :: Missing param[padding]")
 		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: box:setPaddingLeft() :: Incorrect param[padding] - expecting number and got " .. type(p))
 		self.paddingLeft = p
+		return self
 	end
 	
 	function b:setPaddingRight(p)
 		assert(p, "[" .. self.name .. "] FAILURE: box:setPaddingRight() :: Missing param[padding]")
 		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: box:setPaddingRight() :: Incorrect param[padding] - expecting number and got " .. type(p))
 		self.paddingRight = p
+		return self
 	end
 	
 	function b:setPaddingTop(p)
 		assert(p, "[" .. self.name .. "] FAILURE: box:setPaddingTop() :: Missing param[padding]")
 		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: box:setPaddingTop() :: Incorrect param[padding] - expecting number and got " .. type(p))
 		self.paddingTop = p
+		return self
 	end
 	
 	function b:startAnimation()
 		self.inAnimation = true
+		return self
 	end
 	
 	function b:stopAnimation()
 		self.inAnimation = false
+		return self
 	end
 	
 	function b:setMoveable(m)
 		assert(m ~= nil, "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Missing param[useBorder]")
 		assert(type(m) == "boolean", "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(m))
 		self.moveable = m
+		return self
 	end
 	
 	function b:isMoveable()
@@ -436,6 +465,7 @@ function box:new(n, p)
 		assert(o, "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Missing param[opacity]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Incorrect param[opacity] - expecting number and got " .. type(o))
 		self.color[4] = o
+		return self
 	end
 	
 	function b:getOpacity()
@@ -467,6 +497,7 @@ function box:new(n, p)
 				table.remove(events[n], k)
 			end
 		end
+		return self
 	end
 	
 	function b:touchmoved(id, x, y, dx, dy, pressure)
@@ -493,6 +524,7 @@ function box:new(n, p)
 		assert(uB ~= nil, "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Missing param[useBorder]")
 		assert(type(uB) == "boolean", "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(uB))
 		self.border = uB
+		return self
 	end
 	
 	function b:getUseBorder()
@@ -503,6 +535,7 @@ function box:new(n, p)
 		assert(w, "[" .. self.name .. "] FAILURE: box:setWidth() :: Missing param[width]")
 		assert(type(w) == "number", "[" .. self.name .. "] FAILURE: box:setWidth() :: Incorrect param[width] - expecting number and got " .. type(w))
 		self.w = w
+		return self
 	end
 	
 	function b:getWidth()
@@ -513,6 +546,7 @@ function box:new(n, p)
 		assert(x, "[" .. self.name .. "] FAILURE: box:setX() :: Missing param[x]")
 		assert(type(x) == "number", "[" .. self.name .. "] FAILURE: box:setX() :: Incorrect param[x] - expecting number and got " .. type(x))
 		self.pos.x = x
+		return self
 	end
 	
 	function b:getX()
@@ -523,6 +557,7 @@ function box:new(n, p)
 		assert(y, "[" .. self.name .. "] FAILURE: box:setY() :: Missing param[y]")
 		assert(type(y) == "number", "[" .. self.name .. "] FAILURE: box:setY() :: Incorrect param[y] - expecting number and got " .. type(y))
 		self.pos.y = y
+		return self
 	end
 	
 	function b:getY()
@@ -533,6 +568,7 @@ function box:new(n, p)
 		assert(z, "[" .. self.name .. "] FAILURE: box:setZ() :: Missing param[z]")
 		assert(type(z) == "number", "[" .. self.name .. "] FAILURE: box:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
 		self.pos.z = z
+		return self
 	end
 	
 	function b:getZ()
