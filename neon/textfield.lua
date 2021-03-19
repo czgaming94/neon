@@ -71,6 +71,7 @@ function textfield:new(n, p)
 	t.maxed = false
 	t.font = love.graphics.getFont()
 	t.fonts = {}
+	t.defaults = {}
 	t.hovered = false
 	t.clicked = false
 	t.hidden = false
@@ -101,6 +102,10 @@ function textfield:new(n, p)
 	t.opacityAnimateSpeed = 0
 	t.opacityToAnimateTo = 0
 	t.opacityAnimateTime = lt.getTime()
+	t.animateBorderOpacity = true
+	t.opacityToAnimateBorderTo = 0
+	t.opacityBorderAnimateTime = lt.getTime()
+	t.opacityBorderAnimateSpeed = 0
 	
 	function t:animateToColor(c, s)
 		assert(c, "[" .. self.name .. "] FAILURE: textfield:animateToColor() :: Missing param[color]")
@@ -187,8 +192,16 @@ function textfield:new(n, p)
 		self.pos.x = d.x or self.pos.x
 		self.pos.y = d.y or self.pos.y
 		self.pos.z = d.z or self.pos.z
-		self.color = d.color or self.color
-		self.textColor = d.textColor or self.textColor
+		if d.color then
+			for k,v in ipairs(d.color) do
+				self.color[k] = v
+			end
+		end
+		if d.textColor then
+			for k,v in ipairs(d.textColor) do
+				self.textColor[k] = v
+			end
+		end
 		self.font = d.font or self.font
 		self.w = d.w or d.width or self.font:getWidth(self.textfield)
 		self.h = d.h or d.height or self.font:getHeight(self.textfield)
@@ -197,7 +210,7 @@ function textfield:new(n, p)
 		if t.moveable ~= nil then self.moveable = t.moveable end
 		if t.hollow ~= nil then self.hollow = t.hollow end
 		self.maxLines = floor((self.h - (10 + self.paddingTop + self.paddingBottom)) / self.font:getHeight())
-		print(self.maxLines, self.h, self.font:getHeight())
+		self.defaults = d
 		return self
 	end
 	

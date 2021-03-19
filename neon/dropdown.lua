@@ -62,6 +62,7 @@ function dropdown:new(n, p)
 	}
 	d.border = false
 	d.borderColor = {1,1,1,1}
+	d.defaults = {}
 	d.color = {1,1,1,1}
 	d.overlayColor = {1,1,1,.5}
 	d.optionsColor = {1,1,1,1}
@@ -110,6 +111,10 @@ function dropdown:new(n, p)
 	d.opacityAnimateSpeed = 0
 	d.opacityToAnimateTo = 0
 	d.opacityAnimateTime = lt.getTime()
+	d.animateBorderOpacity = true
+	d.opacityToAnimateBorderTo = 0
+	d.opacityBorderAnimateTime = lt.getTime()
+	d.opacityBorderAnimateSpeed = 0
 	
 	function d:animateToColor(t, s)
 		assert(t, "[" .. self.name .. "] FAILURE: dropdown:animateToColor() :: Missing param[color]")
@@ -117,11 +122,13 @@ function dropdown:new(n, p)
 		assert(#t == 4, "[" .. self.name .. "] FAILURE: dropdown:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #t)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		self.colorToAnimateTo = t
-		self.colorAnimateSpeed = s
-		self.colorAnimateTime = lt.getTime()
-		self.inAnimation = true
-		self.animateColor = true
+		if not self.fadedByFunc then
+			self.colorToAnimateTo = t
+			self.colorAnimateSpeed = s
+			self.colorAnimateTime = lt.getTime()
+			self.inAnimation = true
+			self.animateColor = true
+		end
 		return self
 	end
 	
@@ -131,11 +138,13 @@ function dropdown:new(n, p)
 		assert(#t > 2, "[" .. self.name .. "] FAILURE: dropdown:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #t)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		self.borderColorToAnimateTo = t
-		self.borderColorAnimateSpeed = s
-		self.borderColorAnimateTime = lt.getTime()
-		self.inAnimation = true
-		self.animateBorderColor = true
+		if not self.fadedByFunc then
+			self.borderColorToAnimateTo = t
+			self.borderColorAnimateSpeed = s
+			self.borderColorAnimateTime = lt.getTime()
+			self.inAnimation = true
+			self.animateBorderColor = true
+		end
 		return self
 	end
 	
@@ -147,11 +156,13 @@ function dropdown:new(n, p)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
-		self.positionToAnimateTo = {x = x, y = y}
-		self.positionAnimateDrag = s
-		self.positionAnimateTime = lt.getTime()
-		self.inAnimation = true
-		self.animatePosition = true
+		if not self.fadedByFunc then
+			self.positionToAnimateTo = {x = x, y = y}
+			self.positionAnimateDrag = s
+			self.positionAnimateTime = lt.getTime()
+			self.inAnimation = true
+			self.animatePosition = true
+		end
 		return self
 	end
 	
@@ -160,11 +171,28 @@ function dropdown:new(n, p)
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		self.opacityToAnimateTo = o
-		self.opacityAnimateTime = lt.getTime()
-		self.opacityAnimateSpeed = s
-		self.inAnimation = true
-		self.animateOpacity = true
+		if not self.fadedByFunc then
+			self.opacityToAnimateTo = o
+			self.opacityAnimateTime = lt.getTime()
+			self.opacityAnimateSpeed = s
+			self.inAnimation = true
+			self.animateOpacity = true
+		end
+		return self
+	end
+	
+	function d:animateBorderToOpacity(o, s)
+		assert(o, "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Missing param[o]")
+		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
+		s = s or 1
+		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		if not self.fadedByFunc then
+			self.opacityToAnimateBorderTo = o
+			self.opacityBorderAnimateTime = lt.getTime()
+			self.opacityBorderAnimateSpeed = s
+			self.inAnimation = true
+			self.animateBorderOpacity = true
+		end
 		return self
 	end
 	
@@ -264,15 +292,27 @@ function dropdown:new(n, p)
 		self.pos.x = t.x or self.pos.x
 		self.pos.y = t.y or self.pos.y
 		self.pos.z = t.z or self.pos.z
-		self.color = t.color or self.color
 		if t.useBorder ~= nil then self.border = t.useBorder end
 		if t.clickable ~= nil then self.clickable = t.clickable end
 		if t.moveable ~= nil then self.moveable = t.moveable end
 		if t.hollow ~= nil then self.hollow = t.hollow end
 		if t.round ~= nil then self.round = t.round end
 		if t.closeOnUnfocus ~= nil then self.closeOnUnfocus = t.closeOnUnfocus end
-		self.borderColor = t.borderColor or self.borderColor
-		self.optionsColor = t.optionColor or self.optionsColor
+		if t.color then
+			for k,v in ipairs(t.color) do
+				self.color[k] = v
+			end
+		end
+		if t.borderColor then
+			for k,v in ipairs(t.borderColor) do
+				self.borderColor[k] = v
+			end
+		end
+		if t.optionsColor then
+			for k,v in ipairs(t.optionsColor) do
+				self.optionsColor[k] = v
+			end
+		end
 		self.font = t.font or self.font
 		self.optionFont = t.optionFont or self.optionFont
 		self.roundRadius = (t.roundRadius and t.roundRadius) or (t.radius and t.radius) or self.roundRadius
@@ -320,6 +360,7 @@ function dropdown:new(n, p)
 				end 
 			end 
 		end
+		self.defaults = t
 		return self
 	end
 	

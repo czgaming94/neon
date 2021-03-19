@@ -63,6 +63,7 @@ function text:new(n, p)
 	t.z = t.pos.z
 	t.timerEvent = nil
 	t.color = {1,1,1,1}
+	t.defaults = {}
 	t.font = love.graphics.getFont()
 	t.fonts = {}
 	t.hovered = false
@@ -196,7 +197,13 @@ function text:new(n, p)
 		self.pos.y = d.y or self.pos.y
 		self.typewriterSpeed = d.s or d.speed or self.typewriterSpeed
 		self.pos.z = d.z or self.pos.z
-		self.color = d.color or self.color
+		--self.color = d.color or self.color
+		if d.color then
+			for k,v in ipairs(d.color) do
+				self.color[k] = v
+			end
+		end
+		if self.name == "gamehelp" then print(d.color, self.color) end
 		self.font = d.font or self.font
 		self.w = d.w or d.width or self.font:getWidth(self.text)
 		self.h = d.h or d.height or self.font:getHeight(self.text)
@@ -250,6 +257,7 @@ function text:new(n, p)
 		if d.moveable ~= nil then self.moveable = d.moveable end
 		if d.hollow ~= nil then self.hollow = d.hollow end
 		if d.shadow ~= nil then self.shadow = d.shadow end
+		self.defaults = d
 		return self
 	end
 	

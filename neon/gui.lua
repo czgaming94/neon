@@ -357,6 +357,7 @@ function gui:update(dt)
 						local allBorderColorsMatch = true
 						local inProperPosition = true
 						local atProperOpacity = true
+						local atProperBorderOpacity = true
 						
 						if i.animateColor then
 							for k,v in ipairs(i.colorToAnimateTo) do
@@ -391,9 +392,31 @@ function gui:update(dt)
 							else
 								if i.fadedByFunc then
 									if i.color[4] == 1 then
-										if i.afterFadeIn then i:afterFadeIn() end
+										if i.events.afterFadeIn then 
+											for _,v in ipairs(i.events.afterFadeIn) do
+												v.fn(i, v.target, event)
+											end
+										end
+										if events.afterFadeIn then
+											for _,v in ipairs(events.afterFadeIn) do
+												if v.o == i.type then
+													v.fn(i, v.target, event)
+												end
+											end
+										end
 									elseif i.color[4] == 0 then
-										if i.afterFadeOut then i:afterFadeOut() end
+										if i.events.afterFadeOut then 
+											for _,v in ipairs(i.events.afterFadeOut) do
+												v.fn(i, v.target, event)
+											end
+										end
+										if events.afterFadeOut then
+											for _,v in ipairs(events.afterFadeOut) do
+												if v.o == i.type then
+													v.fn(i, v.target, event)
+												end
+											end
+										end
 									end
 									i.fadedByFunc = false
 								end
@@ -413,12 +436,56 @@ function gui:update(dt)
 							end
 						end
 						
-						if allColorsMatch and inProperPosition and atProperOpacity and allBorderColorsMatch then
+						if i.animateBorderOpacity then
+							if i.borderColor[4] ~= i.opacityToAnimateBorderTo then
+								if i.borderColor[4] < i.opacityToAnimateBorderTo then
+									i.borderColor[4] = min(i.opacityToAnimateBorderTo, i.borderColor[4] + (i.opacityBorderAnimateSpeed * dt))
+								else
+									i.borderColor[4] = max(i.opacityToAnimateBorderTo, i.borderColor[4] - (i.opacityBorderAnimateSpeed * dt))
+								end
+								atProperBorderOpacity = false
+							else
+								if i.fadedByFunc then
+									if i.borderColor[4] == 1 then
+										if i.events.afterFadeIn then 
+											for _,v in ipairs(i.events.afterFadeIn) do
+												v.fn(i, v.target, event)
+											end
+										end
+										if events.afterFadeIn then
+											for _,v in ipairs(events.afterFadeIn) do
+												if v.o == i.type then
+													v.fn(i, v.target, event)
+												end
+											end
+										end
+									elseif i.borderColor[4] == 0 then
+										if i.events.afterFadeOut then 
+											for _,v in ipairs(i.events.afterFadeOut) do
+												v.fn(i, v.target, event)
+											end
+										end
+										if events.afterFadeOut then
+											for _,v in ipairs(events.afterFadeOut) do
+												if v.o == i.type then
+													v.fn(i, v.target, event)
+												end
+											end
+										end
+									end
+									i.fadedByFunc = false
+								end
+							end
+						end
+						
+						if allColorsMatch and inProperPosition and atProperOpacity and allBorderColorsMatch and atProperBorderOpacity then
 							i.inAnimation = false
 							i.animateColor = false
 							i.animatePosition = false
 							if i.animateOpacity and i.faded then i.hidden = true end
 							i.animateOpacity = false
+							i.animateBorderColor = false
+							i.animateBorderOpacity = false
 						end
 					end
 					i:update(dt)
@@ -433,7 +500,27 @@ function gui:enable()
 	return self
 end
 
-function gui:disable()
+function gui:disable(kill)
+	kill = kill ~= nil and kill or true
+	if kill then
+		for h,o in ipairs(items) do
+			for y,i in ipairs(o.items) do
+				i.hovered = false
+				i.active = false
+				i.clicked = false
+				i.held = false
+				i.fadedByFunc = false
+				i.inAnimation = false
+				i.animateColor = false
+				i.animatePosition = false
+				i.animateOpacity = false
+				i.animateBorderColor = false
+				i.animateBorderOpacity = false
+				i:setData(i.defaults)
+				self:update(love.timer.getDelta())
+			end
+		end
+	end
 	self.enabled = false
 	return self
 end

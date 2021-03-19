@@ -35,7 +35,9 @@ box.guis = {}
 
 function box:new(n, p)
 	local b = {}
+	print(p, p.id)
 	if not self.guis[p.id] then self.guis[p.id] = p end
+	print(self.guis[p.id])
 	b.name = n
 	b.id = #self.items + 1
 	b.type = "box"
@@ -53,6 +55,7 @@ function box:new(n, p)
 	b.border = false
 	b.borderColor = {1,1,1,1}
 	b.color = {1,1,1,1}
+	b.defaults = {}
 	b.hovered = false
 	b.clicked = false
 	b.clickable = true
@@ -90,6 +93,10 @@ function box:new(n, p)
 	b.opacityAnimateSpeed = 0
 	b.opacityToAnimateTo = 0
 	b.opacityAnimateTime = lt.getTime()
+	b.animateBorderOpacity = false
+	b.opacityToAnimateBorderTo = 0
+	b.opacityBorderAnimateTime = lt.getTime()
+	b.opacityBorderAnimateSpeed = 0
 	
 	function b:addImage(i, n, a)
 		assert(i, "[" .. self.name .. "] FAILURE: box:addImage() :: Missing param[img]")
@@ -166,6 +173,21 @@ function box:new(n, p)
 		return self
 	end
 	
+	function b:animateBorderToOpacity(o, s)
+		assert(o, "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Missing param[o]")
+		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
+		s = s or 1
+		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		if not self.fadedByFunc then
+			self.opacityToAnimateBorderTo = o
+			self.opacityBorderAnimateTime = lt.getTime()
+			self.opacityBorderAnimateSpeed = s
+			self.inAnimation = true
+			self.animateBorderOpacity = true
+		end
+		return self
+	end
+	
 	function b:isAnimating()
 		return self.inAnimation
 	end
@@ -226,8 +248,16 @@ function box:new(n, p)
 		if t.moveable ~= nil then self.moveable = t.moveable end
 		if t.hollow ~= nil then self.hollow = t.hollow end
 		if t.keepBackground then self.keepBackground = t.keepBackground end
-		self.borderColor = t.borderColor or self.borderColor
-		self.color = t.color or self.color
+		if t.color then
+			for k,v in ipairs(t.color) do
+				self.color[k] = v
+			end
+		end
+		if t.borderColor then
+			for k,v in ipairs(t.borderColor) do
+				self.borderColor[k] = v
+			end
+		end
 		self.image = self.images[t.image] or self.image
 		self.color[4] = t.opacity or self.color[4]
 		if t.padding then
@@ -244,6 +274,7 @@ function box:new(n, p)
 				self.iX, self.iY = unpack(t.imageOffset)
 			end
 		end
+		self.defaults = t
 		return self
 	end
 	
@@ -257,14 +288,14 @@ function box:new(n, p)
 		
 		lg.setColor(1,1,1,1)
 		if self.border then
-			if self.parent and box.guis[self.parent].use255 then
+			if self.parent and box.guis[self.parent] and box.guis[self.parent].use255 then
 				lg.setColor(love.math.colorFromBytes(self.borderColor))
 			else
 				lg.setColor(self.borderColor)
 			end
 			lg.rectangle("line", self.pos.x - 1, self.pos.y - 1, self.paddingLeft + self.w + self.paddingRight + 2, self.paddingTop + self.h + self.paddingBottom + 2)
 		end
-		if self.parent and box.guis[self.parent].use255 then
+		if self.parent and box.guis[self.parent] and box.guis[self.parent].use255 then
 			lg.setColor(love.math.colorFromBytes(self.color))
 		else
 			lg.setColor(self.color)

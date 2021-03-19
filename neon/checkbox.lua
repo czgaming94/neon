@@ -62,6 +62,7 @@ function checkbox:new(n, p)
 	}
 	c.border = false
 	c.borderColor = {1,1,1,1}
+	c.defaults = {}
 	c.color = {1,1,1,1}
 	c.overlayColor = {1,1,1,.5}
 	c.optionsColor = {1,1,1,1}
@@ -107,6 +108,10 @@ function checkbox:new(n, p)
 	c.opacityAnimateSpeed = 0
 	c.opacityToAnimateTo = 0
 	c.opacityAnimateTime = lt.getTime()
+	c.animateBorderOpacity = true
+	c.opacityToAnimateBorderTo = 0
+	c.opacityBorderAnimateTime = lt.getTime()
+	c.opacityBorderAnimateSpeed = 0
 	
 	function c:animateToColor(t, s)
 		assert(t, "[" .. self.name .. "] FAILURE: checkbox:animateToColor() :: Missing param[color]")
@@ -114,11 +119,13 @@ function checkbox:new(n, p)
 		assert(#t == 4, "[" .. self.name .. "] FAILURE: checkbox:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #t)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		self.colorToAnimateTo = t
-		self.colorAnimateSpeed = s
-		self.colorAnimateTime = lt.getTime()
-		self.inAnimation = true
-		self.animateColor = true
+		if not self.fadedByFunc then
+			self.colorToAnimateTo = t
+			self.colorAnimateSpeed = s
+			self.colorAnimateTime = lt.getTime()
+			self.inAnimation = true
+			self.animateColor = true
+		end
 		return self
 	end
 	
@@ -128,11 +135,13 @@ function checkbox:new(n, p)
 		assert(#t > 2, "[" .. self.name .. "] FAILURE: checkbox:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #t)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		self.borderColorToAnimateTo = t
-		self.borderColorAnimateSpeed = s
-		self.borderColorAnimateTime = lt.getTime()
-		self.inAnimation = true
-		self.animateBorderColor = true
+		if not self.fadedByFunc then
+			self.borderColorToAnimateTo = t
+			self.borderColorAnimateSpeed = s
+			self.borderColorAnimateTime = lt.getTime()
+			self.inAnimation = true
+			self.animateBorderColor = true
+		end
 		return self
 	end
 	
@@ -144,11 +153,13 @@ function checkbox:new(n, p)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
-		self.positionToAnimateTo = {x = x, y = y}
-		self.positionAnimateDrag = s
-		self.positionAnimateTime = lt.getTime()
-		self.inAnimation = true
-		self.animatePosition = true
+		if not self.fadedByFunc then
+			self.positionToAnimateTo = {x = x, y = y}
+			self.positionAnimateDrag = s
+			self.positionAnimateTime = lt.getTime()
+			self.inAnimation = true
+			self.animatePosition = true
+		end
 		return self
 	end
 	
@@ -157,11 +168,28 @@ function checkbox:new(n, p)
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		self.opacityToAnimateTo = o
-		self.opacityAnimateTime = lt.getTime()
-		self.opacityAnimateSpeed = s
-		self.inAnimation = true
-		self.animateOpacity = true
+		if not self.fadedByFunc then
+			self.opacityToAnimateTo = o
+			self.opacityAnimateTime = lt.getTime()
+			self.opacityAnimateSpeed = s
+			self.inAnimation = true
+			self.animateOpacity = true
+		end
+		return self
+	end
+	
+	function c:animateBorderToOpacity(o, s)
+		assert(o, "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Missing param[o]")
+		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
+		s = s or 1
+		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		if not self.fadedByFunc then
+			self.opacityToAnimateBorderTo = o
+			self.opacityBorderAnimateTime = lt.getTime()
+			self.opacityBorderAnimateSpeed = s
+			self.inAnimation = true
+			self.animateBorderOpacity = true
+		end
 		return self
 	end
 	
@@ -248,7 +276,6 @@ function checkbox:new(n, p)
 		self.pos.x = d.x or self.pos.x
 		self.pos.y = d.y or self.pos.y
 		self.pos.z = d.z or self.pos.z
-		self.color = d.color or self.color
 		if d.useBorder ~= nil then self.border = d.useBorder end
 		if d.clickable ~= nil then self.clickable = d.clickable end
 		if d.moveable ~= nil then self.moveable = d.moveable end
@@ -258,9 +285,26 @@ function checkbox:new(n, p)
 		if d.singleSelection ~= nil then self.single = d.singleSelection end
 		if d.fixPadding ~= nil then self.fixPadding = d.fixPadding end
 		if d.fix ~= nil then self.fixPadding = d.fix end
-		self.borderColor = d.borderColor or self.borderColor
-		self.optionsColor = d.optionColor or self.optionsColor
-		self.overlayColor = d.overlayColor or self.overlayColor
+		if d.color then
+			for k,v in ipairs(d.color) do
+				self.color[k] = v
+			end
+		end
+		if d.borderColor then
+			for k,v in ipairs(d.borderColor) do
+				self.borderColor[k] = v
+			end
+		end
+		if d.optionsColor then
+			for k,v in ipairs(d.optionsColor) do
+				self.optionsColor[k] = v
+			end
+		end
+		if d.overlayColor then
+			for k,v in ipairs(d.overlayColor) do
+				self.overlayColor[k] = v
+			end
+		end
 		self.font = d.font or self.font
 		self.labelFont = d.labelFont or self.labelFont
 		self.roundRadius = (d.roundRadius and d.roundRadius) or (d.radius and d.radius) or self.roundRadius
@@ -328,6 +372,7 @@ function checkbox:new(n, p)
 				end 
 			end 
 		end
+		self.defaults = d
 		return self
 	end
 	
