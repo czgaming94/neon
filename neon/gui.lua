@@ -517,7 +517,6 @@ function gui:disable(kill)
 				i.animateBorderColor = false
 				i.animateBorderOpacity = false
 				i:setData(i.defaults)
-				--self:update(love.timer.getDelta())
 			end
 		end
 	end
