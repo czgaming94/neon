@@ -503,8 +503,8 @@ end
 function gui:disable(kill)
 	kill = kill ~= nil and kill or true
 	if kill then
-		for h,o in ipairs(items) do
-			for y,i in ipairs(o.items) do
+		for _,o in ipairs(items) do
+			for _,i in ipairs(o.items) do
 				i.hovered = false
 				i.active = false
 				i.clicked = false
