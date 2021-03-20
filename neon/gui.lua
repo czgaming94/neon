@@ -559,11 +559,15 @@ end
 function gui:child(n, i)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:child() :: Missing param[name]")
-	assert(type(n) == "string", "FAILURE: gui:child() :: Incorrect param[name] - expecting string and got " .. type(n))
+	assert(type(n) == "string" or type(n) == "number", "FAILURE: gui:child() :: Incorrect param[name] - expecting string and got " .. type(n))
 	for _,g in ipairs(items) do
 		if g.enabled or i then
 			for _,v in ipairs(g.items) do
-				if v.name == n then return v end
+				if type(n) == "string" then
+					if v.name == n then return v end
+				else
+					if v.id == n then return v end
+				end
 			end
 		end
 	end
