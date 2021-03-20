@@ -92,19 +92,19 @@ function textfield:new(n, p)
 	t.animateColor = false
 	t.colorToAnimateTo = {1,1,1,1}
 	t.colorAnimateSpeed = 0
-	t.colorAnimateTime = lt.getTime()
+	t.colorAnimateTime = 0
 	t.animatePosition = false
 	t.positionAnimateSpeed = 0
 	t.positionToAnimateTo = {x = 0, y = 0}
 	t.positionToAnimateFrom = {x = 0, y = 0}
-	t.positionAnimateTime = lt.getTime()
+	t.positionAnimateTime = 0
 	t.animateOpacity = false
 	t.opacityAnimateSpeed = 0
 	t.opacityToAnimateTo = 0
-	t.opacityAnimateTime = lt.getTime()
+	t.opacityAnimateTime = 0
 	t.animateBorderOpacity = true
 	t.opacityToAnimateBorderTo = 0
-	t.opacityBorderAnimateTime = lt.getTime()
+	t.opacityBorderAnimateTime = 0
 	t.opacityBorderAnimateSpeed = 0
 	
 	function t:animateToColor(c, s)
@@ -113,27 +113,37 @@ function textfield:new(n, p)
 		assert(#c == 4, "[" .. self.name .. "] FAILURE: textfield:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: textfield:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		self.colorToAnimateTo = c
-		self.colorAnimateSpeed = s
-		self.colorAnimateTime = lt.getTime()
-		self.inAnimation = true
-		self.animateColor = true
+		if not self.fadedByFunc then
+			self.colorToAnimateTo = c
+			self.colorAnimateSpeed = s
+			self.colorAnimateTime = 0
+			self.inAnimation = true
+			self.animateColor = true
+		end
 		return self
 	end
 	
 	function t:animateToPosition(x, y, s)
 		assert(x, "[" .. self.name .. "] FAILURE: textfield:animateToPosition() :: Missing param[x]")
-		assert(type(x) == "number", "[" .. self.name .. "] FAILURE: textfield:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
+		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: textfield:animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
 		assert(y, "[" .. self.name .. "] FAILURE: textfield:animateToPosition() :: Missing param[y]")
-		assert(type(y) == "number", "[" .. self.name .. "] FAILURE: textfield:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
+		assert(type(y) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: textfield:animateToPosition() :: Incorrect param[y] - expecting number or 'auto' and got " .. type(y))
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: textfield:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
-		self.positionToAnimateTo = {x = x, y = y}
-		self.positionAnimateDrag = s
-		self.positionAnimateTime = lt.getTime()
-		self.inAnimation = true
-		self.animatePosition = true
+		if not self.fadedByFunc then
+			if x == "auto" then
+				x = self.pos.x
+			end
+			if y == "auto" then
+				y = self.pos.y
+			end
+			self.positionToAnimateTo = {x = x, y = y}
+			self.positionAnimateDrag = s
+			self.positionAnimateTime = 0
+			self.inAnimation = true
+			self.animatePosition = true
+		end
 		return self
 	end
 	
@@ -142,11 +152,13 @@ function textfield:new(n, p)
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: textfield:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: textfield:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		self.opacityToAnimateTo = o
-		self.opacityAnimateTime = lt.getTime()
-		self.opacityAnimateSpeed = s
-		self.inAnimation = true
-		self.animateOpacity = true
+		if not self.fadedByFunc then
+			self.opacityToAnimateTo = o
+			self.opacityAnimateTime = 0
+			self.opacityAnimateSpeed = s
+			self.inAnimation = true
+			self.animateOpacity = true
+		end
 		return self
 	end
 	
@@ -389,7 +401,6 @@ function textfield:new(n, p)
 							end
 						end
 					elseif event.key == "right" then
-						print(1)
 						if self.cursorOffset < #self.display[self.currentLine] then
 							self.cursorOffset = self.cursorOffset + 1
 						else

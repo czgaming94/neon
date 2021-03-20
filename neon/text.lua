@@ -97,16 +97,16 @@ function text:new(n, p)
 	t.animateColor = false
 	t.colorToAnimateTo = {1,1,1,1}
 	t.colorAnimateSpeed = 0
-	t.colorAnimateTime = lt.getTime()
+	t.colorAnimateTime = 0
 	t.animatePosition = false
 	t.positionAnimateSpeed = 0
 	t.positionToAnimateTo = {x = 0, y = 0}
 	t.positionToAnimateFrom = {x = 0, y = 0}
-	t.positionAnimateTime = lt.getTime()
+	t.positionAnimateTime = 0
 	t.animateOpacity = false
 	t.opacityAnimateSpeed = 0
 	t.opacityToAnimateTo = 0
-	t.opacityAnimateTime = lt.getTime()
+	t.opacityAnimateTime = 0
 	
 	function t:animateToColor(c, s)
 		assert(c, "[" .. self.name .. "] FAILURE: text:animateToColor() :: Missing param[color]")
@@ -114,27 +114,37 @@ function text:new(n, p)
 		assert(#c == 4, "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		self.colorToAnimateTo = c
-		self.colorAnimateSpeed = s
-		self.colorAnimateTime = lt.getTime()
-		self.inAnimation = true
-		self.animateColor = true
+		if not self.fadedByFunc then
+			self.colorToAnimateTo = c
+			self.colorAnimateSpeed = s
+			self.colorAnimateTime = 0
+			self.inAnimation = true
+			self.animateColor = true
+		end
 		return self
 	end
 	
 	function t:animateToPosition(x, y, s)
 		assert(x, "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Missing param[x]")
-		assert(type(x) == "number", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
+		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
 		assert(y, "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Missing param[y]")
-		assert(type(y) == "number", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
+		assert(type(y) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[y] - expecting number or 'auto' and got " .. type(y))
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
-		self.positionToAnimateTo = {x = x, y = y}
-		self.positionAnimateDrag = s
-		self.positionAnimateTime = lt.getTime()
-		self.inAnimation = true
-		self.animatePosition = true
+		if not self.fadedByFunc then
+			if x == "auto" then
+				x = self.pos.x
+			end
+			if y == "auto" then
+				y = self.pos.y
+			end
+			self.positionToAnimateTo = {x = x, y = y}
+			self.positionAnimateSpeed = s
+			self.positionAnimateTime = 0
+			self.inAnimation = true
+			self.animatePosition = true
+		end
 		return self
 	end
 	
@@ -143,11 +153,13 @@ function text:new(n, p)
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		self.opacityToAnimateTo = o
-		self.opacityAnimateTime = lt.getTime()
-		self.opacityAnimateSpeed = s
-		self.inAnimation = true
-		self.animateOpacity = true
+		if not self.fadedByFunc then	
+			self.opacityToAnimateTo = o
+			self.opacityAnimateTime = 0
+			self.opacityAnimateSpeed = s
+			self.inAnimation = true
+			self.animateOpacity = true
+		end
 		return self
 	end
 	
@@ -197,13 +209,11 @@ function text:new(n, p)
 		self.pos.y = d.y or self.pos.y
 		self.typewriterSpeed = d.s or d.speed or self.typewriterSpeed
 		self.pos.z = d.z or self.pos.z
-		--self.color = d.color or self.color
 		if d.color then
 			for k,v in ipairs(d.color) do
 				self.color[k] = v
 			end
 		end
-		if self.name == "gamehelp" then print(d.color, self.color) end
 		self.font = d.font or self.font
 		self.w = d.w or d.width or self.font:getWidth(self.text)
 		self.h = d.h or d.height or self.font:getHeight(self.text)
@@ -394,6 +404,10 @@ function text:new(n, p)
 		return self
 	end
 	
+	function t:getFont()
+		return self.font
+	end
+	
 	function t:isHovered()
 		return self.hovered
 	end
@@ -532,22 +546,6 @@ function text:new(n, p)
 			end
 		end
 		return self
-	end
-	
-	function t:touchmoved(id, x, y, dx, dy, pressure)
-		if (x >= self.pos.x + self.paddingLeft and x <= self.pos.x + self.w + self.paddingRight) and 
-		(y >= self.pos.y + self.paddingTop and y <= self.pos.y + self.h + self.paddingBottom) then
-			if not self.hovered then
-				if self.onHoverEnter then self:onHoverEnter() end
-				self.hovered = true 
-			end
-			if self.whileHovering then self:whileHovering() end
-		else
-			if self.hovered then 
-				if self.onHoverExit then self:onHoverExit() end
-				self.hovered = false 
-			end
-		end
 	end
 	
 	function t:typewriterCycle()

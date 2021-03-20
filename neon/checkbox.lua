@@ -98,19 +98,19 @@ function checkbox:new(n, p)
 	c.animateColor = false
 	c.colorToAnimateTo = {1,1,1,1}
 	c.colorAnimateSpeed = 0
-	c.colorAnimateTime = lt.getTime()
+	c.colorAnimateTime = 0
 	c.animatePosition = false
 	c.positionAnimateSpeed = 0
 	c.positionToAnimateTo = {x = 0, y = 0}
 	c.positionToAnimateFrom = {x = 0, y = 0}
-	c.positionAnimateTime = lt.getTime()
+	c.positionAnimateTime = 0
 	c.animateOpacity = false
 	c.opacityAnimateSpeed = 0
 	c.opacityToAnimateTo = 0
-	c.opacityAnimateTime = lt.getTime()
+	c.opacityAnimateTime = 0
 	c.animateBorderOpacity = true
 	c.opacityToAnimateBorderTo = 0
-	c.opacityBorderAnimateTime = lt.getTime()
+	c.opacityBorderAnimateTime = 0
 	c.opacityBorderAnimateSpeed = 0
 	
 	function c:animateToColor(t, s)
@@ -122,7 +122,7 @@ function checkbox:new(n, p)
 		if not self.fadedByFunc then
 			self.colorToAnimateTo = t
 			self.colorAnimateSpeed = s
-			self.colorAnimateTime = lt.getTime()
+			self.colorAnimateTime = 0
 			self.inAnimation = true
 			self.animateColor = true
 		end
@@ -138,7 +138,7 @@ function checkbox:new(n, p)
 		if not self.fadedByFunc then
 			self.borderColorToAnimateTo = t
 			self.borderColorAnimateSpeed = s
-			self.borderColorAnimateTime = lt.getTime()
+			self.borderColorAnimateTime = 0
 			self.inAnimation = true
 			self.animateBorderColor = true
 		end
@@ -147,16 +147,22 @@ function checkbox:new(n, p)
 	
 	function c:animateToPosition(x, y, s)
 		assert(x, "[" .. self.name .. "] FAILURE: checkbox:animateToPosition() :: Missing param[x]")
-		assert(type(x) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
+		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: checkbox:animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
 		assert(y, "[" .. self.name .. "] FAILURE: checkbox:animateToPosition() :: Missing param[y]")
-		assert(type(y) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
+		assert(type(y) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: checkbox:animateToPosition() :: Incorrect param[y] - expecting number or 'auto' and got " .. type(y))
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
 		if not self.fadedByFunc then
+			if x == "auto" then
+				x = self.pos.x
+			end
+			if y == "auto" then
+				y = self.pos.y
+			end
 			self.positionToAnimateTo = {x = x, y = y}
 			self.positionAnimateDrag = s
-			self.positionAnimateTime = lt.getTime()
+			self.positionAnimateTime = 0
 			self.inAnimation = true
 			self.animatePosition = true
 		end
@@ -170,7 +176,7 @@ function checkbox:new(n, p)
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		if not self.fadedByFunc then
 			self.opacityToAnimateTo = o
-			self.opacityAnimateTime = lt.getTime()
+			self.opacityAnimateTime = 0
 			self.opacityAnimateSpeed = s
 			self.inAnimation = true
 			self.animateOpacity = true
@@ -185,7 +191,7 @@ function checkbox:new(n, p)
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		if not self.fadedByFunc then
 			self.opacityToAnimateBorderTo = o
-			self.opacityBorderAnimateTime = lt.getTime()
+			self.opacityBorderAnimateTime = 0
 			self.opacityBorderAnimateSpeed = s
 			self.inAnimation = true
 			self.animateBorderOpacity = true
@@ -389,7 +395,7 @@ function checkbox:new(n, p)
 			if v.text then
 				lg.push()
 				if self.border then
-					if self.parent and checkbox.guis[self.parent].use255 then
+					if self.parent and checkbox.guis[self.parent] and checkbox.guis[self.parent].use255 then
 						lg.setColor(love.math.colorFromBytes(self.borderColor))
 					else
 						lg.setColor(self.borderColor)
@@ -400,7 +406,7 @@ function checkbox:new(n, p)
 						lg.rectangle("line", v.x - 1, v.y - 1, v.w + 2, v.h + 2)
 					end
 				end
-				if self.parent and checkbox.guis[self.parent].use255 then
+				if self.parent and checkbox.guis[self.parent] and checkbox.guis[self.parent].use255 then
 					lg.setColor(love.math.colorFromBytes(self.color))
 				else
 					lg.setColor(self.color)
@@ -596,7 +602,6 @@ function checkbox:new(n, p)
 						if self.single then
 							self.selected = {}
 							self.selected[k] = v
-							print(k)
 						else
 							self.selected[k] = v
 						end

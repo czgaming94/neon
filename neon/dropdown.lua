@@ -101,19 +101,19 @@ function dropdown:new(n, p)
 	d.animateColor = false
 	d.colorToAnimateTo = {1,1,1,1}
 	d.colorAnimateSpeed = 0
-	d.colorAnimateTime = lt.getTime()
+	d.colorAnimateTime = 0
 	d.animatePosition = false
 	d.positionAnimateSpeed = 0
 	d.positionToAnimateTo = {x = 0, y = 0}
 	d.positionToAnimateFrom = {x = 0, y = 0}
-	d.positionAnimateTime = lt.getTime()
+	d.positionAnimateTime = 0
 	d.animateOpacity = false
 	d.opacityAnimateSpeed = 0
 	d.opacityToAnimateTo = 0
-	d.opacityAnimateTime = lt.getTime()
+	d.opacityAnimateTime = 0
 	d.animateBorderOpacity = true
 	d.opacityToAnimateBorderTo = 0
-	d.opacityBorderAnimateTime = lt.getTime()
+	d.opacityBorderAnimateTime = 0
 	d.opacityBorderAnimateSpeed = 0
 	
 	function d:animateToColor(t, s)
@@ -125,7 +125,7 @@ function dropdown:new(n, p)
 		if not self.fadedByFunc then
 			self.colorToAnimateTo = t
 			self.colorAnimateSpeed = s
-			self.colorAnimateTime = lt.getTime()
+			self.colorAnimateTime = 0
 			self.inAnimation = true
 			self.animateColor = true
 		end
@@ -141,7 +141,7 @@ function dropdown:new(n, p)
 		if not self.fadedByFunc then
 			self.borderColorToAnimateTo = t
 			self.borderColorAnimateSpeed = s
-			self.borderColorAnimateTime = lt.getTime()
+			self.borderColorAnimateTime = 0
 			self.inAnimation = true
 			self.animateBorderColor = true
 		end
@@ -150,16 +150,22 @@ function dropdown:new(n, p)
 	
 	function d:animateToPosition(x, y, s)
 		assert(x, "[" .. self.name .. "] FAILURE: dropdown:animateToPosition() :: Missing param[x]")
-		assert(type(x) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
+		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: dropdown:animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
 		assert(y, "[" .. self.name .. "] FAILURE: dropdown:animateToPosition() :: Missing param[y]")
-		assert(type(y) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
+		assert(type(y) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: dropdown:animateToPosition() :: Incorrect param[y] - expecting number or 'auto' and got " .. type(y))
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
 		if not self.fadedByFunc then
+			if x == "auto" then
+				x = self.pos.x
+			end
+			if y == "auto" then
+				y = self.pos.y
+			end
 			self.positionToAnimateTo = {x = x, y = y}
 			self.positionAnimateDrag = s
-			self.positionAnimateTime = lt.getTime()
+			self.positionAnimateTime = 0
 			self.inAnimation = true
 			self.animatePosition = true
 		end
@@ -173,7 +179,7 @@ function dropdown:new(n, p)
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		if not self.fadedByFunc then
 			self.opacityToAnimateTo = o
-			self.opacityAnimateTime = lt.getTime()
+			self.opacityAnimateTime = 0
 			self.opacityAnimateSpeed = s
 			self.inAnimation = true
 			self.animateOpacity = true
@@ -188,7 +194,7 @@ function dropdown:new(n, p)
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		if not self.fadedByFunc then
 			self.opacityToAnimateBorderTo = o
-			self.opacityBorderAnimateTime = lt.getTime()
+			self.opacityBorderAnimateTime = 0
 			self.opacityBorderAnimateSpeed = s
 			self.inAnimation = true
 			self.animateBorderOpacity = true

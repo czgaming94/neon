@@ -35,9 +35,7 @@ box.guis = {}
 
 function box:new(n, p)
 	local b = {}
-	print(p, p.id)
 	if not self.guis[p.id] then self.guis[p.id] = p end
-	print(self.guis[p.id])
 	b.name = n
 	b.id = #self.items + 1
 	b.type = "box"
@@ -79,23 +77,23 @@ function box:new(n, p)
 	b.animateColor = false
 	b.colorToAnimateTo = {1,1,1,1}
 	b.colorAnimateSpeed = 0
-	b.colorAnimateTime = lt.getTime()
+	b.colorAnimateTime = 0
 	b.animateBorderColor = false
 	b.borderColorToAnimateTo = {1,1,1,1}
 	b.borderColorAnimateSpeed = 0
-	b.borderColorAnimateTime = lt.getTime()
+	b.borderColorAnimateTime = 0
 	b.animatePosition = false
 	b.positionAnimateSpeed = 0
 	b.positionToAnimateTo = {x = 0, y = 0}
 	b.positionToAnimateFrom = {x = 0, y = 0}
-	b.positionAnimateTime = lt.getTime()
+	b.positionAnimateTime = 0
 	b.animateOpacity = false
 	b.opacityAnimateSpeed = 0
 	b.opacityToAnimateTo = 0
-	b.opacityAnimateTime = lt.getTime()
+	b.opacityAnimateTime = 0
 	b.animateBorderOpacity = false
 	b.opacityToAnimateBorderTo = 0
-	b.opacityBorderAnimateTime = lt.getTime()
+	b.opacityBorderAnimateTime = 0
 	b.opacityBorderAnimateSpeed = 0
 	
 	function b:addImage(i, n, a)
@@ -117,7 +115,7 @@ function box:new(n, p)
 		if not self.fadedByFunc then
 			self.colorToAnimateTo = c
 			self.colorAnimateSpeed = s
-			self.colorAnimateTime = lt.getTime()
+			self.colorAnimateTime = 0
 			self.inAnimation = true
 			self.animateColor = true
 		end
@@ -133,7 +131,7 @@ function box:new(n, p)
 		if not self.fadedByFunc then
 			self.borderColorToAnimateTo = c
 			self.borderColorAnimateSpeed = s
-			self.borderColorAnimateTime = lt.getTime()
+			self.borderColorAnimateTime = 0
 			self.inAnimation = true
 			self.animateBorderColor = true
 		end
@@ -142,16 +140,22 @@ function box:new(n, p)
 	
 	function b:animateToPosition(x, y, s)
 		assert(x, "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Missing param[x]")
-		assert(type(x) == "number", "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Incorrect param[x] - expecting number and got " .. type(x))
+		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
 		assert(y, "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Missing param[y]")
-		assert(type(y) == "number", "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Incorrect param[y] - expecting number and got " .. type(y))
+		assert(type(y) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Incorrect param[y] - expecting number or 'auto' and got " .. type(y))
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
 		if not self.fadedByFunc then
+			if x == "auto" then
+				x = self.pos.x
+			end
+			if y == "auto" then
+				y = self.pos.y
+			end
 			self.positionToAnimateTo = {x = x, y = y}
 			self.positionAnimateSpeed = s
-			self.positionAnimateTime = lt.getTime()
+			self.positionAnimateTime = 0
 			self.inAnimation = true
 			self.animatePosition = true
 		end
@@ -165,7 +169,7 @@ function box:new(n, p)
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		if not self.fadedByFunc then
 			self.opacityToAnimateTo = o
-			self.opacityAnimateTime = lt.getTime()
+			self.opacityAnimateTime = 0
 			self.opacityAnimateSpeed = s
 			self.inAnimation = true
 			self.animateOpacity = true
@@ -180,7 +184,7 @@ function box:new(n, p)
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		if not self.fadedByFunc then
 			self.opacityToAnimateBorderTo = o
-			self.opacityBorderAnimateTime = lt.getTime()
+			self.opacityBorderAnimateTime = 0
 			self.opacityBorderAnimateSpeed = s
 			self.inAnimation = true
 			self.animateBorderOpacity = true
