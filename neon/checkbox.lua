@@ -29,6 +29,7 @@
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
 local checkbox = {}
+checkbox.__index = checkbox
 
 checkbox.items = {}
 checkbox.guis = {}
@@ -86,6 +87,7 @@ function checkbox:new(n, p)
 	c.fixPadding = false
 	c.moveable = false
 	c.held = false
+	c.forceOption = false
 	c.events = {}
 	c.options = {}
 	c.optionPaddingLeft = 0
@@ -113,13 +115,13 @@ function checkbox:new(n, p)
 	c.opacityBorderAnimateTime = 0
 	c.opacityBorderAnimateSpeed = 0
 	
-	function c:animateToColor(t, s)
+	function c:animateToColor(t, s, f)
 		assert(t, "[" .. self.name .. "] FAILURE: checkbox:animateToColor() :: Missing param[color]")
 		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: checkbox:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(t))
 		assert(#t == 4, "[" .. self.name .. "] FAILURE: checkbox:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #t)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.colorToAnimateTo = t
 			self.colorAnimateSpeed = s
 			self.colorAnimateTime = 0
@@ -129,13 +131,13 @@ function checkbox:new(n, p)
 		return self
 	end
 	
-	function c:animateBorderToColor(t, s)
+	function c:animateBorderToColor(t, s, f)
 		assert(t, "[" .. self.name .. "] FAILURE: checkbox:animateBorderToColor() :: Missing param[color]")
 		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: checkbox:animateBorderToColor() :: Incorrect param[color] - expecting table and got " .. type(t))
 		assert(#t > 2, "[" .. self.name .. "] FAILURE: checkbox:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #t)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.borderColorToAnimateTo = t
 			self.borderColorAnimateSpeed = s
 			self.borderColorAnimateTime = 0
@@ -145,7 +147,7 @@ function checkbox:new(n, p)
 		return self
 	end
 	
-	function c:animateToPosition(x, y, s)
+	function c:animateToPosition(x, y, s, f)
 		assert(x, "[" .. self.name .. "] FAILURE: checkbox:animateToPosition() :: Missing param[x]")
 		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: checkbox:animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
 		assert(y, "[" .. self.name .. "] FAILURE: checkbox:animateToPosition() :: Missing param[y]")
@@ -153,7 +155,7 @@ function checkbox:new(n, p)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			if x == "auto" then
 				x = self.pos.x
 			end
@@ -169,12 +171,12 @@ function checkbox:new(n, p)
 		return self
 	end
 	
-	function c:animateToOpacity(o, s)
+	function c:animateToOpacity(o, s, f)
 		assert(o, "[" .. self.name .. "] FAILURE: checkbox:animateToOpacity() :: Missing param[o]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: checkbox:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.opacityToAnimateTo = o
 			self.opacityAnimateTime = 0
 			self.opacityAnimateSpeed = s
@@ -184,12 +186,12 @@ function checkbox:new(n, p)
 		return self
 	end
 	
-	function c:animateBorderToOpacity(o, s)
+	function c:animateBorderToOpacity(o, s, f)
 		assert(o, "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Missing param[o]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.opacityToAnimateBorderTo = o
 			self.opacityBorderAnimateTime = 0
 			self.opacityBorderAnimateSpeed = s
@@ -291,6 +293,8 @@ function checkbox:new(n, p)
 		if d.singleSelection ~= nil then self.single = d.singleSelection end
 		if d.fixPadding ~= nil then self.fixPadding = d.fixPadding end
 		if d.fix ~= nil then self.fixPadding = d.fix end
+		if d.force ~= nil then self.forceOption = d.force end
+		if d.forceOption ~= nil then self.forceOption = d.forceOption end
 		if d.color then
 			for k,v in ipairs(d.color) do
 				self.color[k] = v
@@ -515,6 +519,17 @@ function checkbox:new(n, p)
 		return self.font
 	end
 	
+	function c:setForceOption(f)
+		assert(f ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setForceOption() :: Missing param[hollow]")
+		assert(type(f) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setForceOption() :: Incorrect param[hollow] - expecting boolean and got " .. type(f))
+		self.forceOption = f
+		return self
+	end
+	
+	function c:getForceOption()
+		return self.forceOption
+	end
+	
 	function c:setHeight(h)
 		assert(h, "[" .. self.name .. "] FAILURE: checkbox:setHeight() :: Missing param[height]")
 		assert(type(h) == "number", "[" .. self.name .. "] FAILURE: checkbox:setHeight() :: Incorrect param[height] - expecting number and got " .. type(h))
@@ -597,7 +612,13 @@ function checkbox:new(n, p)
 			for k,v in ipairs(self.options) do
 				if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
 					if self.selected[k] then
-						self.selected[k] = nil
+						if self.forceOption then
+							if #self.selected > 1 then
+								self.selected[k] = nil
+							end
+						else
+							self.selected[k] = nil
+						end
 					else
 						if self.single then
 							self.selected = {}
@@ -812,6 +833,7 @@ function checkbox:new(n, p)
 		return (1 - c) * e + c * s
 	end
 	
+	setmetatable(c, checkbox)
 	return c
 end
 

@@ -28,6 +28,7 @@
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
 local dropdown = {}
+dropdown.__index = dropdown
 
 dropdown.items = {}
 dropdown.guis = {}
@@ -116,13 +117,13 @@ function dropdown:new(n, p)
 	d.opacityBorderAnimateTime = 0
 	d.opacityBorderAnimateSpeed = 0
 	
-	function d:animateToColor(t, s)
+	function d:animateToColor(t, s, f)
 		assert(t, "[" .. self.name .. "] FAILURE: dropdown:animateToColor() :: Missing param[color]")
 		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: dropdown:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(t))
 		assert(#t == 4, "[" .. self.name .. "] FAILURE: dropdown:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #t)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.colorToAnimateTo = t
 			self.colorAnimateSpeed = s
 			self.colorAnimateTime = 0
@@ -132,13 +133,13 @@ function dropdown:new(n, p)
 		return self
 	end
 	
-	function d:animateBorderToColor(t, s)
+	function d:animateBorderToColor(t, s, f)
 		assert(t, "[" .. self.name .. "] FAILURE: dropdown:animateBorderToColor() :: Missing param[color]")
 		assert(type(t) == "table", "[" .. self.name .. "] FAILURE: dropdown:animateBorderToColor() :: Incorrect param[color] - expecting table and got " .. type(t))
 		assert(#t > 2, "[" .. self.name .. "] FAILURE: dropdown:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #t)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.borderColorToAnimateTo = t
 			self.borderColorAnimateSpeed = s
 			self.borderColorAnimateTime = 0
@@ -148,7 +149,7 @@ function dropdown:new(n, p)
 		return self
 	end
 	
-	function d:animateToPosition(x, y, s)
+	function d:animateToPosition(x, y, s, f)
 		assert(x, "[" .. self.name .. "] FAILURE: dropdown:animateToPosition() :: Missing param[x]")
 		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: dropdown:animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
 		assert(y, "[" .. self.name .. "] FAILURE: dropdown:animateToPosition() :: Missing param[y]")
@@ -156,7 +157,7 @@ function dropdown:new(n, p)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			if x == "auto" then
 				x = self.pos.x
 			end
@@ -172,12 +173,12 @@ function dropdown:new(n, p)
 		return self
 	end
 	
-	function d:animateToOpacity(o, s)
+	function d:animateToOpacity(o, s, f)
 		assert(o, "[" .. self.name .. "] FAILURE: dropdown:animateToOpacity() :: Missing param[o]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: dropdown:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.opacityToAnimateTo = o
 			self.opacityAnimateTime = 0
 			self.opacityAnimateSpeed = s
@@ -187,12 +188,12 @@ function dropdown:new(n, p)
 		return self
 	end
 	
-	function d:animateBorderToOpacity(o, s)
+	function d:animateBorderToOpacity(o, s, f)
 		assert(o, "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Missing param[o]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.opacityToAnimateBorderTo = o
 			self.opacityBorderAnimateTime = 0
 			self.opacityBorderAnimateSpeed = s
@@ -762,6 +763,7 @@ function dropdown:new(n, p)
 		return (1 - c) * e + c * s
 	end
 	
+	setmetatable(d, dropdown)
 	return d
 end
 

@@ -29,6 +29,7 @@
 local lg, lt = love.graphics, love.timer
 local min, max, abs, floor = math.min, math.max, math.abs, math.floor
 local textfield = {}
+textfield.__index = textfield
 local keyIsDown = false
 
 textfield.items = {}
@@ -107,13 +108,13 @@ function textfield:new(n, p)
 	t.opacityBorderAnimateTime = 0
 	t.opacityBorderAnimateSpeed = 0
 	
-	function t:animateToColor(c, s)
+	function t:animateToColor(c, s, f)
 		assert(c, "[" .. self.name .. "] FAILURE: textfield:animateToColor() :: Missing param[color]")
 		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: textfield:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
 		assert(#c == 4, "[" .. self.name .. "] FAILURE: textfield:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: textfield:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.colorToAnimateTo = c
 			self.colorAnimateSpeed = s
 			self.colorAnimateTime = 0
@@ -123,7 +124,7 @@ function textfield:new(n, p)
 		return self
 	end
 	
-	function t:animateToPosition(x, y, s)
+	function t:animateToPosition(x, y, s, f)
 		assert(x, "[" .. self.name .. "] FAILURE: textfield:animateToPosition() :: Missing param[x]")
 		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: textfield:animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
 		assert(y, "[" .. self.name .. "] FAILURE: textfield:animateToPosition() :: Missing param[y]")
@@ -131,7 +132,7 @@ function textfield:new(n, p)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: textfield:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			if x == "auto" then
 				x = self.pos.x
 			end
@@ -147,12 +148,12 @@ function textfield:new(n, p)
 		return self
 	end
 	
-	function t:animateToOpacity(o, s)
+	function t:animateToOpacity(o, s, f)
 		assert(o, "[" .. self.name .. "] FAILURE: textfield:animateToOpacity() :: Missing param[o]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: textfield:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: textfield:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.opacityToAnimateTo = o
 			self.opacityAnimateTime = 0
 			self.opacityAnimateSpeed = s
@@ -613,6 +614,7 @@ function textfield:new(n, p)
 		return (1 - c) * e + c * s
 	end
 	
+	setmetatable(t, textfield)
 	return t
 end
 

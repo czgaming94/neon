@@ -61,6 +61,7 @@ gui.z = 0
 gui.use255 = false
 gui.id = 1
 gui.enabled = true
+gui.allowUpdate = true
 gui.held = {}
 gui.images = {}
 
@@ -217,6 +218,15 @@ function gui:animateToOpacity(obj, o, s)
 	return obj
 end
 
+function gui:canUpdate(a)
+	if a ~= nil then
+		assert(type(a) == "boolean", "FAILURE: gui:canUpdate() :: Incorrect param[update] - expecting boolean and got " .. type(a))
+		self.allowUpdate = a
+		return self
+	else
+		return self.allowUpdate
+	end
+end
 
 function gui:addColor(c, n)
 	if not self.enabled then return false end
@@ -295,220 +305,217 @@ end
 
 function gui:update(dt)
 	if not self.enabled then return false end
-	local c = coroutine.create(function()
-		for _,v in ipairs(items) do 
-			if v.enabled then
-				for _,i in ipairs(v.items) do 
-					if not i.hidden then 
-						local x,y = love.mouse.getPosition()
-						local hover = (x >= i.pos.x + i.paddingLeft and x <= i.pos.x + i.w + i.paddingRight) and (y >= i.pos.y + i.paddingTop and y <= i.pos.y + i.h + i.paddingBottom)
-						local event = {x=x,y=y}
-						if i.type == "text" then
-							hover = (x >= i.pos.x and x <= i.pos.x + i.w) and (y >= i.pos.y and y <= i.pos.y + i.h)
-						elseif i.type == "dropdown" then
-							if i.border then
-								hover = i.open and (x >= i.pos.x and x <= i.pos.x + i.dW + i.optionPaddingLeft + i.optionPaddingRight + 2 and y >= i.pos.y and y <= i.pos.y + i.h + i.dH) or (x >= i.pos.x and x <= i.pos.x + i.w and y >= i.pos.y and y <= i.pos.y + i.h)
-							else
-								hover = i.open and (x >= i.pos.x and x <= i.pos.x + i.dW + i.optionPaddingLeft + i.optionPaddingRight and y >= i.pos.y and y <= i.pos.y + i.h + i.dH) or (x >= i.pos.x and x <= i.pos.x + i.w and y >= i.pos.y and y <= i.pos.y + i.h)
+	for _,v in ipairs(items) do 
+		if v.enabled and v:canUpdate() then
+			for _,i in ipairs(v.items) do 
+				if not i.hidden then 
+					local x,y = love.mouse.getPosition()
+					local hover = (x >= i.pos.x + i.paddingLeft and x <= i.pos.x + i.w + i.paddingRight) and (y >= i.pos.y + i.paddingTop and y <= i.pos.y + i.h + i.paddingBottom)
+					local event = {x=x,y=y}
+					if i.type == "text" then
+						hover = (x >= i.pos.x and x <= i.pos.x + i.w) and (y >= i.pos.y and y <= i.pos.y + i.h)
+					elseif i.type == "dropdown" then
+						if i.border then
+							hover = i.open and (x >= i.pos.x and x <= i.pos.x + i.dW + i.optionPaddingLeft + i.optionPaddingRight + 2 and y >= i.pos.y and y <= i.pos.y + i.h + i.dH) or (x >= i.pos.x and x <= i.pos.x + i.w and y >= i.pos.y and y <= i.pos.y + i.h)
+						else
+							hover = i.open and (x >= i.pos.x and x <= i.pos.x + i.dW + i.optionPaddingLeft + i.optionPaddingRight and y >= i.pos.y and y <= i.pos.y + i.h + i.dH) or (x >= i.pos.x and x <= i.pos.x + i.w and y >= i.pos.y and y <= i.pos.y + i.h)
+						end
+					end
+					if hover then
+						if i.hovered then
+							if i.events.whileHovering then 
+								for _,v in ipairs(i.events.whileHovering) do	
+									v.fn(i, v.target, event)
+								end
 							end
 						end
-						if hover then
-							if i.hovered then
-								if i.events.whileHovering then 
-									for _,v in ipairs(i.events.whileHovering) do	
+						if not i.hovered then
+							if i.events.onHoverEnter then 
+								for _,v in ipairs(i.events.onHoverEnter) do	
+									v.fn(i, v.target, event)
+								end
+							end
+							if events.onHoverEnter then
+								for _,v in ipairs(events.onHoverEnter) do
+									if v.o == i.type then
 										v.fn(i, v.target, event)
 									end
 								end
 							end
-							if not i.hovered then
-								if i.events.onHoverEnter then 
-									for _,v in ipairs(i.events.onHoverEnter) do	
-										v.fn(i, v.target, event)
-									end
+							i.hovered = true 
+						end
+					else
+						if i.hovered then 
+							if i.events.onHoverExit then 
+								for _,v in ipairs(i.events.onHoverExit) do	
+									v.fn(i, v.target, event)
 								end
-								if events.onHoverEnter then
-									for _,v in ipairs(events.onHoverEnter) do
-										if v.o == i.type then
-											v.fn(i, v.target, event)
-										end
-									end
-								end
-								i.hovered = true 
 							end
-						else
-							if i.hovered then 
-								if i.events.onHoverExit then 
-									for _,v in ipairs(i.events.onHoverExit) do	
+							if events.onHoverExit then
+								for _,v in ipairs(events.onHoverExit) do
+									if v.o == i.type then
 										v.fn(i, v.target, event)
 									end
 								end
-								if events.onHoverExit then
-									for _,v in ipairs(events.onHoverExit) do
-										if v.o == i.type then
-											v.fn(i, v.target, event)
-										end
+							end
+							i.hovered = false 
+						end
+					end
+					
+					if i:isAnimating() then
+						local allColorsMatch = true
+						local allBorderColorsMatch = true
+						local inProperPosition = true
+						local atProperOpacity = true
+						local atProperBorderOpacity = true
+						
+						if i.animateColor then
+							for k,v in ipairs(i.colorToAnimateTo) do
+								if i.color[k] ~= v then
+									if v > i.color[k] then
+										i.color[k] = min(v, i.color[k] + (i.colorAnimateSpeed * dt))
+									else
+										i.color[k] = max(v, i.color[k] - (i.colorAnimateSpeed * dt))
 									end
+									allColorsMatch = false
 								end
-								i.hovered = false 
 							end
 						end
 						
-						if i:isAnimating() then
-							local allColorsMatch = true
-							local allBorderColorsMatch = true
-							local inProperPosition = true
-							local atProperOpacity = true
-							local atProperBorderOpacity = true
-							
-							if i.animateColor then
-								for k,v in ipairs(i.colorToAnimateTo) do
-									if i.color[k] ~= v then
-										if v > i.color[k] then
-											i.color[k] = min(v, i.color[k] + (i.colorAnimateSpeed * dt))
-										else
-											i.color[k] = max(v, i.color[k] - (i.colorAnimateSpeed * dt))
-										end
-										allColorsMatch = false
-									end
-								end
+						if i.animatePosition then
+							i.positionAnimateTime = i.positionAnimateTime + dt
+							local t = min(i.positionAnimateTime * (i.positionAnimateSpeed / 10), 1.0)
+							if i.pos.x ~= i.positionToAnimateTo.x or i.pos.y ~= i.positionToAnimateTo.y then
+								i.pos.x = i.lerp(i.positionToAnimateFrom.x, i.positionToAnimateTo.x, t)
+								i.pos.y = i.lerp(i.positionToAnimateFrom.y, i.positionToAnimateTo.y, t)
+								inProperPosition = false
 							end
-							
-							if i.animatePosition then
-								i.positionAnimateTime = i.positionAnimateTime + dt
-								local t = min(i.positionAnimateTime * (i.positionAnimateSpeed / 10), 1.0)
-								if i.pos.x ~= i.positionToAnimateTo.x or i.pos.y ~= i.positionToAnimateTo.y then
-									i.pos.x = i.lerp(i.positionToAnimateFrom.x, i.positionToAnimateTo.x, t)
-									i.pos.y = i.lerp(i.positionToAnimateFrom.y, i.positionToAnimateTo.y, t)
-									inProperPosition = false
-								end
-							end
-							
-							if i.animateOpacity then
-								if i.color[4] ~= i.opacityToAnimateTo then
-									if i.color[4] < i.opacityToAnimateTo then
-										i.color[4] = min(i.opacityToAnimateTo, i.color[4] + (i.opacityAnimateSpeed * dt))
-									else
-										i.color[4] = max(i.opacityToAnimateTo, i.color[4] - (i.opacityAnimateSpeed * dt))
-									end
-									atProperOpacity = false
+						end
+						
+						if i.animateOpacity then
+							if i.color[4] ~= i.opacityToAnimateTo then
+								if i.color[4] < i.opacityToAnimateTo then
+									i.color[4] = min(i.opacityToAnimateTo, i.color[4] + (i.opacityAnimateSpeed * dt))
 								else
-									if i.fadedByFunc then
-										if i.color[4] == 1 then
-											if i.events.afterFadeIn then 
-												for _,v in ipairs(i.events.afterFadeIn) do
+									i.color[4] = max(i.opacityToAnimateTo, i.color[4] - (i.opacityAnimateSpeed * dt))
+								end
+								atProperOpacity = false
+							else
+								if i.fadedByFunc then
+									if i.color[4] == 1 then
+										if i.events.afterFadeIn then 
+											for _,v in ipairs(i.events.afterFadeIn) do
+												v.fn(i, v.target, event)
+											end
+										end
+										if events.afterFadeIn then
+											for _,v in ipairs(events.afterFadeIn) do
+												if v.o == i.type then
 													v.fn(i, v.target, event)
 												end
 											end
-											if events.afterFadeIn then
-												for _,v in ipairs(events.afterFadeIn) do
-													if v.o == i.type then
-														v.fn(i, v.target, event)
-													end
-												end
+										end
+									elseif i.color[4] == 0 then
+										if i.events.afterFadeOut then 
+											for _,v in ipairs(i.events.afterFadeOut) do
+												v.fn(i, v.target, event)
 											end
-										elseif i.color[4] == 0 then
-											if i.events.afterFadeOut then 
-												for _,v in ipairs(i.events.afterFadeOut) do
+										end
+										if events.afterFadeOut then
+											for _,v in ipairs(events.afterFadeOut) do
+												if v.o == i.type then
 													v.fn(i, v.target, event)
 												end
 											end
-											if events.afterFadeOut then
-												for _,v in ipairs(events.afterFadeOut) do
-													if v.o == i.type then
-														v.fn(i, v.target, event)
-													end
-												end
-											end
 										end
-										i.fadedByFunc = false
 									end
+									i.fadedByFunc = false
 								end
 							end
-							
-							if i.animateBorderColor then
-								for k,v in ipairs(i.borderColorToAnimateTo) do
-									if i.borderColor[k] ~= v then
-										if v > i.borderColor[k] then
-											i.borderColor[k] = min(v, i.borderColor[k] + (i.borderColorAnimateSpeed * dt))
-										else
-											i.borderColor[k] = max(v, i.borderColor[k] - (i.borderColorAnimateSpeed * dt))
-										end
-										allBorderColorsMatch = false
-									end
-								end
-							end
-							
-							if i.animateBorderOpacity then
-								if i.borderColor[4] ~= i.opacityToAnimateBorderTo then
-									if i.borderColor[4] < i.opacityToAnimateBorderTo then
-										i.borderColor[4] = min(i.opacityToAnimateBorderTo, i.borderColor[4] + (i.opacityBorderAnimateSpeed * dt))
+						end
+						
+						if i.animateBorderColor then
+							for k,v in ipairs(i.borderColorToAnimateTo) do
+								if i.borderColor[k] ~= v then
+									if v > i.borderColor[k] then
+										i.borderColor[k] = min(v, i.borderColor[k] + (i.borderColorAnimateSpeed * dt))
 									else
-										i.borderColor[4] = max(i.opacityToAnimateBorderTo, i.borderColor[4] - (i.opacityBorderAnimateSpeed * dt))
+										i.borderColor[k] = max(v, i.borderColor[k] - (i.borderColorAnimateSpeed * dt))
 									end
-									atProperBorderOpacity = false
+									allBorderColorsMatch = false
+								end
+							end
+						end
+						
+						if i.animateBorderOpacity then
+							if i.borderColor[4] ~= i.opacityToAnimateBorderTo then
+								if i.borderColor[4] < i.opacityToAnimateBorderTo then
+									i.borderColor[4] = min(i.opacityToAnimateBorderTo, i.borderColor[4] + (i.opacityBorderAnimateSpeed * dt))
 								else
-									if i.fadedByFunc then
-										if i.borderColor[4] == 1 then
-											if i.events.afterFadeIn then 
-												for _,v in ipairs(i.events.afterFadeIn) do
+									i.borderColor[4] = max(i.opacityToAnimateBorderTo, i.borderColor[4] - (i.opacityBorderAnimateSpeed * dt))
+								end
+								atProperBorderOpacity = false
+							else
+								if i.fadedByFunc then
+									if i.borderColor[4] == 1 then
+										if i.events.afterFadeIn then 
+											for _,v in ipairs(i.events.afterFadeIn) do
+												v.fn(i, v.target, event)
+											end
+										end
+										if events.afterFadeIn then
+											for _,v in ipairs(events.afterFadeIn) do
+												if v.o == i.type then
 													v.fn(i, v.target, event)
-												end
-											end
-											if events.afterFadeIn then
-												for _,v in ipairs(events.afterFadeIn) do
-													if v.o == i.type then
-														v.fn(i, v.target, event)
-													end
-												end
-											end
-										elseif i.borderColor[4] == 0 then
-											if i.events.afterFadeOut then 
-												for _,v in ipairs(i.events.afterFadeOut) do
-													v.fn(i, v.target, event)
-												end
-											end
-											if events.afterFadeOut then
-												for _,v in ipairs(events.afterFadeOut) do
-													if v.o == i.type then
-														v.fn(i, v.target, event)
-													end
 												end
 											end
 										end
-										i.fadedByFunc = false
+									elseif i.borderColor[4] == 0 then
+										if i.events.afterFadeOut then 
+											for _,v in ipairs(i.events.afterFadeOut) do
+												v.fn(i, v.target, event)
+											end
+										end
+										if events.afterFadeOut then
+											for _,v in ipairs(events.afterFadeOut) do
+												if v.o == i.type then
+													v.fn(i, v.target, event)
+												end
+											end
+										end
 									end
+									i.fadedByFunc = false
 								end
 							end
-							
-							if allColorsMatch and inProperPosition and atProperOpacity and allBorderColorsMatch and atProperBorderOpacity then
-								i.inAnimation = false
-								i.animateColor = false
-								i.animatePosition = false
-								if i.animateOpacity and i.faded then i.hidden = true end
-								i.animateOpacity = false
-								i.animateBorderColor = false
-								i.animateBorderOpacity = false
-								if i.events.onAnimationComplete then
-									for _,v in ipairs(i.events.onAnimationComplete) do
+						end
+						
+						if allColorsMatch and inProperPosition and atProperOpacity and allBorderColorsMatch and atProperBorderOpacity then
+							i.inAnimation = false
+							i.animateColor = false
+							i.animatePosition = false
+							if i.animateOpacity and i.faded then i.hidden = true end
+							i.animateOpacity = false
+							i.animateBorderColor = false
+							i.animateBorderOpacity = false
+							if i.events.onAnimationComplete then
+								for _,v in ipairs(i.events.onAnimationComplete) do
+									v.fn(i, v.target, event)
+								end
+							end
+							if events.onAnimationComplete then
+								for _,v in ipairs(events.onAnimationComplete) do
+									if v.o == i.type then
 										v.fn(i, v.target, event)
-									end
-								end
-								if events.onAnimationComplete then
-									for _,v in ipairs(events.onAnimationComplete) do
-										if v.o == i.type then
-											v.fn(i, v.target, event)
-										end
 									end
 								end
 							end
 						end
-						i:update(dt)
 					end
-				end 
-			end
+					i:update(dt)
+				end
+			end 
 		end
-	end)
-	coroutine.resume(c)
+	end
 end
 
 function gui:enable()
@@ -572,6 +579,21 @@ function gui:child(n, i)
 		end
 	end
 	return nil
+end
+
+function gui:children(t, i)
+	if not self.enabled then return false end
+	local children = {}
+	for _,g in ipairs(items) do
+		if g.enabled or i then
+			for _,v in ipairs(g.items) do
+				if v.type == t then
+					children[#children + 1] = v
+				end
+			end
+		end
+	end
+	return children
 end
 
 function gui:getHeld()
@@ -715,73 +737,72 @@ function gui:mousepressed(x, y, button, istouch, presses)
 	if not self.enabled then return false end
 	local event = {x=x, y=y, button=button, istouch=istouch, presses=presses}
 	local objs = self:copy(items, "handles")
-	local c = coroutine.create(function()
-		table.sort(objs, function(a, b) return a.z > b.z end)
-		local hitTarget = false
-		for _,o in ipairs(objs) do
-			if o.enabled then
-				local obj = self:copy(o, "handles")
-				table.sort(obj.items, function(a,b) 
-					if not a or not b then return false end
-					return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z 
-				end)
-				for k,v in ipairs(obj.items) do
-					local i = self:child(v.name)
-					if i then
-						if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
-							if i.moveable then
-								i.held = true
-								local heldID = #self.held + 1
-								self.held[heldID] = {id = heldID, obj = i}
+	
+	table.sort(objs, function(a, b) return a.z > b.z end)
+	local hitTarget = false
+	for _,o in ipairs(objs) do
+		if o.enabled then
+			local obj = self:copy(o, "handles")
+			table.sort(obj.items, function(a,b) 
+				if not a or not b then return false end
+				return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z 
+			end)
+			for k,v in ipairs(obj.items) do
+				local i = self:child(v.name)
+				if i then
+					if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
+						if i.moveable then
+							i.held = true
+							local heldID = #self.held + 1
+							self.held[heldID] = {id = heldID, obj = i}
+						end
+						if i.mousepressed then i:mousepressed(event) end
+						if button == 1 then
+							if i.events.onClick then 
+								for j,e in ipairs(i.events.onClick) do
+									e.fn(i, e.target, event)
+								end
 							end
-							if i.mousepressed then i:mousepressed(event) end
-							if button == 1 then
-								if i.events.onClick then 
-									for j,e in ipairs(i.events.onClick) do
+							if events.onClick then
+								for _,e in ipairs(events.onClick) do
+									if e.o == i.type then
 										e.fn(i, e.target, event)
 									end
 								end
-								if events.onClick then
-									for _,e in ipairs(events.onClick) do
-										if e.o == i.type then
-											e.fn(i, e.target, event)
-										end
-									end
+							end
+						else
+							if i.events.onRightClick then 
+								for j,e in ipairs(i.events.onRightClick) do
+									e.fn(i, e.target, event)
 								end
-							else
-								if i.events.onRightClick then 
-									for j,e in ipairs(i.events.onRightClick) do
+							end
+							if events.onRightClick then
+								for _,e in ipairs(events.onRightClick) do
+									if e.o == i.type then
 										e.fn(i, e.target, event)
 									end
 								end
-								if events.onRightClick then
-									for _,e in ipairs(events.onRightClick) do
-										if e.o == i.type then
-											e.fn(i, e.target, event)
-										end
-									end
-								end
 							end
-							if not i.hollow then hitTarget = true end
 						end
-						if i.type == "dropdown" and i.open and not i.hovered then
-							local optionHit = false
-							for k,v in ipairs(i.options) do
-								if v.hovered then optionHit = true end
-							end
-							if not optionHit then i.open = false end
+						if not i.hollow then hitTarget = true end
+					end
+					if i.type == "dropdown" and i.open and not i.hovered then
+						local optionHit = false
+						for k,v in ipairs(i.options) do
+							if v.hovered then optionHit = true end
 						end
-						if i.type == "textfield" and i.active and not i.hovered then
-							i.active = false
-						end
+						if not optionHit then i.open = false end
+					end
+					if i.type == "textfield" and i.active and not i.hovered then
+						i.active = false
 					end
 				end
-				obj = nil
 			end
+			obj = nil
 		end
-		objs = nil
-	end)
-	coroutine.resume(c)
+	end
+	objs = nil
+		
 end
 
 function gui:mousereleased(x, y, button, istouch, presses)

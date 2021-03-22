@@ -29,6 +29,7 @@
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
 local box = {}
+box.__index = box
 
 box.items = {}
 box.guis = {}
@@ -63,11 +64,16 @@ function box:new(n, p)
 	b.faded = false
 	b.fadedByFunc = false
 	b.hidden = false
+	b.round = false
+	b.radius = 0
 	b.events = {}
 	b.images = {}
 	b.image = nil
 	b.iX = 0
 	b.iY = 0
+	b.noiseX = false
+	b.noiseY = false
+	b.noiseStrength = 4
 	b.keepBackground = false
 	b.paddingLeft = 0
 	b.paddingRight = 0
@@ -106,13 +112,13 @@ function box:new(n, p)
 		return self
 	end
 	
-	function b:animateToColor(c, s)
+	function b:animateToColor(c, s, f)
 		assert(c, "[" .. self.name .. "] FAILURE: box:animateToColor() :: Missing param[color]")
 		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: box:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
 		assert(#c > 2, "[" .. self.name .. "] FAILURE: box:animateToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.colorToAnimateTo = c
 			self.colorAnimateSpeed = s
 			self.colorAnimateTime = 0
@@ -122,13 +128,13 @@ function box:new(n, p)
 		return self
 	end
 	
-	function b:animateBorderToColor(c, s)
+	function b:animateBorderToColor(c, s, f)
 		assert(c, "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Missing param[color]")
 		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
 		assert(#c > 2, "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.borderColorToAnimateTo = c
 			self.borderColorAnimateSpeed = s
 			self.borderColorAnimateTime = 0
@@ -138,7 +144,7 @@ function box:new(n, p)
 		return self
 	end
 	
-	function b:animateToPosition(x, y, s)
+	function b:animateToPosition(x, y, s, f)
 		assert(x, "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Missing param[x]")
 		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
 		assert(y, "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Missing param[y]")
@@ -146,7 +152,7 @@ function box:new(n, p)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			if x == "auto" then
 				x = self.pos.x
 			end
@@ -162,12 +168,12 @@ function box:new(n, p)
 		return self
 	end
 	
-	function b:animateToOpacity(o, s)
+	function b:animateToOpacity(o, s, f)
 		assert(o, "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Missing param[o]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.opacityToAnimateTo = o
 			self.opacityAnimateTime = 0
 			self.opacityAnimateSpeed = s
@@ -177,12 +183,12 @@ function box:new(n, p)
 		return self
 	end
 	
-	function b:animateBorderToOpacity(o, s)
+	function b:animateBorderToOpacity(o, s, f)
 		assert(o, "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Missing param[o]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.opacityToAnimateBorderTo = o
 			self.opacityBorderAnimateTime = 0
 			self.opacityBorderAnimateSpeed = s
@@ -252,6 +258,8 @@ function box:new(n, p)
 		if t.moveable ~= nil then self.moveable = t.moveable end
 		if t.hollow ~= nil then self.hollow = t.hollow end
 		if t.keepBackground then self.keepBackground = t.keepBackground end
+		if t.round then self.round = t.round end
+		self.radius = t.radius or self.radius
 		if t.color then
 			for k,v in ipairs(t.color) do
 				self.color[k] = v
@@ -291,13 +299,25 @@ function box:new(n, p)
 		lg.push()
 		
 		lg.setColor(1,1,1,1)
+		local x,y
+		if love.math.random(0,100) > 50 then
+			x = not self.noiseX and (self.pos.x) or self.pos.x + ((love.math.noise(self.pos.x)) * self.noiseStrength)
+			y = not self.noiseY and (self.pos.y) or self.pos.y + ((love.math.noise(self.pos.y)) * self.noiseStrength)
+		else
+			x = not self.noiseX and (self.pos.x) or self.pos.x - ((love.math.noise(self.pos.x)) * self.noiseStrength)
+			y = not self.noiseY and (self.pos.y) or self.pos.y - ((love.math.noise(self.pos.y)) * self.noiseStrength)
+		end
 		if self.border then
 			if self.parent and box.guis[self.parent] and box.guis[self.parent].use255 then
 				lg.setColor(love.math.colorFromBytes(self.borderColor))
 			else
 				lg.setColor(self.borderColor)
 			end
-			lg.rectangle("line", self.pos.x - 1, self.pos.y - 1, self.paddingLeft + self.w + self.paddingRight + 2, self.paddingTop + self.h + self.paddingBottom + 2)
+			if self.round then
+				lg.rectangle("line", x - 1, y - 1, self.paddingLeft + self.w + self.paddingRight + 2, self.paddingTop + self.h + self.paddingBottom + 2, self.radius)
+			else
+				lg.rectangle("line", x - 1, y - 1, self.paddingLeft + self.w + self.paddingRight + 2, self.paddingTop + self.h + self.paddingBottom + 2)
+			end
 		end
 		if self.parent and box.guis[self.parent] and box.guis[self.parent].use255 then
 			lg.setColor(love.math.colorFromBytes(self.color))
@@ -307,11 +327,19 @@ function box:new(n, p)
 		if self.image then 
 			assert(type(self.image) == "userdata", "[" .. self.name .. "] FAILURE: box:draw(" .. self.name .. ") :: Incorrect param[image] - expecting image userdata and got " .. type(self.image))
 			if self.keepBackground then
-				lg.rectangle("fill", self.pos.x, self.pos.y, self.w, self.h)
+				if self.round then
+					lg.rectangle("fill", x, y, self.w, self.h, self.radius)
+				else
+					lg.rectangle("fill", x, y, self.w, self.h)
+				end
 			end
-			lg.draw(self.image, self.pos.x + self.iX, self.pos.y + self.iY)
+			lg.draw(self.image, x + self.iX, y + self.iY)
 		else
-			lg.rectangle("fill", self.pos.x, self.pos.y, self.w, self.h)
+			if self.round then
+				lg.rectangle("fill", x, y, self.w, self.h, self.radius)
+			else
+				lg.rectangle("fill", x, y, self.w, self.h)
+			end
 		end
 		lg.pop()
 	end
@@ -403,7 +431,7 @@ function box:new(n, p)
 			if self.parent then
 				self.image = self.images[i] or box.guis[self.parent].images[i]
 			else
-				self.image = i or self.images[i]
+				self.image = self.images[i] or i
 			end
 		else self.image = i end
 		return self
@@ -508,6 +536,40 @@ function box:new(n, p)
 		return self.name
 	end
 	
+	function b:setNoiseStrength(n)
+		assert(n, "[" .. self.name .. "] FAILURE: box:setNoiseStrength() :: Missing param[strength]")
+		assert(type(n) == "number", "[" .. self.name .. "] FAILURE: box:setNoiseStrength() :: Incorrect param[strength] - expecting number and got " .. type(n))
+		self.noiseStrength = n
+		return self
+	end
+	
+	function b:getNoiseStrength()
+		return self.noiseStrength
+	end
+	
+	function b:setNoiseX(n)
+		assert(n ~= nil, "[" .. self.name .. "] FAILURE: box:setNoiseX() :: Missing param[useNoise]")
+		assert(type(n) == "boolean", "[" .. self.name .. "] FAILURE: box:setNoiseX() :: Incorrect param[useNoise] - expecting boolean and got " .. type(n))
+		self.noiseX = n
+		return self
+	end
+	
+	function b:getNoiseX()
+		return self.noiseX
+	end	
+	
+	function b:setNoiseY(n)
+		assert(n ~= nil, "[" .. self.name .. "] FAILURE: box:setNoiseY() :: Missing param[useNoise]")
+		assert(type(n) == "boolean", "[" .. self.name .. "] FAILURE: box:setNoiseY() :: Incorrect param[useNoise] - expecting boolean and got " .. type(n))
+		self.noiseY = n
+		return self
+	end
+	
+	function b:getNoiseY()
+		return self.noiseY
+	end
+
+	
 	function b:setOpacity(o)
 		assert(o, "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Missing param[opacity]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Incorrect param[opacity] - expecting number and got " .. type(o))
@@ -545,6 +607,17 @@ function box:new(n, p)
 			end
 		end
 		return self
+	end
+	
+	function b:setRounded(r)
+		assert(r ~= nil, "[" .. self.name .. "] FAILURE: box:setRounded() :: Missing param[round]")
+		assert(type(r) == "boolean", "[" .. self.name .. "] FAILURE: box:setRounded() :: Incorrect param[round] - expecting boolean and got " .. type(r))
+		self.round = r
+		return self
+	end
+	
+	function b:isRounded()
+		return self.round
 	end
 	
 	function b:touchmoved(id, x, y, dx, dy, pressure)
@@ -626,6 +699,7 @@ function box:new(n, p)
 		return (1 - t) * t1 + t * t2
 	end
 	
+	setmetatable(b, box)
 	self.items[b.id] = b
 	return b
 end

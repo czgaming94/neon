@@ -29,6 +29,7 @@
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
 local text = {}
+text.__index = text
 
 local prefixes = {
 	color = "c",
@@ -77,6 +78,7 @@ function text:new(n, p)
 	t.moveable = false
 	t.held = false
 	t.shadow = false
+	t.align = "center"
 	t.events = {}
 	t.paddingLeft = 0
 	t.paddingRight = 0
@@ -108,13 +110,13 @@ function text:new(n, p)
 	t.opacityToAnimateTo = 0
 	t.opacityAnimateTime = 0
 	
-	function t:animateToColor(c, s)
+	function t:animateToColor(c, s, f)
 		assert(c, "[" .. self.name .. "] FAILURE: text:animateToColor() :: Missing param[color]")
 		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
 		assert(#c == 4, "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			self.colorToAnimateTo = c
 			self.colorAnimateSpeed = s
 			self.colorAnimateTime = 0
@@ -124,7 +126,7 @@ function text:new(n, p)
 		return self
 	end
 	
-	function t:animateToPosition(x, y, s)
+	function t:animateToPosition(x, y, s, f)
 		assert(x, "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Missing param[x]")
 		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
 		assert(y, "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Missing param[y]")
@@ -132,7 +134,7 @@ function text:new(n, p)
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
-		if not self.fadedByFunc then
+		if not self.fadedByFunc or f then
 			if x == "auto" then
 				x = self.pos.x
 			end
@@ -148,12 +150,12 @@ function text:new(n, p)
 		return self
 	end
 	
-	function t:animateToOpacity(o, s)
+	function t:animateToOpacity(o, s, f)
 		assert(o, "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Missing param[o]")
 		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc then	
+		if not self.fadedByFunc or f then	
 			self.opacityToAnimateTo = o
 			self.opacityAnimateTime = 0
 			self.opacityAnimateSpeed = s
@@ -209,6 +211,7 @@ function text:new(n, p)
 		self.pos.y = d.y or self.pos.y
 		self.typewriterSpeed = d.s or d.speed or self.typewriterSpeed
 		self.pos.z = d.z or self.pos.z
+		self.align = d.align or self.align
 		if d.color then
 			for k,v in ipairs(d.color) do
 				self.color[k] = v
@@ -321,9 +324,9 @@ function text:new(n, p)
 		else
 			if self.w ~= 0 then
 				if self.shadow then
-					lg.printf({{0,0,0,.4}, self.text}, self.pos.x + 1, self.pos.y + 1, self.w, "center")
+					lg.printf({{0,0,0,.4}, self.text}, self.pos.x + 1, self.pos.y + 1, self.w, self.align)
 				end
-				lg.printf({self.color, self.text}, self.pos.x, self.pos.y, self.w, "center")
+				lg.printf({self.color, self.text}, self.pos.x, self.pos.y, self.w, self.align)
 			else
 				if self.shadow then
 					lg.print({{0,0,0,.4}, self.text}, self.pos.x + 1, self.pos.y + 1)
@@ -618,6 +621,7 @@ function text:new(n, p)
 		return (1 - c) * e + c * s
 	end
 	
+	setmetatable(t, text)
 	return t
 end
 
