@@ -27,7 +27,8 @@
 
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
-local dropdown = {}
+local object = require("neon.object")
+local dropdown = object()
 dropdown.__index = dropdown
 
 dropdown.items = {}

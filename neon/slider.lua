@@ -26,7 +26,8 @@
 
 
 
-local slider = {}
+local object = require("neon.object")
+local slider = object()
 
 slider.items = {}
 

@@ -28,7 +28,8 @@
 
 local lg, lt = love.graphics, love.timer
 local min, max, abs, floor = math.min, math.max, math.abs, math.floor
-local textfield = {}
+local object = require("neon.object")
+local textfield = object()
 textfield.__index = textfield
 local keyIsDown = false
 

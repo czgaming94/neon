@@ -152,7 +152,7 @@ function love.update(dt)
 end
 
 function love.draw()
-	Neon:draw()
+	Neon:drawAll()
 end
 
 function love.keypressed(key,scancode,isrepeat)

@@ -26,7 +26,8 @@
 
 
 
-local radial = {}
+local object = require("neon.object")
+local radial = object()
 
 radial.items = {}
 

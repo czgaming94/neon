@@ -28,7 +28,8 @@
 
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
-local box = {}
+local object = require("neon.object")
+local box = object()
 box.__index = box
 
 box.items = {}

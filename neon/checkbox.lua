@@ -28,7 +28,8 @@
 
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
-local checkbox = {}
+local object = require("neon.object")
+local checkbox = object()
 checkbox.__index = checkbox
 
 checkbox.items = {}
@@ -612,6 +613,8 @@ function checkbox:new(n, p)
 			for k,v in ipairs(self.options) do
 				if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
 					if self.selected[k] then
+						for e,r in ipairs(self.selected) do print(e,r) end
+						print(#self.selected)
 						if self.forceOption then
 							if #self.selected > 1 then
 								self.selected[k] = nil

@@ -28,7 +28,8 @@
 
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
-local text = {}
+local object = require("neon.object")
+local text = object()
 text.__index = text
 
 local prefixes = {

@@ -76,7 +76,7 @@ function gui:new(item)
 	if not self.enabled then return false end
 	item = item or self
 	local new = self:generate(item)
-	new.id = #items
+	new.id = #items + 1
 	items[#items + 1] = new
 	return new
 end
@@ -306,7 +306,7 @@ end
 function gui:update(dt)
 	if not self.enabled then return false end
 	for _,v in ipairs(items) do 
-		if v.enabled and v:canUpdate() then
+		if v.enabled and v.allowUpdate then
 			for _,i in ipairs(v.items) do 
 				if not i.hidden then 
 					local x,y = love.mouse.getPosition()
@@ -524,7 +524,7 @@ function gui:enable()
 end
 
 function gui:disable(kill)
-	kill = kill ~= nil and kill or true
+	if kill ~= nil then kill = kill else kill = true end
 	if kill then
 		for _,o in ipairs(items) do
 			for _,i in ipairs(o.items) do
@@ -547,19 +547,55 @@ function gui:disable(kill)
 	return self
 end
 
+function gui:drawAll()
+	if not self.enabled then return false end
+	table.sort(items, function(a,b) 
+		if not a or not b then return false end
+		if a.z == b.z then
+			if a.id == b.id then
+				return false
+			else
+				return a.id > b.id
+			end
+		else
+			return a.z < b.z
+		end
+	end)
+	for _,v in ipairs(items) do
+		table.sort(v.items, function(a,b) 
+			if not a or not b then return false end
+			if a.pos.z == b.pos.z then
+				if a.id == b.id then
+					return false
+				else
+					return a.id > b.id
+				end
+			else
+				return a.pos.z < b.pos.z
+			end
+		end)
+		for _,i in ipairs(self.items) do 
+			if not i.hidden then i:draw(dt) end
+		end
+	end
+end
+
 function gui:draw()
 	if not self.enabled then return false end
-	table.sort(items, function(a, b) return a.z < b.z end)
-	for _,v in ipairs(items) do
-		if v.enabled then
-			table.sort(v.items, function(a,b) 
-				if not a or not b then return false end 
-				return a.pos.z == b.pos.z and (a.id > b.id) or a.pos.z < b.pos.z 
-			end)
-			for _,i in ipairs(v.items) do 
-				if not i.hidden then i:draw(dt) end
+	table.sort(self.items, function(a,b) 
+		if not a or not b then return false end
+		if a.pos.z == b.pos.z then
+			if a.id == b.id then
+				return a
+			else
+				return a.id > b.id
 			end
+		else
+			return a.pos.z < b.pos.z
 		end
+	end)
+	for _,i in ipairs(self.items) do 
+		if not i.hidden then i:draw(dt) end
 	end
 end
 
@@ -738,14 +774,33 @@ function gui:mousepressed(x, y, button, istouch, presses)
 	local event = {x=x, y=y, button=button, istouch=istouch, presses=presses}
 	local objs = self:copy(items, "handles")
 	
-	table.sort(objs, function(a, b) return a.z > b.z end)
+	table.sort(objs, function(a,b) 
+		if not a or not b then return false end
+		if a.z == b.z then
+			if a.id == b.id then
+				return false
+			else
+				return a.id < b.id
+			end
+		else
+			return a.z > b.z
+		end
+	end)
 	local hitTarget = false
 	for _,o in ipairs(objs) do
 		if o.enabled then
 			local obj = self:copy(o, "handles")
 			table.sort(obj.items, function(a,b) 
 				if not a or not b then return false end
-				return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z 
+				if a.pos.z == b.pos.z then
+					if a.id == b.id then
+						return false
+					else
+						return a.id < b.id
+					end
+				else
+					return a.pos.z > b.pos.z
+				end
 			end)
 			for k,v in ipairs(obj.items) do
 				local i = self:child(v.name)
@@ -914,20 +969,17 @@ function gui:remove(n)
 	if type(n) ~= "string" and type(n) ~= "number" then
 		assert(type(n) == "string" or type(n) == "number", "FAILURE: gui:remove() :: Incorrect param[name] - expecting string or number and got " .. type(n))
 	end
-	
-	local c = coroutine.create(function()
-		if type(n) == "string" then
-			for k,t in ipairs(self.items) do
-				if t.name == n then 
-					t = nil
-					return self
-				end
+
+	if type(n) == "string" then
+		for k,t in ipairs(self.items) do
+			if t.name == n then 
+				t = nil
+				return self
 			end
-		else
-			self.items[n] = nil
 		end
-	end)
-	coroutine.resume(c)
+	else
+		self.items[n] = nil
+	end
 	return self
 end
 
