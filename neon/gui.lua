@@ -368,6 +368,7 @@ function gui:update(dt)
 						local inProperPosition = true
 						local atProperOpacity = true
 						local atProperBorderOpacity = true
+						local imagesMatch = true
 						
 						if i.animateColor then
 							for k,v in ipairs(i.colorToAnimateTo) do
@@ -379,6 +380,15 @@ function gui:update(dt)
 									end
 									allColorsMatch = false
 								end
+							end
+						end
+						
+						if i.animateImage then
+							if i.imageAnimateTime <= i.imageAnimateSpeed then
+								i.imageAnimateTime = i.imageAnimateTime + dt
+								imagesMatch = false
+							else
+								i.image = i.imageToAnimateTo
 							end
 						end
 						
@@ -489,7 +499,7 @@ function gui:update(dt)
 							end
 						end
 						
-						if allColorsMatch and inProperPosition and atProperOpacity and allBorderColorsMatch and atProperBorderOpacity then
+						if allColorsMatch and inProperPosition and atProperOpacity and allBorderColorsMatch and atProperBorderOpacity and imagesMatch then
 							i.inAnimation = false
 							i.animateColor = false
 							i.animatePosition = false
@@ -497,6 +507,7 @@ function gui:update(dt)
 							i.animateOpacity = false
 							i.animateBorderColor = false
 							i.animateBorderOpacity = false
+							i.animateImage = false
 							if i.events.onAnimationComplete then
 								for _,v in ipairs(i.events.onAnimationComplete) do
 									v.fn(i, v.target, event)
@@ -586,7 +597,7 @@ function gui:draw()
 		if not a or not b then return false end
 		if a.pos.z == b.pos.z then
 			if a.id == b.id then
-				return a
+				return false
 			else
 				return a.id > b.id
 			end
@@ -857,7 +868,6 @@ function gui:mousepressed(x, y, button, istouch, presses)
 		end
 	end
 	objs = nil
-		
 end
 
 function gui:mousereleased(x, y, button, istouch, presses)
@@ -891,47 +901,101 @@ function gui:touchmoved(id, x, y, dx, dy, pressure)
 	end
 end
 
-function gui:touchpressed(event)
+function gui:touchpressed(id, x, y, dx, dy, pressure)
 	if not self.enabled then return false end
+	local event = {id=id, x=x, y=y, dx=dx, dy=dy, pressure=pressure}
 	local objs = self:copy(items, "handles")
-	table.sort(objs, function(a, b) return a.z > b.z end)
+	
+	table.sort(objs, function(a,b) 
+		if not a or not b then return false end
+		if a.z == b.z then
+			if a.id == b.id then
+				return false
+			else
+				return a.id < b.id
+			end
+		else
+			return a.z > b.z
+		end
+	end)
 	local hitTarget = false
 	for _,o in ipairs(objs) do
 		if o.enabled then
 			local obj = self:copy(o, "handles")
-			table.sort(obj.items, function(a,b) return a.pos.z == b.pos.z and (a.id < b.id) or a.pos.z > b.pos.z end)
+			table.sort(obj.items, function(a,b) 
+				if not a or not b then return false end
+				if a.pos.z == b.pos.z then
+					if a.id == b.id then
+						return false
+					else
+						return a.id < b.id
+					end
+				else
+					return a.pos.z > b.pos.z
+				end
+			end)
 			for k,v in ipairs(obj.items) do
 				local i = self:child(v.name)
-				if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
-					if i.touchpressed then i:touchpressed(event) end
-					if button == 1 then
-						if i.events.onTouch then 
-							for j,e in ipairs(i.events.onTouch) do
-								e.fn(i, e.target, event)
-							end
+				if i then
+					if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
+						if i.moveable then
+							i.held = true
+							local heldID = #self.held + 1
+							self.held[heldID] = {id = heldID, obj = i}
 						end
-						if events.onTouch then
-							for _,e in ipairs(events.onTouch) do
-								if e.o == i.type then
+						if i.touchpressed then i:touchpressed(event) end
+						if id == 1 then
+							if i.events.onTouch then 
+								for j,e in ipairs(i.events.onTouch) do
 									e.fn(i, e.target, event)
 								end
 							end
-						end
-					else
-						if i.events.onRightTouch then 
-							for j,e in ipairs(i.events.onRightTouch) do
-								e.fn(i, e.target, event)
+							if events.onTouch then
+								for _,e in ipairs(events.onTouch) do
+									if e.o == i.type then
+										e.fn(i, e.target, event)
+									end
+								end
 							end
-						end
-						if events.onRightTouch then
-							for _,e in ipairs(events.onRightTouch) do
-								if e.o == i.type then
+						elseif id == 2 then
+							if i.events.onDoubleTouch then 
+								for j,e in ipairs(i.events.onDoubleTouch) do
 									e.fn(i, e.target, event)
 								end
 							end
+							if events.onDoubleTouch then
+								for _,e in ipairs(events.onDoubleTouch) do
+									if e.o == i.type then
+										e.fn(i, e.target, event)
+									end
+								end
+							end
+						else
+							if i.events.onMultiTouch then 
+								for j,e in ipairs(i.events.onMultiTouch) do
+									e.fn(i, e.target, event)
+								end
+							end
+							if events.onMultiTouch then
+								for _,e in ipairs(events.onMultiTouch) do
+									if e.o == i.type then
+										e.fn(i, e.target, event)
+									end
+								end
+							end
 						end
+						if not i.hollow then hitTarget = true end
 					end
-					if not i.hollow then hitTarget = true end
+					if i.type == "dropdown" and i.open and not i.hovered then
+						local optionHit = false
+						for k,v in ipairs(i.options) do
+							if v.hovered then optionHit = true end
+						end
+						if not optionHit then i.open = false end
+					end
+					if i.type == "textfield" and i.active and not i.hovered then
+						i.active = false
+					end
 				end
 			end
 			obj = nil

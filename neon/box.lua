@@ -49,6 +49,10 @@ function box:new(n, p)
 		y = 0,
 		z = 0
 	}
+	b.shaders = {
+		fadeOut = lg.newShader(love.filesystem.read("/neon/shaders/fadeOut.shader")),
+		fadeIn = lg.newShader(love.filesystem.read("/neon/shaders/fadeIn.shader"))
+	}
 	b.x = b.pos.x
 	b.y = b.pos.y
 	b.z = b.pos.z
@@ -70,6 +74,8 @@ function box:new(n, p)
 	b.events = {}
 	b.images = {}
 	b.image = nil
+	b.oldImage = nil
+	b.imageBlend = "premultiply"
 	b.iX = 0
 	b.iY = 0
 	b.noiseX = false
@@ -102,6 +108,10 @@ function box:new(n, p)
 	b.opacityToAnimateBorderTo = 0
 	b.opacityBorderAnimateTime = 0
 	b.opacityBorderAnimateSpeed = 0
+	b.animateImage = false
+	b.imageToAnimateTo = nil
+	b.imageAnimateTime = 0
+	b.imageAnimateSpeed = s
 	
 	function b:addImage(i, n, a)
 		assert(i, "[" .. self.name .. "] FAILURE: box:addImage() :: Missing param[img]")
@@ -170,8 +180,8 @@ function box:new(n, p)
 	end
 	
 	function b:animateToOpacity(o, s, f)
-		assert(o, "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Missing param[o]")
-		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
+		assert(o, "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Missing param[opacity]")
+		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Incorrect param[opacity] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		if not self.fadedByFunc or f then
@@ -185,8 +195,8 @@ function box:new(n, p)
 	end
 	
 	function b:animateBorderToOpacity(o, s, f)
-		assert(o, "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Missing param[o]")
-		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
+		assert(o, "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Missing param[opacity]")
+		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[opacity] - expecting number and got " .. type(o))
 		s = s or 1
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
 		if not self.fadedByFunc or f then
@@ -195,6 +205,27 @@ function box:new(n, p)
 			self.opacityBorderAnimateSpeed = s
 			self.inAnimation = true
 			self.animateBorderOpacity = true
+		end
+		return self
+	end
+	
+	function b:animateToImage(i, s, f)
+		assert(i, "[" .. self.name .. "] FAILURE: box:animateToImage() :: Missing param[image]")
+		assert(type(i) == "string" or type(i) == "userdata", "[" .. self.name .. "] FAILURE: box:animateToImage() :: Incorrect param[image] - expecting image userdata or string and got " .. type(i))
+		s = s or 3
+		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateToImage() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		if not self.fadedByFunc or f then
+			self.oldImage = self.image
+			self.imageAnimateFilter = {0,0,0,1}
+			if type(i) == "string" then
+				self.imageToAnimateTo = self.images[i]
+			else
+				self.imageToAnimateTo = i
+			end
+			self.imageAnimateTime = 0
+			self.imageAnimateSpeed = s
+			self.inAnimation = true
+			self.animateImage = true
 		end
 		return self
 	end
@@ -334,7 +365,19 @@ function box:new(n, p)
 					lg.rectangle("fill", x, y, self.w, self.h)
 				end
 			end
-			lg.draw(self.image, x + self.iX, y + self.iY)
+			if self.animateImage then
+				lg.setBlendMode("alpha", "alphamultiply")
+				self.shaders.fadeIn:send('time', max(0, min(1, self.imageAnimateTime / self.imageAnimateSpeed)))
+				lg.setShader(self.shaders.fadeIn)
+				lg.draw(self.imageToAnimateTo, x + self.iX, y + self.iY)
+				self.shaders.fadeOut:send('time', max(0, min(1, self.imageAnimateTime / self.imageAnimateSpeed)))
+				lg.setShader(self.shaders.fadeOut)
+				lg.draw(self.image, x + self.iX, y + self.iY)
+				lg.setShader()
+				lg.setBlendMode("alpha")
+			else
+				lg.draw(self.image, x + self.iX, y + self.iY)
+			end
 		else
 			if self.round then
 				lg.rectangle("fill", x, y, self.w, self.h, self.radius)

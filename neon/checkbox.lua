@@ -83,6 +83,7 @@ function checkbox:new(n, p)
 	c.hidden = false
 	c.vertical = false
 	c.round = false
+	c.shadowLabel = false
 	c.hollow = false
 	c.single = false
 	c.fixPadding = false
@@ -296,6 +297,7 @@ function checkbox:new(n, p)
 		if d.fix ~= nil then self.fixPadding = d.fix end
 		if d.force ~= nil then self.forceOption = d.force end
 		if d.forceOption ~= nil then self.forceOption = d.forceOption end
+		if d.labelShadow ~= nil then self.shadowLabel = d.labelShadow end
 		if d.color then
 			for k,v in ipairs(d.color) do
 				self.color[k] = v
@@ -378,9 +380,13 @@ function checkbox:new(n, p)
 		
 		if d.default then
 			for k,v in ipairs(self.options) do 
-				if v.text == d.default then
-					self.selected[k] = v
-				end 
+				if d.default == "all" then
+					v.selected = true
+				else
+					if v.text == d.default then
+						v.selected = true
+					end
+				end
 			end 
 		end
 		self.defaults = d
@@ -422,7 +428,7 @@ function checkbox:new(n, p)
 					lg.rectangle("fill", v.x, v.y, v.w, v.h)
 				end
 				
-				if self.selected[k] then
+				if v.selected then
 					lg.setColor(self.overlayColor)
 					if self.round then
 						lg.rectangle("fill", v.x, v.y, v.w, v.h, self.roundRadius, self.roundRadius)
@@ -442,6 +448,11 @@ function checkbox:new(n, p)
 		end
 		lg.setColor(self.labelColor)
 		lg.setFont(self.labelFont)
+		if self.shadowLabel then
+			lg.setColor(0,0,0,.2)
+			lg.print(self.label, self.labelPosition.x + 1, self.labelPosition.y + 1)
+			lg.setColor(self.labelColor)
+		end
 		lg.print(self.label, self.labelPosition.x, self.labelPosition.y)
 		lg.pop()
 	end
@@ -610,24 +621,24 @@ function checkbox:new(n, p)
 	function c:mousepressed(event)
 		local x, y, button = event.x, event.y, event.button
 		if button == 1 then
+			local oneIsSelected = false
 			for k,v in ipairs(self.options) do
 				if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
-					if self.selected[k] then
-						for e,r in ipairs(self.selected) do print(e,r) end
-						print(#self.selected)
-						if self.forceOption then
-							if #self.selected > 1 then
-								self.selected[k] = nil
-							end
-						else
-							self.selected[k] = nil
+					if self.single then
+						for _,o in ipairs(self.options) do
+							o.selected = false
 						end
-					else
-						if self.single then
-							self.selected = {}
-							self.selected[k] = v
-						else
-							self.selected[k] = v
+					end
+					v.selected = not v.selected
+					if self.forceOption then
+						local haveSelected = false
+						for _,o in ipairs(self.options) do
+							if o.selected then 
+								haveSelected = true 
+							end
+						end
+						if not haveSelected then
+							v.selected = true
 						end
 					end
 					if self.events.onOptionClick then 
