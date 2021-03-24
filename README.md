@@ -4,6 +4,8 @@ is to be as easy to grasp as possible for beginners, as well as users coming fro
 This API is based off of a modified version of the [standard metatable table.deepcopy function](http://lua-users.org/wiki/CopyTable).<br>
 > The deepcopy function creates a special instance of a table, allowing the user to create multiple instance
 > without overwriting the original.
+#### [If you aren't quite understanding how to start using the API, check out this quick starters guide!](https://github.com/czgaming94/neon/blob/main/docs/examples/StartGuide.md)
+
 ### GUI Handles
 The GUI lib brings a few handles and callbacks that allow the user to have full control.
 ##### :new()
@@ -238,4 +240,3 @@ functions, but each one has individual functions that are specific to only it.<b
 [Boxes](https://github.com/czgaming94/neon/blob/main/docs/Box.md) | [Text](https://github.com/czgaming94/neon/blob/main/docs/Text.md) | [Checkboxes](https://github.com/czgaming94/neon/blob/main/docs/Checkbox.md) | [Dropdowns](https://github.com/czgaming94/neon/blob/main/docs/Dropdown.md) | [Radials](https://github.com/czgaming94/neon/blob/main/docs/Radial.md) | [Sliders](https://github.com/czgaming94/neon/blob/main/docs/Slider.md) | [Textfields](https://github.com/czgaming94/neon/blob/main/docs/Textfield.md)
 ------------|------------|------------|------------|------------|------------|------------
 The goal of the box object is for backgrounds, buttons, and HUD containers. This is the most commonly used type of object in a GUI. | The text object has a few abilities. It can be treated as regular static text, or it can be treated as a typewriter, and given syntax coding to morph and affect how the text is displayed. | The checkbox is designed to be used for taking user input on choices. A top use for the checkbox is for Poll option selection. Checkboxes can accept multiple selections, or be limited to a single selection. | The dropdown is just as it sounds; A menu of options that drops down when clicked on. This is commonly used for toggling between user input options, form submissions, etc. | __Coming Soon__ | __Coming Soon__ | Textfields are as they sound. A field that text can be put. Either you the dev, can put the text that will be there in, or, you can allow the user to type into it. To disable user typing, add `useable = false` to the `setData` function, or use `:useable(false)` on the textfield object.
-#### [If you aren't quite understanding how to start using the API, check out this quick starters guide!](https://github.com/czgaming94/neon/blob/main/docs/examples/StartGuide.md)
