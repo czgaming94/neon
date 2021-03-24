@@ -134,8 +134,18 @@ These functions provide the ability to directly modify many variables of your el
 The biggest change that may happen, is accepting additional parameter types. No old elements will be broken by updates.
 ##### :addImage(userdata image, string name, boolean automatic)
 > Add an image to the box element memory. These will be used with the :setImage() function.
+```lua
+local background = love.graphics.newImage("/images/background.png")
+Neon:child("myBox"):addImage(background, "background", true)
+-- The third param being true tells the box to automatically set the currently used image to this provided image.
+```
 ##### :isAnimating()
 > Returns true/false depending on whether the element is in the process of any animation.
+```lua
+if Neon:child("myBox"):isAnimating() then
+	print("in animation")
+end
+```
 ##### :setBorderColor(table color)
 > Set the border color of your element to a new color. Default is white.
 ##### :getBorderColor()
