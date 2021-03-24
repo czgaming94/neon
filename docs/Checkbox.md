@@ -23,34 +23,46 @@ myCheckbox:setData({
 ## API Callbacks
 This API brings several user defined callbacks which allow you to customize what happens when a user interacts with your elements.<br>
 Any callback with an `event` paramter has a table provided to it with data accessible to the user. You can easily define these<br>
-with 
+with `registerEvent` or by using `registerGlobalEvent` through the parent GUI.
+##### onClick(self, target, event) -- {x, y, button, istouch, presses}
+> Triggered when a user clicks on the element.
 ```lua
-myCheckbox:registerEvent("onClick", function(self, target, event)
+Checkbox:registerEvent("onClick", function(self, target, event)
   print(target.name, event.x, event.y) 
 end, yourTargetelement)
 ```
-##### :onClick(self, target, event) -- {x, y, button, istouch, presses}
-> Triggered when a user clicks on the element.
-##### :onTouch(self, target, event) -- {id, x, y, dx, dy, pressure}
+##### onTouch(self, target, event) -- {id, x, y, dx, dy, pressure}
 > Triggered when a user taps on the element on mobile.
-##### :onHoverEnter(self, target, event) -- {x, y}
+##### onHoverEnter(self, target, event) -- {x, y}
 > Triggered when a user initially hovers over an element.
-##### :onHoverExit(self, target, event) -- {x, y}
+##### onHoverExit(self, target, event) -- {x, y}
 > Triggered when a user initially stops hovering an element.
-##### :beforeFadeIn(self, target)
+##### beforeFadeIn(self, target)
 > Triggered when an element is about to fade in.
-##### :onFadeIn(self, target)
+##### onFadeIn(self, target)
 > Triggered when an element is fading in.
-##### :afterFadeIn(self, target)
+##### afterFadeIn(self, target)
 > Triggered after an element fades in.
-##### :beforeFadeOut(self, target)
+##### beforeFadeOut(self, target)
 > Triggered when an element is about to fade out.
-##### :onFadeOut(self, target)
+##### onFadeOut(self, target)
 > Triggered when an element is fading out.
-##### :afterFadeOut(self, target)
+##### afterFadeOut(self, target)
 > Triggered after an element fades out.
-##### :onOptionClick(self, option, target, event) -- {text, width, height, x, y}, target, {x, y, button, istouch, presses}
+##### onOptionClick(self, option, target, event) -- {text, width, height, x, y}, target, {x, y, button, istouch, presses}
 > Triggered when a user clicks an option on a checkbox.
+##### onAnimationStart(self, target)
+> Triggered after an element fades out.
+```
+Neon:child("myBox"):registerEvent("onAnimationStart", function(self, target, animating)
+   if animating.position then
+      target:animateToPosition(unpack(self.positionToAnimateTo), self.positionAnimateSpeed)
+   end
+end), Neon:child("myBox2"), "moveMyBox2")
+-- tell box2 to move where you are moving, at the same speed
+```
+##### onAnimationComplete(self, target)
+> Triggered after an element fades out.
 ## Data Handling
 These functions provide the ability to directly modify many variables of your elements. The way these work currently may change.<br>
 The biggest change that may happen, is accepting additional parameter types. No old elements will be broken by updates.

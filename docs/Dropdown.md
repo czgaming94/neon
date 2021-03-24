@@ -1,6 +1,6 @@
-# Checkbox
-The checkbox is designed to be used for taking user input on choices. A top use for the checkbox is for Poll option selection.<br>
-Checkboxes can accept multiple selections, or be limited to a single selection. 
+# Dropdown
+The Dropdown is designed to be used for taking user input on choices. A top use for the Dropdown is for Poll option selection.<br>
+Dropdowns can accept multiple selections, or be limited to a single selection. 
 ## Object Creation
 ```lua
 local GUI = require("gui")
@@ -23,34 +23,48 @@ myDropdown:setData({
 ## API Callbacks
 This API brings several user defined callbacks which allow you to customize what happens when a user interacts with your elements.<br>
 Any callback with an `event` paramter has a table provided to it with data accessible to the user. You can easily define these<br>
-with 
+with `registerEvent` or by using `registerGlobalEvent` through the parent GUI.
+##### onClick(self, target, event) -- {x, y, button, istouch, presses}
+> Triggered when a user clicks on the element.
 ```lua
-myDropdown:registerEvent("onClick", function(self, target, event)
+Dropdown:registerEvent("onClick", function(self, target, event)
   print(target.name, event.x, event.y) 
 end, yourTargetelement)
 ```
-##### :onClick(self, target, event) -- {x, y, button, istouch, presses}
+##### onClick(self, target, event) -- {x, y, button, istouch, presses}
 > Triggered when a user clicks on the element.
-##### :onTouch(self, target, event) -- {id, x, y, dx, dy, pressure}
+##### onTouch(self, target, event) -- {id, x, y, dx, dy, pressure}
 > Triggered when a user taps on the element on mobile.
-##### :onHoverEnter(self, target, event) -- {x, y}
+##### onHoverEnter(self, target, event) -- {x, y}
 > Triggered when a user initially hovers over an element.
-##### :onHoverExit(self, target, event) -- {x, y}
+##### onHoverExit(self, target, event) -- {x, y}
 > Triggered when a user initially stops hovering an element.
-##### :beforeFadeIn(self, target)
+##### beforeFadeIn(self, target)
 > Triggered when an element is about to fade in.
-##### :onFadeIn(self, target)
+##### onFadeIn(self, target)
 > Triggered when an element is fading in.
-##### :afterFadeIn(self, target)
+##### afterFadeIn(self, target)
 > Triggered after an element fades in.
-##### :beforeFadeOut(self, target)
+##### beforeFadeOut(self, target)
 > Triggered when an element is about to fade out.
-##### :onFadeOut(self, target)
+##### onFadeOut(self, target)
 > Triggered when an element is fading out.
-##### :afterFadeOut(self, target)
+##### afterFadeOut(self, target)
 > Triggered after an element fades out.
-##### :onOptionClick(self, option, target, event) -- {text, width, height, x, y}, target, {x, y, button, istouch, presses}
-> Triggered when a user clicks an option on a checkbox.
+##### onOptionClick(self, option, target, event) -- {text, width, height, x, y}, target, {x, y, button, istouch, presses}
+> Triggered when a user clicks an option on a Dropdown.
+##### onAnimationStart(self, target)
+> Triggered after an element fades out.
+```
+Neon:child("myBox"):registerEvent("onAnimationStart", function(self, target, animating)
+   if animating.position then
+      target:animateToPosition(unpack(self.positionToAnimateTo), self.positionAnimateSpeed)
+   end
+end), Neon:child("myBox2"), "moveMyBox2")
+-- tell box2 to move where you are moving, at the same speed
+```
+##### onAnimationComplete(self, target)
+> Triggered after an element fades out.
 ## Data Handling
 These functions provide the ability to directly modify many variables of your elements. The way these work currently may change.<br>
 The biggest change that may happen, is accepting additional parameter types. No old elements will be broken by updates.
@@ -106,21 +120,21 @@ boolean | closeOnUnfocus | |
 ##### :isHovered()
 > Returns whether an element is hovered.
 ##### :setLabel(string label)
-> Set the label of the current checkbox.
+> Set the label of the current Dropdown.
 ##### :getLabel()
-> Get the label of the current checkbox.
+> Get the label of the current Dropdown.
 ##### :setLabelColor(table color)
-> Set the label color of the current checkbox to a new color. Default is white.
+> Set the label color of the current Dropdown to a new color. Default is white.
 ##### :getLabelColor()
-> Get the label color of the current checkbox.
+> Get the label color of the current Dropdown.
 ##### :setLabelFont(userdata font)
-> Set the label font of the current checkbox.
+> Set the label font of the current Dropdown.
 ##### :getLabelFont()
-> Get the label font of the current checkbox.
+> Get the label font of the current Dropdown.
 ##### :setLabelPosition(table pos)
-> Set the label position of the current checkbox.
+> Set the label position of the current Dropdown.
 ##### :getLabelPosition()
-> Get the label position of the current checkbox.
+> Get the label position of the current Dropdown.
 ##### :setMoveable(boolean canMove)
 > Set whether an element is moveable.
 ##### :getMoveable()
@@ -130,15 +144,15 @@ boolean | closeOnUnfocus | |
 ##### :getOpacity()
 > Get the opacity of the current element
 ##### :addOption(string option)
-> Add an option to the list of options availabe on your checkbox.
+> Add an option to the list of options availabe on your Dropdown.
 ##### :removeOption(string option)
-> Remove an option from the current checkbox.
+> Remove an option from the current Dropdown.
 ##### :setOptionColor(table color)
-> Set the option color of the current checkbox.
+> Set the option color of the current Dropdown.
 ##### :getOptionColor()
-> Get the option color of the current checkbox.
+> Get the option color of the current Dropdown.
 ##### :setOptionPadding(table padding) [top, right, bottom, left]
-> Set the padding for the current checkbox options.
+> Set the padding for the current Dropdown options.
 ##### :setOptionPaddingBottom(number padding)
 > Set the bottom padding
 ##### :setOptionPaddingLeft(number padding)
@@ -147,10 +161,6 @@ boolean | closeOnUnfocus | |
 > Set the right padding
 ##### :setOptionPaddingTop(number padding)
 > Set the top padding
-##### :setOverlayColor(table color)
-> Set the overlay color of the current checkbox.
-##### :getOverlayColor()
-> Get the overlay color of the current checkbox.
 ##### :getParent()
 > Returns the parent GUI element of the current element.
 ##### :setUseBorder(boolean useBorder)

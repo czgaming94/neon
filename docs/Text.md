@@ -17,34 +17,55 @@ myText:setData({
 ## API Callbacks
 This API brings several user defined callbacks which allow you to customize what happens when a user interacts with your elements.<br>
 Any callback with an `event` paramter has a table provided to it with data accessible to the user. You can easily define these<br>
-with `
+with `registerEvent` or by using `registerGlobalEvent` through the parent GUI.
+##### onClick(self, target, event) -- {x, y, button, istouch, presses}
+> Triggered when a user clicks on the element.
 ```lua
-myText:registerEvent("onClick", function(self, target, event)
+Text:registerEvent("onClick", function(self, target, event)
   print(target.name, event.x, event.y) 
 end, yourTargetelement)
 ```
-##### :onClick(self, target, event) -- {x, y, button, istouch, presses}
+##### onClick(self, target, event) -- {x, y, button, istouch, presses}
 > Triggered when a user clicks on the element.
-##### :onTouch(self, target, event) -- {id, x, y, dx, dy, pressure}
+##### onTouch(self, target, event) -- {id, x, y, dx, dy, pressure}
 > Triggered when a user taps on the element on mobile.
-##### :onHoverEnter(self, target, event) -- {x, y}
+##### onHoverEnter(self, target, event) -- {x, y}
 > Triggered when a user initially hovers over an element.
-##### :onHoverExit(self, target, event) -- {x, y}
+##### onHoverExit(self, target, event) -- {x, y}
 > Triggered when a user initially stops hovering an element.
-##### :beforeFadeIn(self, target)
+##### beforeFadeIn(self, target)
 > Triggered when an element is about to fade in.
-##### :onFadeIn(self, target)
+##### onFadeIn(self, target)
 > Triggered when an element is fading in.
-##### :afterFadeIn(self, target)
+##### afterFadeIn(self, target)
 > Triggered after an element fades in.
-##### :beforeFadeOut(self, target)
+##### beforeFadeOut(self, target)
 > Triggered when an element is about to fade out.
-##### :onFadeOut(self, target)
+##### onFadeOut(self, target)
 > Triggered when an element is fading out.
-##### :afterFadeOut(self, target)
+##### afterFadeOut(self, target)
 > Triggered after an element fades out.
-##### :onTypewriterFinish(self, target)
+##### onTypewriterFinish(self, target)
 > Triggered each time a typewriter element cycles its full text.
+##### onAnimationStart(self, target)
+> Triggered each time a different animation type is started.
+```
+Neon:child("myText"):registerEvent("onAnimationStart", function(self, target, animating)
+   if animating.position then
+      target:animateToPosition(unpack(self.positionToAnimateTo), self.positionAnimateSpeed)
+   end
+end), Neon:child("myText2"), "moveMyText2")
+-- tell Text2 to move where you are moving, at the same speed
+```
+##### onAnimationComplete(self, target)
+> Triggered after an element finishes all current animations.
+```
+Neon:child("myText"):registerEvent("onAnimationComplete", function(self, target)
+	target:animateToPosition(unpack(self.positionToAnimateTo), self.positionAnimateSpeed)
+	self:animateToPosition(love.math.random(20, 400), love.math.random(20, 400), self.positionAnimateSpeed)
+end), Neon:child("myText2"), "moveMyText2")
+-- tell text2 to move where you just moved to, at the same speed Text1 is moving at.
+```
 ## Data Handling
 These functions provide the ability to directly modify many variables of your elements. The way these work currently may change.<br>
 The biggest change that may happen, is accepting additional parameter types. No old elements will be broken by updates.

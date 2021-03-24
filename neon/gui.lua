@@ -370,6 +370,23 @@ function gui:update(dt)
 						local atProperBorderOpacity = true
 						local imagesMatch = true
 						
+						if i.runAnimations then
+							local animEvent = {color = i.animateColor, borderColor = i.animateBorderColor, opacity = i.animateOpacity, borderOpacity = i.animateBorderOpacity, position = i.animatePosition, image = i.animateImage}
+							if i.events.onAnimationStart then
+								for _,v in ipairs(i.events.onAnimationStart) do
+									v.fn(i, v.target, animEvent)
+								end
+							end
+							if events.onAnimationStart then
+								for _,v in ipairs(events.onAnimationStart) do
+									if v.o == i.type then
+										v.fn(i, v.target, animEvent)
+									end
+								end
+							end
+							i.runAnimations = false
+						end
+						
 						if i.animateColor then
 							for k,v in ipairs(i.colorToAnimateTo) do
 								if i.color[k] ~= v then
@@ -415,26 +432,26 @@ function gui:update(dt)
 									if i.color[4] == 1 then
 										if i.events.afterFadeIn then 
 											for _,v in ipairs(i.events.afterFadeIn) do
-												v.fn(i, v.target, event)
+												v.fn(i, v.target)
 											end
 										end
 										if events.afterFadeIn then
 											for _,v in ipairs(events.afterFadeIn) do
 												if v.o == i.type then
-													v.fn(i, v.target, event)
+													v.fn(i, v.target)
 												end
 											end
 										end
 									elseif i.color[4] == 0 then
 										if i.events.afterFadeOut then 
 											for _,v in ipairs(i.events.afterFadeOut) do
-												v.fn(i, v.target, event)
+												v.fn(i, v.target)
 											end
 										end
 										if events.afterFadeOut then
 											for _,v in ipairs(events.afterFadeOut) do
 												if v.o == i.type then
-													v.fn(i, v.target, event)
+													v.fn(i, v.target)
 												end
 											end
 										end
@@ -470,26 +487,26 @@ function gui:update(dt)
 									if i.borderColor[4] == 1 then
 										if i.events.afterFadeIn then 
 											for _,v in ipairs(i.events.afterFadeIn) do
-												v.fn(i, v.target, event)
+												v.fn(i, v.target)
 											end
 										end
 										if events.afterFadeIn then
 											for _,v in ipairs(events.afterFadeIn) do
 												if v.o == i.type then
-													v.fn(i, v.target, event)
+													v.fn(i, v.target)
 												end
 											end
 										end
 									elseif i.borderColor[4] == 0 then
 										if i.events.afterFadeOut then 
 											for _,v in ipairs(i.events.afterFadeOut) do
-												v.fn(i, v.target, event)
+												v.fn(i, v.target)
 											end
 										end
 										if events.afterFadeOut then
 											for _,v in ipairs(events.afterFadeOut) do
 												if v.o == i.type then
-													v.fn(i, v.target, event)
+													v.fn(i, v.target)
 												end
 											end
 										end
@@ -510,13 +527,13 @@ function gui:update(dt)
 							i.animateImage = false
 							if i.events.onAnimationComplete then
 								for _,v in ipairs(i.events.onAnimationComplete) do
-									v.fn(i, v.target, event)
+									v.fn(i, v.target)
 								end
 							end
 							if events.onAnimationComplete then
 								for _,v in ipairs(events.onAnimationComplete) do
 									if v.o == i.type then
-										v.fn(i, v.target, event)
+										v.fn(i, v.target)
 									end
 								end
 							end

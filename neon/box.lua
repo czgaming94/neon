@@ -88,6 +88,7 @@ function box:new(n, p)
 	b.paddingTop = 0
 	b.paddingBottom = 0
 	b.inAnimation = false
+	b.runAnimations = false
 	b.animateColor = false
 	b.colorToAnimateTo = {1,1,1,1}
 	b.colorAnimateSpeed = 0
@@ -136,6 +137,7 @@ function box:new(n, p)
 			self.colorAnimateTime = 0
 			self.inAnimation = true
 			self.animateColor = true
+			self.runAnimations = true
 		end
 		return self
 	end
@@ -152,6 +154,7 @@ function box:new(n, p)
 			self.borderColorAnimateTime = 0
 			self.inAnimation = true
 			self.animateBorderColor = true
+			self.runAnimations = true
 		end
 		return self
 	end
@@ -176,6 +179,7 @@ function box:new(n, p)
 			self.positionAnimateTime = 0
 			self.inAnimation = true
 			self.animatePosition = true
+			self.runAnimations = true
 		end
 		return self
 	end
@@ -191,6 +195,7 @@ function box:new(n, p)
 			self.opacityAnimateSpeed = s
 			self.inAnimation = true
 			self.animateOpacity = true
+			self.runAnimations = true
 		end
 		return self
 	end
@@ -206,6 +211,7 @@ function box:new(n, p)
 			self.opacityBorderAnimateSpeed = s
 			self.inAnimation = true
 			self.animateBorderOpacity = true
+			self.runAnimations = true
 		end
 		return self
 	end
@@ -227,6 +233,7 @@ function box:new(n, p)
 			self.imageAnimateSpeed = s
 			self.inAnimation = true
 			self.animateImage = true
+			self.runAnimations = true
 		end
 		return self
 	end
