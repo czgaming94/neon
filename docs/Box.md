@@ -113,7 +113,7 @@ end, yourTargetelement)
 ```
 ##### onAnimationStart(self, target)
 > Triggered after an element fades out.
-```
+```lua
 Neon:child("myBox"):registerEvent("onAnimationStart", function(self, target, animating)
    if animating.position then
       target:animateToPosition(unpack(self.positionToAnimateTo), self.positionAnimateSpeed)
@@ -123,7 +123,7 @@ end), Neon:child("myBox2"), "moveMyBox2")
 ```
 ##### onAnimationComplete(self, target)
 > Triggered after an element fades out.
-```
+```lua
 Neon:child("myBox"):registerEvent("onAnimationStart", function(self, target, animating)
 	self:animateToPosition(love.math.random(50,400), love.math.random(50,400), love.math.random(1,5))
 end), Neon:child("myBox2"), "moveMyBox2")
