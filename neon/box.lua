@@ -242,6 +242,20 @@ function box:new(n, p)
 		return self.inAnimation
 	end
 	
+	function b:cancelAnimation(single)
+		if not single then
+			self.inAnimation = false
+			self.animateColor = false
+			self.animatePosition = false
+			self.animateOpacity = false
+			self.animateBorderColor = false
+			self.animateBorderOpacity = false
+			self.animateImage = false
+		else
+			self[single] = false
+		end
+	end
+	
 	function b:setBorderColor(bC)
 		assert(bC, "[" .. self.name .. "] FAILURE: box:setBorderColor() :: Missing param[color]")
 		assert(type(bC) == "table", "[" .. self.name .. "] FAILURE: box:setBorderColor() :: Incorrect param[color] - expecting table and got " .. type(bC))

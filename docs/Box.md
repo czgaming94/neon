@@ -58,18 +58,59 @@ end)
 ```
 ##### onHoverExit(self, target, event) -- {x, y}
 > Triggered when a user initially stops hovering an element.
+```lua
+myBox:registerEvent("onHoverExit", function(self, target, event)
+	self:animateToOpacity(0.4)
+end, yourTargetelement)
+```
 ##### beforeFadeIn(self, target)
 > Triggered when an element is about to fade in.
+```lua
+myBox:registerEvent("beforeFadeIn", function(self, target, event)
+	if Game.visibleBoxes > Game.maxBoxes then
+		self:cancelAnimation("animateOpacity")
+	end
+end, yourTargetelement)
+```
 ##### onFadeIn(self, target)
 > Triggered when an element is fading in.
+```lua
+myBox:registerEvent("onFadeIn", function(self, target, event)
+	Game.hasAnimatingBox = true
+end, yourTargetelement)
+```
 ##### afterFadeIn(self, target)
 > Triggered after an element fades in.
+```lua
+myBox:registerEvent("afterFadeIn", function(self, target, event)
+	Game.visibleBoxes = Game.visibleBoxes + 1
+	Game.hasAnimatingBox = false
+end, yourTargetelement)
+```
 ##### beforeFadeOut(self, target)
 > Triggered when an element is about to fade out.
+```lua
+myBox:registerEvent("beforeFadeOut", function(self, target, event)
+	if Game.hiddenBoxes > Game.maxHidden then
+		self:cancelAnimation("animateOpacity")
+	end
+end, yourTargetelement)
+```
 ##### onFadeOut(self, target)
 > Triggered when an element is fading out.
+```lua
+myBox:registerEvent("onFadeOut", function(self, target, event)
+	Game.hasAnimatingBox = true
+end, yourTargetelement)
+```
 ##### afterFadeOut(self, target)
 > Triggered after an element fades out.
+```lua
+myBox:registerEvent("afterFadeIn", function(self, target, event)
+	Game.visibleBoxes = Game.visibleBoxes - 1
+	Game.hasAnimatingBox = false
+end, yourTargetelement)
+```
 ##### onAnimationStart(self, target)
 > Triggered after an element fades out.
 ```
@@ -82,6 +123,12 @@ end), Neon:child("myBox2"), "moveMyBox2")
 ```
 ##### onAnimationComplete(self, target)
 > Triggered after an element fades out.
+```
+Neon:child("myBox"):registerEvent("onAnimationStart", function(self, target, animating)
+	self:animateToPosition(love.math.random(50,400), love.math.random(50,400), love.math.random(1,5))
+end), Neon:child("myBox2"), "moveMyBox2")
+-- tell box2 to move where you are moving, at the same speed
+```
 ## Data Handling
 These functions provide the ability to directly modify many variables of your elements. The way these work currently may change.<br>
 The biggest change that may happen, is accepting additional parameter types. No old elements will be broken by updates.
