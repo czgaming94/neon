@@ -15,13 +15,47 @@ with `registerEvent` or by using `registerGlobalEvent` through the parent GUI.
 > Triggered when a user clicks on the element.
 ```lua
 myBox:registerEvent("onClick", function(self, target, event)
-  print(target.name, event.x, event.y) 
+	print(target.name, event.x, event.y) 
 end, yourTargetelement)
 ```
 ##### onTouch(self, target, event) -- {id, x, y, dx, dy, pressure}
 > Triggered when a user taps on the element on mobile.
+```lua
+myBox:registerEvent("onTouch", function(self, target, event)
+	print(target.name, event.x, event.y) 
+end, yourTargetelement)
+```
 ##### onHoverEnter(self, target, event) -- {x, y}
 > Triggered when a user initially hovers over an element.
+```lua
+myBox:registerEvent("onHoverEnter", function(self, target, event)
+	if event.x == self.x then
+		if event.y == self.y then
+			print('top left corner')
+		elseif event.y == self.y + self.height then
+			print('bottom left corner')
+		else
+			print('left side')
+		end
+	elseif event.x == self.x + self.width then
+		if event.y == self.y then
+			print('top right corner')
+		elseif event.y == self.y + self.height then
+			print('bottom right corner')
+		else
+			print('right side')
+		end
+	else
+		if event.y == self.y then
+			print('top middle')
+		elseif event.y == self.y + self.height then
+			print('bottom middle')
+		else
+			print('middle side')
+		end
+	end
+end)
+```
 ##### onHoverExit(self, target, event) -- {x, y}
 > Triggered when a user initially stops hovering an element.
 ##### beforeFadeIn(self, target)
