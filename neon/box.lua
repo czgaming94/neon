@@ -346,7 +346,7 @@ function box:new(n, p)
 				lg.setColor(self.borderColor)
 			end
 			if self.round then
-				lg.rectangle("line", x - 1, y - 1, self.paddingLeft + self.w + self.paddingRight + 2, self.paddingTop + self.h + self.paddingBottom + 2, self.radius)
+				lg.rectangle("line", x, y, self.paddingLeft + self.w + self.paddingRight, self.paddingTop + self.h + self.paddingBottom, self.radius)
 			else
 				lg.rectangle("line", x - 1, y - 1, self.paddingLeft + self.w + self.paddingRight + 2, self.paddingTop + self.h + self.paddingBottom + 2)
 			end
