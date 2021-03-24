@@ -800,9 +800,7 @@ end
 function gui:mousepressed(x, y, button, istouch, presses)
 	if not self.enabled then return false end
 	local event = {x=x, y=y, button=button, istouch=istouch, presses=presses}
-	local objs = self:copy(items, "handles")
-	
-	table.sort(objs, function(a,b) 
+	table.sort(items, function(a,b) 
 		if not a or not b then return false end
 		if a.z == b.z then
 			if a.id == b.id then
@@ -815,10 +813,9 @@ function gui:mousepressed(x, y, button, istouch, presses)
 		end
 	end)
 	local hitTarget = false
-	for _,o in ipairs(objs) do
+	for _,o in ipairs(items) do
 		if o.enabled then
-			local obj = self:copy(o, "handles")
-			table.sort(obj.items, function(a,b) 
+			table.sort(o.items, function(a,b) 
 				if not a or not b then return false end
 				if a.pos.z == b.pos.z then
 					if a.id == b.id then
@@ -830,7 +827,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 					return a.pos.z > b.pos.z
 				end
 			end)
-			for k,v in ipairs(obj.items) do
+			for k,v in ipairs(o.items) do
 				local i = self:child(v.name)
 				if i then
 					if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
@@ -881,10 +878,32 @@ function gui:mousepressed(x, y, button, istouch, presses)
 					end
 				end
 			end
-			obj = nil
+			table.sort(o.items, function(a,b) 
+				if not a or not b then return false end
+				if a.pos.z == b.pos.z then
+					if a.id == b.id then
+						return false
+					else
+						return a.id < b.id
+					end
+				else
+					return a.pos.z > b.pos.z
+				end
+			end)
 		end
 	end
-	objs = nil
+	table.sort(items, function(a,b) 
+		if not a or not b then return false end
+		if a.z == b.z then
+			if a.id == b.id then
+				return false
+			else
+				return a.id < b.id
+			end
+		else
+			return a.z > b.z
+		end
+	end)
 end
 
 function gui:mousereleased(x, y, button, istouch, presses)
@@ -921,9 +940,7 @@ end
 function gui:touchpressed(id, x, y, dx, dy, pressure)
 	if not self.enabled then return false end
 	local event = {id=id, x=x, y=y, dx=dx, dy=dy, pressure=pressure}
-	local objs = self:copy(items, "handles")
-	
-	table.sort(objs, function(a,b) 
+	table.sort(items, function(a,b) 
 		if not a or not b then return false end
 		if a.z == b.z then
 			if a.id == b.id then
@@ -938,8 +955,7 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 	local hitTarget = false
 	for _,o in ipairs(objs) do
 		if o.enabled then
-			local obj = self:copy(o, "handles")
-			table.sort(obj.items, function(a,b) 
+			table.sort(o.items, function(a,b) 
 				if not a or not b then return false end
 				if a.pos.z == b.pos.z then
 					if a.id == b.id then
@@ -1015,10 +1031,32 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 					end
 				end
 			end
-			obj = nil
+			table.sort(o.items, function(a,b) 
+				if not a or not b then return false end
+				if a.pos.z == b.pos.z then
+					if a.id == b.id then
+						return false
+					else
+						return a.id > b.id
+					end
+				else
+					return a.pos.z < b.pos.z
+				end
+			end)
 		end
 	end
-	objs = nil
+	table.sort(items, function(a,b) 
+		if not a or not b then return false end
+		if a.z == b.z then
+			if a.id == b.id then
+				return false
+			else
+				return a.id > b.id
+			end
+		else
+			return a.z < b.z
+		end
+	end)
 end
 
 function gui:hardRemove(n)
