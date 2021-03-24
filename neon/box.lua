@@ -78,6 +78,7 @@ function box:new(n, p)
 	b.imageBlend = "premultiply"
 	b.iX = 0
 	b.iY = 0
+	b.r = {0,0,0,0}
 	b.noiseX = false
 	b.noiseY = false
 	b.noiseStrength = 4
@@ -291,7 +292,13 @@ function box:new(n, p)
 		if t.hollow ~= nil then self.hollow = t.hollow end
 		if t.keepBackground then self.keepBackground = t.keepBackground end
 		if t.round then self.round = t.round end
-		self.radius = t.radius or self.radius
+		if t.radius then
+			if type(t.radius) == "table" then
+				self.r = t.radius
+			else
+				for k,v in ipairs(self.r) do self.r[k] = t.radius end
+			end
+		end
 		if t.color then
 			for k,v in ipairs(t.color) do
 				self.color[k] = v
@@ -346,7 +353,13 @@ function box:new(n, p)
 				lg.setColor(self.borderColor)
 			end
 			if self.round then
-				lg.rectangle("line", x, y, self.paddingLeft + self.w + self.paddingRight, self.paddingTop + self.h + self.paddingBottom, self.radius)
+				lg.setBlendMode("replace", "premultiplied")
+				lg.setColor({self.borderColor[1], self.borderColor[2], self.borderColor[3], self.borderColor[4]})
+				lg.rectangle("fill", x - 1, y - 1, (self.w - self.r[3]) + 2, (self.h - self.r[4]) + 2, self.r[1])
+				lg.rectangle("fill", x - 1, y - 1, (self.w - self.r[1]) + 2, (self.h - self.r[4]) + 2, self.r[2])
+				lg.rectangle("fill", (x + self.r[1]) - 1, (y + self.r[2]) - 1, (self.w - self.r[1]) + 2, (self.h - self.r[2]) + 2, self.r[3])
+				lg.rectangle("fill", x - 1, (y + self.r[2]) - 1, (self.w - self.r[1]) + 2, (self.h - self.r[2]) + 2, self.r[4])
+				lg.setBlendMode("alpha")
 			else
 				lg.rectangle("line", x - 1, y - 1, self.paddingLeft + self.w + self.paddingRight + 2, self.paddingTop + self.h + self.paddingBottom + 2)
 			end
@@ -380,7 +393,13 @@ function box:new(n, p)
 			end
 		else
 			if self.round then
-				lg.rectangle("fill", x, y, self.w, self.h, self.radius)
+				lg.setBlendMode("replace", "premultiplied")
+				lg.setColor({self.color[1], self.color[2], self.color[3], self.color[4]})
+				lg.rectangle("fill", x, y, self.w - self.r[3], self.h - self.r[4], self.r[1])
+				lg.rectangle("fill", x, y, self.w - self.r[1], self.h - self.r[4], self.r[2])
+				lg.rectangle("fill", x + self.r[1], y + self.r[2], self.w - self.r[1], self.h - self.r[2], self.r[3])
+				lg.rectangle("fill", x, y + self.r[2], self.w - self.r[1], self.h - self.r[2], self.r[4])
+				lg.setBlendMode("alpha")
 			else
 				lg.rectangle("fill", x, y, self.w, self.h)
 			end
