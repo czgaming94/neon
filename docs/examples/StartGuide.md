@@ -45,6 +45,7 @@ Now let's take a look at what our code should look like.
 local Neon = require("neon")
 	
 local box = Neon:addBox("myBox")
+local x = 10
 	
 box:setData({
 	width = 150, height = 50,
@@ -54,8 +55,8 @@ box:setData({
 })
 	
 box:registerEvent("onClick", function(self, target, event)
-    print(self.name, event.x, event.y)
-end, nil, "boxClick")
+    print(self.name, event.x, event.y, target)
+end, x, "boxClick")
 	
 	
 -- Use a single source for love callbacks
