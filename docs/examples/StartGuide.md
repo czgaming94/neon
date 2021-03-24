@@ -41,7 +41,6 @@ This section tells the event what to do when it is fired.<Br>
 <br>
 Now let's take a look at what our code should look like.
 ```lua
--- Use a single source for love callbacks
 local Neon = require("neon")
 	
 local box = Neon:addBox("myBox")
@@ -58,6 +57,7 @@ box:registerEvent("onClick", function(self, target, event)
 end, nil, "boxClick")
 	
 	
+-- Use a single source for love callbacks
 function love.update(dt)
 	Neon:update(dt)
 end
