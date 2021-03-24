@@ -39,8 +39,24 @@ This section tells the event what to do when it is fired.<Br>
 `target` is the object defined afer the event in the `registerEvent` block, here we have it defined as nil.<br>
 `event` is the data that came from LOVE. onClick would deliver an associative table of `{x, y, button, istouch, presses}`<br>
 <br>
-Now that we have our box set with data, and an event defined, it is time to use LOVE to draw our GUI.
+Now let's take a look at what our code should look like.
 ```lua
+local Neon = require("neon")
+	
+local box = Neon:addBox("myBox")
+	
+box:setData({
+	width = 150, height = 50,
+	x = 50, y = 25, z = 1,
+	color = {0,1,1,1},
+	useBorder = true, borderColor = {1,1,0,1}
+})
+	
+box:registerEvent("onClick", function(self, target, event)
+    print(self.name, event.x, event.y)
+end, nil, "boxClick")
+	
+	
 -- Use a single source for love callbacks
 function love.update(dt)
 	Neon:update(dt)
