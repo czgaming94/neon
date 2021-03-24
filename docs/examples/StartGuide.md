@@ -6,6 +6,7 @@ local Neon = require("neon")
 Next, let's create a box, there are a few ways to do this:
 ```lua
 local box = Neon:addBox("myBox")
+local x = 10
 -- or
 Neon:add("box", "myBox")
 ```
@@ -25,18 +26,18 @@ As you can see, we set the definition of this elements width, height, x,y,z, col
 and what color the border is. Next, let's create a callback for when you click on the box.
 ```lua
 box:registerEvent("onClick", function(self, target, event)
-    print(self.name, event.x, event.y)
-end, nil, "boxClick")
+    print(self.name, event.x, event.y, target)
+end, x, "boxClick")
 ```
 Let's break this down. `box:registerEvent("onClick",` defines the event to happen only when you click.
 ```lua
 function(self, target, event)
-	print(self.name, event.x, event.y)
+	print(self.name, event.x, event.y, target)
 end
 ```
 This section tells the event what to do when it is fired.<Br>
 `self` is the object the event is fired on.<br>
-`target` is the object defined afer the event in the `registerEvent` block, here we have it defined as nil.<br>
+`target` is the object defined after the event in the `registerEvent` block, here we have it defined as `x`.<br>
 `event` is the data that came from LOVE. onClick would deliver an associative table of `{x, y, button, istouch, presses}`<br>
 <br>
 Now let's take a look at what our code should look like.
@@ -44,6 +45,7 @@ Now let's take a look at what our code should look like.
 local Neon = require("neon")
 	
 local box = Neon:addBox("myBox")
+local x = 10
 	
 box:setData({
 	width = 150, height = 50,
@@ -53,8 +55,8 @@ box:setData({
 })
 	
 box:registerEvent("onClick", function(self, target, event)
-    print(self.name, event.x, event.y)
-end, nil, "boxClick")
+    print(self.name, event.x, event.y, target)
+end, x, "boxClick")
 	
 	
 -- Use a single source for love callbacks
@@ -95,3 +97,5 @@ function love.touchmoved(id, x, y, dx, dy, pressure)
 	Neon:touchmoved(id, x, y, dx, dy, pressure)
 end
 ```
+Once you have run this code, you should get a result like this!<br><br>
+![Example](https://github.com/czgaming94/neon/blob/main/docs/examples/example.png)
