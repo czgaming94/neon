@@ -413,10 +413,27 @@ function gui:update(dt)
 							i.positionAnimateTime = i.positionAnimateTime + dt
 							local t = min(i.positionAnimateTime * (i.positionAnimateSpeed / 10), 1.0)
 							if i.pos.x ~= i.positionToAnimateTo.x or i.pos.y ~= i.positionToAnimateTo.y then
-								i.pos.x = i.lerp(i.positionToAnimateFrom.x, i.positionToAnimateTo.x, t)
-								i.pos.y = i.lerp(i.positionToAnimateFrom.y, i.positionToAnimateTo.y, t)
+								--if i.bouncePositionAnimation then
+								--	i.pos.x = i.lerp(i.positionToAnimateFrom.x, 0, i.positionToAnimateTo.x, 0, t)
+								--	i.pos.y = i.lerp(i.positionToAnimateFrom.y, 20, i.positionToAnimateTo.y, 20, t)
+								--else
+									i.pos.x = i.lerp(i.positionToAnimateFrom.x, i.positionToAnimateTo.x, t)
+									i.pos.y = i.lerp(i.positionToAnimateFrom.y, i.positionToAnimateTo.y, t)
+								--end
 								inProperPosition = false
 							end
+							if i.positionToAnimateTo.x > i.pos.x then
+								i.positionAnimationPercentX = i.positionToAnimateTo.x / i.pos.x
+							else
+								i.positionAnimationPercentX =  i.pos.x / i.positionToAnimateTo.x
+							end
+							if i.positionToAnimateTo.y > i.pos.y then
+								i.positionAnimationPercentY = i.positionToAnimateTo.y / i.pos.y
+							else
+								i.positionAnimationPercentY = i.pos.y / i.positionToAnimateTo.y
+							end
+							
+							i.positionAnimationPercent = i.positionAnimationPercentX * i.positionAnimationPercentY
 						end
 						
 						if i.animateOpacity then
@@ -516,7 +533,7 @@ function gui:update(dt)
 							end
 						end
 						
-						if allColorsMatch and inProperPosition and atProperOpacity and allBorderColorsMatch and atProperBorderOpacity and imagesMatch then
+						if i.inAnimation and allColorsMatch and inProperPosition and atProperOpacity and allBorderColorsMatch and atProperBorderOpacity and imagesMatch then
 							i.inAnimation = false
 							i.animateColor = false
 							i.animatePosition = false
@@ -554,21 +571,19 @@ end
 function gui:disable(kill)
 	if kill ~= nil then kill = kill else kill = true end
 	if kill then
-		for _,o in ipairs(items) do
-			for _,i in ipairs(o.items) do
-				i.hovered = false
-				i.active = false
-				i.clicked = false
-				i.held = false
-				i.fadedByFunc = false
-				i.inAnimation = false
-				i.animateColor = false
-				i.animatePosition = false
-				i.animateOpacity = false
-				i.animateBorderColor = false
-				i.animateBorderOpacity = false
-				i:setData(i.defaults)
-			end
+		for _,i in ipairs(self.items) do
+			i.hovered = false
+			i.active = false
+			i.clicked = false
+			i.held = false
+			i.fadedByFunc = false
+			i.inAnimation = false
+			i.animateColor = false
+			i.animatePosition = false
+			i.animateOpacity = false
+			i.animateBorderColor = false
+			i.animateBorderOpacity = false
+			i:setData(i.defaults)
 		end
 	end
 	self.enabled = false
@@ -717,7 +732,7 @@ function gui:registerGlobalEvent(n, o, f, t, i)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:registerEvent() :: Missing param[eventName]")
 	assert(type(n) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[eventName] - expecting string and got " .. type(n))
-	assert(o, "FAILURE: gui:registerEvent() :: Missing param[type]")
+	assert(o, "FAILURE: gui:registerEvent() :: Missing param[eventType]")
 	assert(type(o) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[type] - expecting string and got " .. type(o))
 	assert(f, "FAILURE: gui:registerEvent() :: Missing param[name]")
 	assert(type(f) == "function", "FAILURE: gui:registerEvent() :: Incorrect param[name] - expecting function and got " .. type(f))

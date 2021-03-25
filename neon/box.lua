@@ -79,6 +79,7 @@ function box:new(n, p)
 	b.iX = 0
 	b.iY = 0
 	b.r = {0,0,0,0}
+	b.rot = 0
 	b.noiseX = false
 	b.noiseY = false
 	b.noiseStrength = 4
@@ -102,6 +103,10 @@ function box:new(n, p)
 	b.positionToAnimateTo = {x = 0, y = 0}
 	b.positionToAnimateFrom = {x = 0, y = 0}
 	b.positionAnimateTime = 0
+	b.bouncePositionAnimation = false
+	b.positionAnimationPercent = 0
+	b.positionAnimationPercentX = 0
+	b.positionAnimationPercentY = 0
 	b.animateOpacity = false
 	b.opacityAnimateSpeed = 0
 	b.opacityToAnimateTo = 0
@@ -159,7 +164,7 @@ function box:new(n, p)
 		return self
 	end
 	
-	function b:animateToPosition(x, y, s, f)
+	function b:animateToPosition(x, y, s, f, e)
 		assert(x, "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Missing param[x]")
 		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
 		assert(y, "[" .. self.name .. "] FAILURE: box:animateToPosition() :: Missing param[y]")
@@ -180,6 +185,7 @@ function box:new(n, p)
 			self.inAnimation = true
 			self.animatePosition = true
 			self.runAnimations = true
+			if e ~= nil then self.bouncePositionAnimation = e else self.bouncePositionAnimation = false end
 		end
 		return self
 	end
@@ -307,6 +313,7 @@ function box:new(n, p)
 		self.pos.x = t.x or self.pos.x
 		self.pos.y = t.y or self.pos.y
 		self.pos.z = t.z or self.pos.z
+		self.rot = t.rot or self.rot
 		if t.useBorder then self.border = t.useBorder end
 		if t.clickable ~= nil then self.clickable = t.clickable end
 		if t.moveable ~= nil then self.moveable = t.moveable end
@@ -403,14 +410,14 @@ function box:new(n, p)
 				lg.setBlendMode("alpha", "alphamultiply")
 				self.shaders.fadeIn:send('time', max(0, min(1, self.imageAnimateTime / self.imageAnimateSpeed)))
 				lg.setShader(self.shaders.fadeIn)
-				lg.draw(self.imageToAnimateTo, x + self.iX, y + self.iY)
+				lg.draw(self.imageToAnimateTo, x + self.iX, y + self.iY, self.rot)
 				self.shaders.fadeOut:send('time', max(0, min(1, self.imageAnimateTime / self.imageAnimateSpeed)))
 				lg.setShader(self.shaders.fadeOut)
-				lg.draw(self.image, x + self.iX, y + self.iY)
+				lg.draw(self.image, x + self.iX, y + self.iY, self.rot)
 				lg.setShader()
 				lg.setBlendMode("alpha")
 			else
-				lg.draw(self.image, x + self.iX, y + self.iY)
+				lg.draw(self.image, x + self.iX, y + self.iY, self.rot)
 			end
 		else
 			if self.round then
@@ -781,6 +788,10 @@ function box:new(n, p)
 	
 	function b.lerp(t1,t2,t)
 		return (1 - t) * t1 + t * t2
+	end
+	
+	function b.softLerp(e,e1,s,s1,c)
+		return (1 - c) * ((s + s1) + ((e - e1) * c^2))
 	end
 	
 	setmetatable(b, box)

@@ -98,6 +98,7 @@ function checkbox:new(n, p)
 	c.optionPaddingBottom = 0
 	c.selected = {}
 	c.font = lg.getFont()
+	c.selectedBorder = {1,1,1,1}
 	c.inAnimation = false
 	c.animateColor = false
 	c.colorToAnimateTo = {1,1,1,1}
@@ -107,6 +108,10 @@ function checkbox:new(n, p)
 	c.positionAnimateSpeed = 0
 	c.positionToAnimateTo = {x = 0, y = 0}
 	c.positionToAnimateFrom = {x = 0, y = 0}
+	c.bouncePositionAnimation = false
+	c.positionAnimationPercent = 0
+	c.positionAnimationPercentX = 0
+	c.positionAnimationPercentY = 0
 	c.positionAnimateTime = 0
 	c.animateOpacity = false
 	c.opacityAnimateSpeed = 0
@@ -265,6 +270,7 @@ function checkbox:new(n, p)
 		self.uH = d.h or d.height or self.uH
 		self.label = d.label or d.text or self.label
 		self.labelColor = d.labelColor or self.labelColor
+		self.selectedColor = d.selectedColor or self.selectedColor
 		if d.labelPosition or d.labelPos then
 			local i = d.labelPosition or d.labelPos
 			if i.x then
@@ -408,8 +414,14 @@ function checkbox:new(n, p)
 				if self.border then
 					if self.parent and checkbox.guis[self.parent] and checkbox.guis[self.parent].use255 then
 						lg.setColor(love.math.colorFromBytes(self.borderColor))
+						if v.selected then
+							lg.setColor(love.math.colorFromBytes(self.selectedBorder))
+						end
 					else
 						lg.setColor(self.borderColor)
+						if v.selected then
+							lg.setColor(self.selectedBorder)
+						end
 					end
 					if self.round then
 						lg.rectangle("line", v.x - 1, v.y - 1, v.w + 2, v.h + 2, self.roundRadius, self.roundRadius)

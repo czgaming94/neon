@@ -108,6 +108,10 @@ function dropdown:new(n, p)
 	d.positionAnimateSpeed = 0
 	d.positionToAnimateTo = {x = 0, y = 0}
 	d.positionToAnimateFrom = {x = 0, y = 0}
+	d.bouncePositionAnimation = false
+	d.positionAnimationPercent = 0
+	d.positionAnimationPercentX = 0
+	d.positionAnimationPercentY = 0
 	d.positionAnimateTime = 0
 	d.animateOpacity = false
 	d.opacityAnimateSpeed = 0

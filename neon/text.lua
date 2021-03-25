@@ -106,6 +106,10 @@ function text:new(n, p)
 	t.positionToAnimateTo = {x = 0, y = 0}
 	t.positionToAnimateFrom = {x = 0, y = 0}
 	t.positionAnimateTime = 0
+	t.positionAnimationPercent = 0
+	t.bouncePositionAnimation = false
+	t.positionAnimationPercentX = 0
+	t.positionAnimationPercentY = 0
 	t.animateOpacity = false
 	t.opacityAnimateSpeed = 0
 	t.opacityToAnimateTo = 0
@@ -127,7 +131,7 @@ function text:new(n, p)
 		return self
 	end
 	
-	function t:animateToPosition(x, y, s, f)
+	function t:animateToPosition(x, y, s, f, e)
 		assert(x, "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Missing param[x]")
 		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
 		assert(y, "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Missing param[y]")
@@ -147,6 +151,7 @@ function text:new(n, p)
 			self.positionAnimateTime = 0
 			self.inAnimation = true
 			self.animatePosition = true
+			if e ~= nil then self.bouncePositionAnimation = e else self.bouncePositionAnimation = false end
 		end
 		return self
 	end
@@ -620,6 +625,11 @@ function text:new(n, p)
 	
 	function t.lerp(e,s,c)
 		return (1 - c) * e + c * s
+	end
+	
+	function t.softLerp(e,e1,s,s1,c)
+		--return (1 - c) * ((s + s1) + ((e - e1) * c^2)) * s
+		return (1 - c) * e - e1 + c^2 * s - s1
 	end
 	
 	setmetatable(t, text)

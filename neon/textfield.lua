@@ -99,6 +99,10 @@ function textfield:new(n, p)
 	t.positionAnimateSpeed = 0
 	t.positionToAnimateTo = {x = 0, y = 0}
 	t.positionToAnimateFrom = {x = 0, y = 0}
+	t.positionAnimationPercent = 0
+	t.positionAnimationPercentX = 0
+	t.positionAnimationPercentY = 0
+	t.bouncePositionAnimation = false
 	t.positionAnimateTime = 0
 	t.animateOpacity = false
 	t.opacityAnimateSpeed = 0
