@@ -423,10 +423,12 @@ function gui:update(dt)
 								--end
 								inProperPosition = false
 							end
+							--[[
 							if i.pos.z ~= i.positionToAnimateTo.z then
 								i.pos.z = i.lerp(i.positionToAnimateFrom.z, i.positionToAnimateTo.z, t)
 								self.needToSort = true
 							end
+							--]]
 							if i.positionToAnimateTo.x > i.pos.x then
 								i.positionAnimationPercentX = i.positionToAnimateTo.x / i.pos.x
 							else

@@ -1,6 +1,8 @@
 local lg, lt = love.graphics, love.timer
 local floor, random, min, max = math.floor, love.math.random, math.min, math.max
-local function obj(t)
+local guis = {}
+local function obj(t, p)
+	if p and p.id and not guis[p.id] then guis[p.id] = p end
 	t = t or {}
 	t.__index = t
 	t.new = t.new or t.init or t[1] or function() end
@@ -13,7 +15,7 @@ local function obj(t)
 	t.pos = {
 		x = 0,
 		y = 0,
-		z = 0
+		z = 1
 	}
 	t.x = t.pos.x
 	t.y = t.pos.y
@@ -230,7 +232,7 @@ local function obj(t)
 				self.w = self.font:getWidth(self.text)
 			end
 			if not d.h and not d.height then
-				self.h = self.font:getHeigth()
+				self.h = self.font:getHeight()
 			end
 		end
 		if d.labelFont then self.labelFont = d.labelFont end
@@ -707,6 +709,7 @@ local function obj(t)
 		assert(z, "[" .. self.name .. "] FAILURE: " .. self.type .. ":setZ() :: Missing param[z]")
 		assert(type(z) == "number", "[" .. self.name .. "] FAILURE: " .. self.type .. ":setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
 		self.pos.z = z
+		guis[self.parent].needToSort = true
 		return self
 	end
 
