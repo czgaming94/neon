@@ -72,7 +72,7 @@ function love.load()
 	myBox:setClickable(false)
 	
 	Neon:child("myBox2"):setData({
-		w = 50, h = lg.getHeight(), x = 1, y = 0, 
+		w = 50, h = lg.getHeight(), x = 1, y = 0, z = 1,
 		color = colors("green"), 
 		useBorder = true, borderColor = colors("black")
 	})

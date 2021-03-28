@@ -728,6 +728,7 @@ function gui:draw()
 				return a.pos.z < b.pos.z
 			end
 		end)
+		self.needToSort = false
 	end
 	for _,i in ipairs(self.items) do 
 		lg.push("all")
@@ -935,7 +936,7 @@ function gui:draw()
 								lg.setColor(i.color)
 								if v.color ~= "white" then
 									if i.parent then
-										lg.setColor(color(v.color))
+										lg.setColor(self.color(v.color))
 									else
 										if type(v.color) == "string" then
 											lg.setColor(colors[v.color])
@@ -1676,6 +1677,7 @@ function gui:hardRemove(n)
 			end
 		end
 	end
+	self.needToSort = true
 	return self
 end
 
@@ -1696,6 +1698,7 @@ function gui:remove(n)
 	else
 		self.items[n] = nil
 	end
+	self.needToSort = true
 	return self
 end
 
@@ -1704,6 +1707,7 @@ function gui:setZ(z)
 	assert(z, "FAILURE: gui:setZ() :: Missing param[z]")
 	assert(type(z) == "number", "FAILURE: gui:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
 	self.z = z
+	self.needToSort = true
 	return self
 end
 
