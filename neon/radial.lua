@@ -26,13 +26,25 @@
 
 
 
+local lg, lt = love.graphics, love.timer
+local min, max = math.min, math.max
 local object = require("neon.object")
-local radial = object()
 
-radial.items = {}
+local radial = {}
 
-function radial:new(n, p)
+radial.guis = {}
+radial.fonts = {}
 
+function radial:new(n, id, p)
+	local r = object()
+	r.__index = r
+	r.name = n
+	r.id = id
+	r.type = "radial"
+	if p then 
+		if not self.guis[p.id] then self.guis[p.id] = p end
+		if p.id then r.parent = p.id else r.parent = nil end
+	end
 end
 
-return radial
+return setmetatable(radial, radial)

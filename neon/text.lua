@@ -29,9 +29,6 @@
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
 local object = require("neon.object")
-local text = object()
-text.__index = text
-
 local prefixes = {
 	color = "c",
 	delay = "d",
@@ -40,54 +37,34 @@ local prefixes = {
 	offset = "o",
 }
 
+local text = {}
 
-text.items = {}
 text.guis = {}
 text.fonts = {}
 
-function text:new(n, p)
-	local t = {}
-	if p and p.id and not self.guis[p.id] then self.guis[p.id] = p end
+function text:new(n, id, p)
+	local t = object()
+	t.__index = t
 	t.name = n
-	t.id = #self.items + 1
+	t.id = id
 	t.type = "text"
-	if p and p.id then t.parent = p.id else t.parent = nil end
-	t.text = ""
-	t.w = 0
-	t.h = 0
-	t.pos = {
-		x = 0,
-		y = 0,
-		z = 0
-	}
-	t.x = t.pos.x
-	t.y = t.pos.y
-	t.z = t.pos.z
-	t.timerEvent = nil
-	t.color = {1,1,1,1}
-	t.defaults = {}
-	t.font = love.graphics.getFont()
+	if p then 
+		if not self.guis[p.id] then self.guis[p.id] = p end
+		if p.id then t.parent = p.id else t.parent = nil end
+	end
+	t.font = lg.getFont()
 	t.fonts = {}
-	t.hovered = false
-	t.clicked = false
-	t.hidden = false
-	t.hollow = false
-	t.clickable = true
-	t.faded = false
-	t.fadedByFunc = false
 	t.fancy = false
-	t.moveable = false
-	t.held = false
 	t.shadow = false
 	t.align = "center"
-	t.events = {}
 	t.paddingLeft = 0
+	t.text = ""
 	t.paddingRight = 0
 	t.paddingTop = 0
 	t.paddingBottom = 0
 	t.typewriter = false
+	t.typewriterText = {}
 	t.typewriterPrint = ""
-	t.typewriterText = self:split(t.text)
 	t.typewriterPos = 1
 	t.typewriterSpeed = 0
 	t.typewriterWaited = 0
@@ -96,306 +73,6 @@ function text:new(n, p)
 	t.typewriterStopped = false
 	t.typewriterRepeat = false
 	t.typewriterRunCount = 0
-	t.inAnimation = false
-	t.animateColor = false
-	t.colorToAnimateTo = {1,1,1,1}
-	t.colorAnimateSpeed = 0
-	t.colorAnimateTime = 0
-	t.animatePosition = false
-	t.positionAnimateSpeed = 0
-	t.positionToAnimateTo = {x = 0, y = 0}
-	t.positionToAnimateFrom = {x = 0, y = 0}
-	t.positionAnimateTime = 0
-	t.positionAnimationPercent = 0
-	t.bouncePositionAnimation = false
-	t.positionAnimationPercentX = 0
-	t.positionAnimationPercentY = 0
-	t.animateOpacity = false
-	t.opacityAnimateSpeed = 0
-	t.opacityToAnimateTo = 0
-	t.opacityAnimateTime = 0
-	
-	function t:animateToColor(c, s, f)
-		assert(c, "[" .. self.name .. "] FAILURE: text:animateToColor() :: Missing param[color]")
-		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
-		assert(#c == 4, "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
-		s = s or 2
-		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc or f then
-			self.colorToAnimateTo = c
-			self.colorAnimateSpeed = s
-			self.colorAnimateTime = 0
-			self.inAnimation = true
-			self.animateColor = true
-		end
-		return self
-	end
-	
-	function t:animateToPosition(x, y, s, f, e)
-		assert(x, "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Missing param[x]")
-		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
-		assert(y, "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Missing param[y]")
-		assert(type(y) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[y] - expecting number or 'auto' and got " .. type(y))
-		s = s or 2
-		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
-		if not self.fadedByFunc or f then
-			if x == "auto" then
-				x = self.pos.x
-			end
-			if y == "auto" then
-				y = self.pos.y
-			end
-			self.positionToAnimateTo = {x = x, y = y}
-			self.positionAnimateSpeed = s
-			self.positionAnimateTime = 0
-			self.inAnimation = true
-			self.animatePosition = true
-			if e ~= nil then self.bouncePositionAnimation = e else self.bouncePositionAnimation = false end
-		end
-		return self
-	end
-	
-	function t:animateToOpacity(o, s, f)
-		assert(o, "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Missing param[o]")
-		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
-		s = s or 1
-		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:animateToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc or f then	
-			self.opacityToAnimateTo = o
-			self.opacityAnimateTime = 0
-			self.opacityAnimateSpeed = s
-			self.inAnimation = true
-			self.animateOpacity = true
-		end
-		return self
-	end
-	
-	function t:isAnimating()
-		return self.inAnimation
-	end
-	
-	function t:setClickable(c)
-		assert(c ~= nil, "[" .. self.name .. "] FAILURE: text:setClickable() :: Missing param[clickable]")
-		assert(type(c) == "boolean", "[" .. self.name .. "] FAILURE: text:setClickable() :: Incorrect param[clickable] - expecting boolean and got " .. type(c))
-		self.clickable = c
-		return self
-	end
-	
-	function t:isClickable()
-		return self.clickable
-	end
-	
-	function t:setColor(c)
-		assert(c, "[" .. self.name .. "] FAILURE: text:setColor() :: Missing param[color]")
-		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: text:setColor() :: Incorrect param[color] - expecting table and got " .. type(c))
-		assert(#c == 4, "[" .. self.name .. "] FAILURE: text:setColor() :: Incorrect param[color] - table length 4 expected and got " .. #c)
-		self.color = c
-		return self
-	end
-	
-	function t:getColor()
-		return self.color
-	end
-	
-	function t:setData(d)
-		assert(d, "[" .. self.name .. "] FAILURE: text:setData() :: Missing param[data]")
-		assert(type(d) == "table", "[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[data] - expecting table and got " .. type(d))
-		assert(d.t or d.text, "[" .. self.name .. "] FAILURE: text:setData() :: Missing param[data['text']")
-		assert(type(d.text) == "string", "[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[text] - expecting string and got " .. type(d.text))
-		assert(d.x, "[" .. self.name .. "] FAILURE: text:setData() :: Missing param[data['x']")
-		assert(type(d.x) == "number", "[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[x] - expecting number and got " .. type(d.x))
-		assert(d.y, "[" .. self.name .. "] FAILURE: text:setData() :: Missing param[data['y']")
-		assert(type(d.y) == "number", "[" .. self.name .. "] FAILURE: text:setData() :: Incorrect param[y] - expecting number and got " .. type(d.y))
-		self.text = d.t or d.text or self.text
-		self.typewriterText, self.fancy = text:split(self.text)
-		if d.tw ~= nil then self.typewriter = d.tw end
-		if d.typewrite ~= nilr then self.typewriter = d.typewriter end
-		if d.r ~= nil then self.typewriterRepeat = d.r end
-		if d.tRepeat ~= nil then self.typewriterRepeat = d.tRepeat end
-		self.pos.x = d.x or self.pos.x
-		self.pos.y = d.y or self.pos.y
-		self.typewriterSpeed = d.s or d.speed or self.typewriterSpeed
-		self.pos.z = d.z or self.pos.z
-		self.align = d.align or self.align
-		if d.color then
-			for k,v in ipairs(d.color) do
-				self.color[k] = v
-			end
-		end
-		self.font = d.font or self.font
-		self.w = d.w or d.width or self.font:getWidth(self.text)
-		self.h = d.h or d.height or self.font:getHeight(self.text)
-		if d.fonts then
-			for k,v in pairs(d.fonts) do
-				self.fonts[k] = v
-			end
-		end
-		if self.typewriter then
-			local font = self.font
-			local lastFont = self.font
-			for k,v in ipairs(self.typewriterText) do
-				lastFont = font
-				if v.font ~= "default" then
-					font = self.fonts[v.font]
-				else
-					font = self.font
-				end
-				
-				if not v.y then
-					v.y = self.pos.y
-				end
-				
-				if not v.x then
-					if k == 1 then
-						v.x = self.pos.x
-					else
-						v.x = self.typewriterText[k - 1].x + lastFont:getWidth(self.typewriterText[k - 1].fullText)
-						if v.x > self.pos.x + (self.w - font:getWidth(v.fullText)) then
-							v.x = self.pos.x
-							v.y = self.typewriterText[k - 1].y + lastFont:getHeight(self.typewriterText[k - 1].fullText) 
-							self.h = self.h + font:getHeight(v.fullText)
-						end
-					end
-				end
-				
-				if v.x == self.pos.x then
-					self.w = math.max(self.w, font:getWidth(v.fullText))
-				else
-					self.w = self.w + font:getWidth(v.fullText)
-				end
-				
-				if v.y == self.pos.y then
-					self.h = math.max(self.h, font:getHeight(v.fullText))
-				else
-					self.h = self.h + font:getHeight(v.fullText)
-				end
-			end
-		end
-		if d.clickable ~= nil then self.clickable = d.clickable end
-		if d.moveable ~= nil then self.moveable = d.moveable end
-		if d.hollow ~= nil then self.hollow = d.hollow end
-		if d.shadow ~= nil then self.shadow = d.shadow end
-		self.defaults = d
-		return self
-	end
-	
-	function t:disable()
-		self.hidden = true
-		return self
-	end
-	
-	function t:draw()
-		lg.push()
-		lg.setColor({1,1,1,1})
-		lg.setFont(self.font)
-		if self.typewriter then
-			if self.fancy then
-				for k,v in ipairs(self.typewriterText) do
-					if v.text then
-						lg.push()
-						lg.setColor(self.color)
-						if v.color ~= "white" then
-							if self.parent then
-								lg.setColor(text.guis[self.parent].color(v.color))
-							else
-								lg.setColor(v.color)
-							end
-						end
-						if v.font ~= "default" then
-							lg.setFont(self.fonts[v.font])
-						end
-						if v.offset[1] then
-							if self.shadow then
-								lg.print({{0,0,0,.4}, v.toShow}, v.x + v.offset[1] + 1, v.y + v.offset[2] + 1)
-							end
-							lg.print(v.toShow, v.x + v.offset[1], v.y + v.offset[2])
-						else
-							if self.shadow then
-								lg.print({{0,0,0,.4}, v.toShow}, v.x + 1, v.y + 1)
-							end
-							lg.print(v.toShow, v.x, v.y)
-						end
-						lg.setColor(1,1,1,1)
-						lg.pop()
-						if not v.finished then break end
-					end
-				end
-			else
-				if self.shadow then
-					lg.print({{0,0,0,.4}, self.typewriterPrint}, self.pos.x + 1, self.pos.y + 1)
-				end
-				lg.print({self.color, self.typewriterPrint}, self.pos.x, self.pos.y)
-			end
-		else
-			if self.w ~= 0 then
-				if self.shadow then
-					lg.printf({{0,0,0,.4}, self.text}, self.pos.x + 1, self.pos.y + 1, self.w, self.align)
-				end
-				lg.printf({self.color, self.text}, self.pos.x, self.pos.y, self.w, self.align)
-			else
-				if self.shadow then
-					lg.print({{0,0,0,.4}, self.text}, self.pos.x + 1, self.pos.y + 1)
-				end
-				lg.print({self.color, self.text}, self.pos.x, self.pos.y)
-			end
-		end
-		
-		lg.setColor(1,1,1,1)
-		lg.pop()
-	end
-	
-	function t:enable()
-		self.hidden = false
-		return self
-	end
-	
-	function t:fadeIn()
-		if self.events.beforeFadeIn then 
-			for _,e in ipairs(self.events.beforeFadeIn) do
-				e.fn(self, e.target)
-			end
-		end
-		self.hidden = false
-		self:animateToOpacity(1)
-		if self.faded then
-			self.animateColor = true
-			self.animatePosition = true
-			self.animateBorderColor = true
-		end
-		self.faded = false
-		self.fadedByFunc = true
-		if self.events.onFadeIn then
-			for _,e in ipairs(self.events.onFadeIn) do
-				e.fn(self, e.target)
-			end
-		end
-		return self
-	end
-	
-	function t:fadeOut(p, h)
-		if self.events.beforeFadeOut then
-			for _,e in ipairs(self.events.beforeFadeOut) do
-				e.fn(self, e.target)
-			end
-		end
-		self:animateToOpacity(0)
-		if p then 
-			self.faded = true
-			if h then
-				self.animateColor = false
-				self.animatePosition = false
-				self.animateBorderColor = false
-			end
-		end
-		self.fadedByFunc = true
-		if self.events.onFadeOut then
-			for _,e in ipairs(self.events.onFadeOut) do
-				e.fn(self, e.target)
-			end
-		return self
-		end
-	end
 	
 	function t:addFont(f, n)
 		assert(f, "[" .. self.name .. "] FAILURE: text:addFont() :: Missing param[font]")
@@ -417,21 +94,6 @@ function text:new(n, p)
 		return self.font
 	end
 	
-	function t:isHovered()
-		return self.hovered
-	end
-	
-	function t:setHollow(h)
-		assert(h ~= nil, "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Missing param[hollow]")
-		assert(type(h) == "boolean", "[" .. self.name .. "] FAILURE: checkbox:setHollow() :: Incorrect param[hollow] - expecting boolean and got " .. type(h))
-		self.hollow = h
-		return self
-	end
-	
-	function t:isHollow()
-		return self.hollow
-	end
-	
 	function t:setTypewriterSpeed(s)
 		assert(s, "[" .. self.name .. "] FAILURE: text:setTypewriterSpeed() :: Missing param[speed]")
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: text:setTypewriterSpeed() :: Incorrect param[speed] - expecting number and got " .. type(s))
@@ -441,120 +103,6 @@ function text:new(n, p)
 	
 	function t:getTypewriterSpeed()
 		return self.typewriterSpeed
-	end
-	
-	function t:startAnimation()
-		self.inAnimation = true
-		return self
-	end
-	
-	function t:stopAnimation()
-		self.inAnimation = false
-		return self
-	end
-	
-	function t:update(dt)		
-		if self.typewriter then
-			self.typewriterWaited = self.typewriterWaited + dt
-			if self.fancy then
-				for k,v in ipairs(self.typewriterText) do
-					if not v.finished then
-						if v.text then
-							if v.delay > 0 and v.delayWaited < v.delay then
-								v.delayWaited = v.delayWaited + dt
-								if v.delayWaited >= v.delay then
-									v.needToWait = false
-								end
-							end
-							if not v.needToWait then
-								v.timeWaited = v.timeWaited + dt
-								if not v.started then
-									v.started = true
-								end
-								while v.timeWaited >= v.time and v.textPos <= #v.text do
-									v.timeWaited = v.timeWaited - v.time
-									v.textPos = v.textPos + 1
-									if not v.toShow then v.toShow = "" end
-									if not v.text[v.textPos] then v.text[v.textPos] = 0 end
-									v.toShow = v.toShow .. v.text[v.textPos]
-								end
-								if v.textPos >= #v.text then
-									v.finished = true
-								end
-							end
-						end
-						if not v.finished then break end
-						if k == #self.typewriterText then
-							if self.events.onTypewriterFinish then
-								for _,e in ipairs(self.events.onTypewriterFinish) do
-									e.fn(self, e.target)
-								end
-							end
-							if self.typewriterRepeat then
-								for _,e in ipairs(self.typewriterText) do
-									v.timeWaited = 0
-									v.toShow = ""
-									v.finished = false
-									v.textPos = 1
-									if v.delayWaited ~= 0 then
-										v.needToWait = true
-									end
-								end
-							end
-						end
-					end
-				end
-			else
-				while self.typewriterWaited >= self.typewriterSpeed and self.typewriterPos <= #self.typewriterText do
-					self.typewriterWaited = self.typewriterWaited - self.typewriterSpeed
-					self.typewriterPrint = self.typewriterPrint .. self.typewriterText[self.typewriterPos]
-					self.typewriterPos = self.typewriterPos + 1
-				end
-				if self.typewriterPos >= #self.typewriterText and not self.typewriterFinished then
-					if not self.typewriterRepeat then self.typewriterFinished = true else self:typewriterCycle() end
-					self.typewriterRunCount = self.typewriterRunCount + 1
-				end
-			end
-		end
-	end
-	
-	function t:setOpacity(o)
-		assert(o, "[" .. self.name .. "] FAILURE: text:setUseBorder() :: Missing param[opacity]")
-		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: text:setUseBorder() :: Incorrect param[opacity] - expecting number and got " .. type(o))
-		self.color[4] = o
-		return self
-	end
-	
-	function t:getOpacity()
-		return self.color[4]
-	end
-	
-	function t:getParent()
-		return text.guis[self.parent]
-	end
-	
-	function t:registerEvent(n, f, t, i)
-		assert(n, "FAILURE: gui:registerEvent() :: Missing param[eventName]")
-		assert(type(n) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[eventName] - expecting string and got " .. type(n))
-		assert(f, "FAILURE: gui:registerEvent() :: Missing param[functiom]")
-		assert(type(f) == "function", "FAILURE: gui:registerEvent() :: Incorrect param[functiom] - expecting function and got " .. type(f))
-		if not self.events[n] then self.events[n] = {} end
-		local id = #self.events[n] + 1
-		self.events[n][id] = {id = id, fn = f, target = t, name = i}
-		return self
-	end
-	
-	function t:removeEvent(n, i)
-		assert(n, "FAILURE: gui:removeGlobalEvent() :: Missing param[eventName]")
-		assert(type(n) == "string", "FAILURE: gui:removeGlobalEvent() :: Incorrect param[eventName] - expecting string and got " .. type(n))
-		assert(i, "FAILURE: gui:registerEvent() :: Missing param[name]")
-		assert(type(i) == "string", "FAILURE: gui:registerEvent() :: Incorrect param[name] - expecting string and got " .. type(i))
-		for k,e in ipairs(self.events[n]) do
-			if e.name == i then
-				table.remove(events[n], k)
-			end
-		end
-		return self
 	end
 	
 	function t:typewriterCycle()
@@ -590,120 +138,79 @@ function text:new(n, p)
 		return self.typewriter
 	end
 	
-	function t:setX(x)
-		assert(x, "[" .. self.name .. "] FAILURE: text:setX() :: Missing param[x]")
-		assert(type(x) == "number", "[" .. self.name .. "] FAILURE: text:setX() :: Incorrect param[x] - expecting number and got " .. type(x))
-		self.pos.x = x
-		return self
-	end
-	
-	function t:getX()
-		return self.pos.x
-	end
-	
-	function t:setY(y)
-		assert(y, "[" .. self.name .. "] FAILURE: text:setY() :: Missing param[y]")
-		assert(type(y) == "number", "[" .. self.name .. "] FAILURE: text:setY() :: Incorrect param[y] - expecting number and got " .. type(y))
-		self.pos.y = y
-		return self
-	end
-	
-	function t:getY()
-		return self.pos.y
-	end
-	
-	function t:setZ(z)
-		assert(z, "[" .. self.name .. "] FAILURE: text:setZ() :: Missing param[z]")
-		assert(type(z) == "number", "[" .. self.name .. "] FAILURE: text:setZ() :: Incorrect param[z] - expecting number and got " .. type(z))
-		self.pos.z = z
-		return self
-	end
-	
-	function t:getZ()
-		return self.pos.z
-	end
-	
-	function t.lerp(e,s,c)
-		return (1 - c) * e + c * s
-	end
-	
-	function t.softLerp(e,e1,s,s1,c)
-		--return (1 - c) * ((s + s1) + ((e - e1) * c^2)) * s
-		return (1 - c) * e - e1 + c^2 * s - s1
-	end
-	
-	setmetatable(t, text)
-	return t
-end
-
-function text:split(s)
-	local t={}
-	local f = false
-	if s:match("{") and s:match("}") then
-		f = true
-		for b in s:gmatch(".-{") do
-			local id = #t + 1
-			t[id] = {}
-			t[id].text = {}
-			t[id].offset = {}
-			t[id].color = "white"
-			t[id].delay = 0
-			t[id].delayWaited = 0
-			t[id].needToWait = false
-			t[id].font = "default"
-			t[id].time = 0.5
-			t[id].started = false
-			t[id].finished = false
-			t[id].textPos = 0
-			t[id].timeWaited = 0
-			t[id].toShow = ""
-			if b:match("}") then
-				for o in b:gmatch(".-}") do
-					local d = o:gsub("}","")
-					for m in d:gmatch("([^,]+)") do
-						local prefix = m:sub(1,1)
-						if prefix == prefixes.color then
-							t[id].color = m:gsub("^" .. prefixes.color .. "=", "")
-						end
-						if prefix == prefixes.delay then
-							t[id].delay = tonumber((m:gsub("^" .. prefixes.delay .. "=", "")))
-							t[id].needToWait = true
-						end
-						if prefix == prefixes.font then
-							t[id].font = m:gsub("^" .. prefixes.font .. "=", "")
-						end
-						if prefix == prefixes.time then
-							t[id].time = tonumber((m:gsub("^" .. prefixes.time .. "=", "")))
-						end
-						if prefix == prefixes.offset then
-							local offsets = {}
-							local o = m:gsub("^" .. prefixes.offset .. "=","")
-							if o:match("%(") and o:match("%)") then
-								o = o:gsub("%(",""):gsub("%)","")
-								for i in o:gmatch("-?[^%.]+") do
-									if i ~= "%." then
-										offsets[#offsets + 1] = tonumber(i) 
+	function t:split()
+		if not self.text then return {} end
+		local s = self.text
+		local d={}
+		local f = false
+		if s:match("{") and s:match("}") then
+			f = true
+			for b in s:gmatch(".-{") do
+				local id = #d + 1
+				d[id] = {}
+				d[id].text = {}
+				d[id].offset = {}
+				d[id].color = "white"
+				d[id].delay = 0
+				d[id].delayWaited = 0
+				d[id].needToWait = false
+				d[id].font = "default"
+				d[id].time = 0.5
+				d[id].started = false
+				d[id].finished = false
+				d[id].textPos = 0
+				d[id].timeWaited = 0
+				d[id].toShow = ""
+				if b:match("}") then
+					for o in b:gmatch(".-}") do
+						local k = o:gsub("}","")
+						for m in k:gmatch("([^,]+)") do
+							local prefix = m:sub(1,1)
+							if prefix == prefixes.color then
+								print(d[id], d[id].color, m)
+								d[id].color = m:gsub("^" .. prefixes.color .. "=", "")
+							end
+							if prefix == prefixes.delay then
+								d[id].delay = tonumber((m:gsub("^" .. prefixes.delay .. "=", "")))
+								d[id].needToWait = true
+							end
+							if prefix == prefixes.font then
+								d[id].font = m:gsub("^" .. prefixes.font .. "=", "")
+							end
+							if prefix == prefixes.time then
+								d[id].time = tonumber((m:gsub("^" .. prefixes.time .. "=", "")))
+							end
+							if prefix == prefixes.offset then
+								local offsets = {}
+								local o = m:gsub("^" .. prefixes.offset .. "=","")
+								if o:match("%(") and o:match("%)") then
+									o = o:gsub("%(",""):gsub("%)","")
+									for i in o:gmatch("-?[^%.]+") do
+										if i ~= "%." then
+											offsets[#offsets + 1] = tonumber(i) 
+										end
 									end
+									d[id].offset = offsets
 								end
-								t[id].offset = offsets
 							end
 						end
 					end
+					d[id].fullText = b:gsub("^.-}",""):gsub("{",""):gsub("^%s*(.-)%s*$","%1")
+				else
+					d[id].fullText = b:gsub("{", "")
 				end
-				t[id].fullText = b:gsub("^.-}",""):gsub("{",""):gsub("^%s*(.-)%s*$","%1")
-			else
-				t[id].fullText = b:gsub("{", "")
+				for i in d[id].fullText:gmatch(".") do
+					d[id].text[#d[id].text + 1] = i
+				end
 			end
-			for i in t[id].fullText:gmatch(".") do
-				t[id].text[#t[id].text + 1] = i
+		else
+			for i in string.gmatch(s, ".") do
+				d[#d+1] = i
 			end
 		end
-	else
-		for i in string.gmatch(s, ".") do
-			t[#t+1] = i
-		end
+		return d, f
 	end
-	return t, f
+	return t
 end
 
-return text
+return setmetatable(text, text)

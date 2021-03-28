@@ -26,13 +26,25 @@
 
 
 
+local lg, lt = love.graphics, love.timer
+local min, max = math.min, math.max
 local object = require("neon.object")
-local slider = object()
 
-slider.items = {}
+local slider = {}
 
-function slider:new(n, p)
+slider.guis = {}
+slider.fonts = {}
 
+function slider:new(n, id, p)
+	local s = object()
+	s.__index = s
+	s.name = n
+	s.id = id
+	s.type = "slider"
+	if p then 
+		if not self.guis[p.id] then self.guis[p.id] = p end
+		if p.id then s.parent = p.id else s.parent = nil end
+	end
 end
 
-return slider
+return setmetatable(slider, slider)
