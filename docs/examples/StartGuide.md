@@ -16,8 +16,8 @@ Here, we have created a box object in both cases, with the name of `myBox`<br>
 The next step, we will set some data for the box, so that it can display itself.
 ```lua
 box:setData({
-	width = 150, height = 50,
-	x = 50, y = 25, z = 1,
+	width = love.graphics.getWidth() - 50, height = love.graphics.getHeight() - 50,
+	x = 25, y = 25, z = 1,
 	color = {0,1,1,1},
 	useBorder = true, borderColor = {1,1,0,1}
 })
@@ -40,6 +40,15 @@ This section tells the event what to do when it is fired.<Br>
 `target` is the object defined after the event in the `registerEvent` block, here we have it defined as `x`.<br>
 `event` is the data that came from LOVE. onClick would deliver an associative table of `{x, y, button, istouch, presses}`<br>
 <br>
+Finally, let's add some text on top of the box.
+```lua
+local textFont = love.graphics.newFont(36)
+Neon:add("text", "boxText"):setData({
+	x = ((love.graphics.getWidth() - 50) / 2) - (textFont:getWidth("Hello World") / 2),
+	y = ((love.graphics.getHeight() - 50) / 2) - (textFont:getHeight() / 2),
+	z = 2, text = "Hello World", shadow = true, color = {1,1,1,1}, font = textFont
+})
+```
 Now let's take a look at what our code should look like.
 ```lua
 local Neon = require("neon")
@@ -48,8 +57,8 @@ local box = Neon:addBox("myBox")
 local x = 10
 	
 box:setData({
-	width = 150, height = 50,
-	x = 50, y = 25, z = 1,
+	width = love.graphics.getWidth() - 50, height = love.graphics.getHeight() - 50,
+	x = 25, y = 25, z = 1,
 	color = {0,1,1,1},
 	useBorder = true, borderColor = {1,1,0,1}
 })
@@ -58,6 +67,12 @@ box:registerEvent("onClick", function(self, target, event)
     print(self.name, event.x, event.y, target)
 end, x, "boxClick")
 	
+local textFont = love.graphics.newFont(36)
+Neon:add("text", "boxText"):setData({
+	x = ((love.graphics.getWidth() - 50) / 2) - (textFont:getWidth("Hello World") / 2),
+	y = ((love.graphics.getHeight() - 50) / 2) - (textFont:getHeight() / 2),
+	z = 2, text = "Hello World", shadow = true, color = {1,1,1,1}, font = textFont
+})
 	
 -- Use a single source for love callbacks
 function love.update(dt)
