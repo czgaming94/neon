@@ -43,8 +43,8 @@ text.guis = {}
 text.fonts = {}
 
 function text:new(n, id, p)
-	local t = object()
-	t.__index = t
+	local t = {}
+	setmetatable(t, object())
 	t.name = n
 	t.id = id
 	t.type = "text"

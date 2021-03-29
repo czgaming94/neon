@@ -567,7 +567,41 @@ function gui:update(dt)
 					
 					end
 					if i.type == "checkbox" then
-					
+						for k,v in ipairs(i.options) do
+							if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
+								if not v.hovered then 
+									v.hovered = true 
+									if i.events.onOptionHover then
+										for _,e in ipairs(i.events.onOptionHover) do
+											e.fn(i, v)
+										end
+									end
+									if events.onOptionHover then
+										for _,e in ipairs(events.onOptionHover) do
+											if i.type == e.o then
+												e.fn(i, v)
+											end
+										end
+									end
+								end
+							else
+								if v.hovered then 
+									v.hovered = false 
+									if i.events.onOptionHoverExit then
+										for _,e in ipairs(i.events.onOptionHoverExit) do
+											e.fn(i, v)
+										end
+									end
+									if events.onOptionHoverExit then
+										for _,e in ipairs(events.onOptionHoverExit) do
+											if i.type == e.o then
+												e.fn(i, v)
+											end
+										end
+									end
+								end
+							end
+						end
 					end
 					if i.type == "dropdown" then
 						if i.open then
@@ -1023,7 +1057,7 @@ function gui:draw()
 				end
 				lg.setColor(1,1,1,1)
 			end
-			if i.draw then i:draw() end
+			if i.draw then i.draw(i) end
 		end
 		lg.pop("all")
 	end
