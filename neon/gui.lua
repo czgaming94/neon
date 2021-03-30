@@ -69,7 +69,7 @@ end
 function gui:new(item)
 	if not self.enabled then return false end
 	item = item or self
-	local new = self:generate(item)
+	local new = self:generate(item, nil, "items")
 	new.id = #items + 1
 	items[#items + 1] = new
 	return new
@@ -414,33 +414,16 @@ function gui:update(dt)
 							i.positionAnimateTime = i.positionAnimateTime + dt
 							local t = min(i.positionAnimateTime * (i.positionAnimateSpeed / 10), 1.0)
 							if i.pos.x ~= i.positionToAnimateTo.x or i.pos.y ~= i.positionToAnimateTo.y then
-								--if i.bouncePositionAnimation then
-								--	i.pos.x = i.lerp(i.positionToAnimateFrom.x, 0, i.positionToAnimateTo.x, 0, t)
-								--	i.pos.y = i.lerp(i.positionToAnimateFrom.y, 20, i.positionToAnimateTo.y, 20, t)
-								--else
-									i.pos.x = i.lerp(i.positionToAnimateFrom.x, i.positionToAnimateTo.x, t)
-									i.pos.y = i.lerp(i.positionToAnimateFrom.y, i.positionToAnimateTo.y, t)
-								--end
+								i.pos.x = i.lerp(i.positionToAnimateFrom.x, i.positionToAnimateTo.x, t)
+								i.pos.y = i.lerp(i.positionToAnimateFrom.y, i.positionToAnimateTo.y, t)
+								if i.type == "text" and i.fancy then
+									for _,v in ipairs(i.typewriterText) do
+										v.x = i.lerp(v.oX, v.tX, t)
+										v.y = i.lerp(v.oY, v.tY, t)
+									end
+								end
 								inProperPosition = false
 							end
-							--[[
-							if i.pos.z ~= i.positionToAnimateTo.z then
-								i.pos.z = i.lerp(i.positionToAnimateFrom.z, i.positionToAnimateTo.z, t)
-								self.needToSort = true
-							end
-							--]]
-							if i.positionToAnimateTo.x > i.pos.x then
-								i.positionAnimationPercentX = i.positionToAnimateTo.x / i.pos.x
-							else
-								i.positionAnimationPercentX =  i.pos.x / i.positionToAnimateTo.x
-							end
-							if i.positionToAnimateTo.y > i.pos.y then
-								i.positionAnimationPercentY = i.positionToAnimateTo.y / i.pos.y
-							else
-								i.positionAnimationPercentY = i.pos.y / i.positionToAnimateTo.y
-							end
-							
-							i.positionAnimationPercent = i.positionAnimationPercentX * i.positionAnimationPercentY
 						end
 						
 						if i.animateOpacity then
@@ -1007,16 +990,52 @@ function gui:draw()
 						lg.print({i.color, i.typewriterPrint}, i.pos.x, i.pos.y)
 					end
 				else
-					if i.w ~= 0 then
-						if i.shadow then
-							lg.printf({{0,0,0,.4}, i.text}, i.pos.x + 1, i.pos.y + 1, i.w, i.align)
+					if i.fancy then
+						for k,v in ipairs(i.typewriterText) do
+							if v.fullText then
+								lg.push()
+								lg.setColor(i.color)
+								if v.color ~= "white" then
+									if i.parent then
+										lg.setColor(self.color(v.color))
+									else
+										if type(v.color) == "string" then
+											lg.setColor(colors[v.color])
+										else
+											lg.setColor(v.color)
+										end
+									end
+								end
+								if v.font ~= "default" then
+									lg.setFont(i.fonts[v.font])
+								end
+								if v.offset[1] then
+									if i.shadow then
+										lg.print({{0,0,0,.4}, v.fullText}, v.x + v.offset[1] + 1, v.y + v.offset[2] + 1)
+									end
+									lg.print(v.fullText, v.x + v.offset[1], v.y + v.offset[2])
+								else
+									if i.shadow then
+										lg.print({{0,0,0,.4}, v.fullText}, v.x + 1, v.y + 1)
+									end
+									lg.print(v.fullText, v.x, v.y)
+								end
+								lg.setColor(1,1,1,1)
+								lg.pop()
+							end
 						end
-						lg.printf({i.color, i.text}, i.pos.x, i.pos.y, i.w, i.align)
 					else
-						if i.shadow then
-							lg.print({{0,0,0,.4}, i.text}, i.pos.x + 1, i.pos.y + 1)
+						if i.w ~= 0 then
+							if i.shadow then
+								lg.printf({{0,0,0,.4}, i.text}, i.pos.x + 1, i.pos.y + 1, i.w, i.align)
+							end
+							lg.printf({i.color, i.text}, i.pos.x, i.pos.y, i.w, i.align)
+						else
+							if i.shadow then
+								lg.print({{0,0,0,.4}, i.text}, i.pos.x + 1, i.pos.y + 1)
+							end
+							lg.print({i.color, i.text}, i.pos.x, i.pos.y)
 						end
-						lg.print({i.color, i.text}, i.pos.x, i.pos.y)
 					end
 				end
 				lg.setColor(1,1,1,1)

@@ -81,7 +81,6 @@ local function obj(t, p)
 		assert(type(y) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Incorrect param[y] - expecting number or 'auto' and got " .. type(y))
 		s = s or 2
 		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
 		if not self.fadedByFunc or f then
 			if x == "auto" then
 				x = self.pos.x
@@ -89,6 +88,26 @@ local function obj(t, p)
 			if y == "auto" then
 				y = self.pos.y
 			end
+			if self.type == "text" then
+				for _,v in ipairs(self.typewriterText) do
+					local xDif, yDif
+					if self.pos.x - v.x ~= 0 then
+						xDif = x - (self.pos.x - v.x)
+					else
+						xDif = self.pos.x
+					end
+					if self.pos.y - v.y ~= 0 then
+						yDif = y - (self.pos.y - v.y)
+					else
+						yDif = self.pos.y
+					end
+					v.oX = v.x
+					v.tX = xDif
+					v.oY = v.y
+					v.tY = yDif
+				end
+			end
+			for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
 			self.positionToAnimateTo = {x = x, y = y}
 			self.positionAnimateSpeed = s
 			self.positionAnimateTime = 0
@@ -439,10 +458,12 @@ local function obj(t, p)
 				end 
 			end
 		end
-		if self.typewriter then
+		if self.typewriter or self.fancy then
 			local font = self.font
 			local lastFont = self.font
-			self.typewriterText, self.fancy = self:split()
+			if not d.text then
+				self.typewriterText, self.fancy = self:split()
+			end
 			for k,v in ipairs(self.typewriterText) do
 				lastFont = font
 				if v.font ~= "default" then
@@ -451,11 +472,12 @@ local function obj(t, p)
 					font = self.font
 				end
 				
-				if not v.y then
+				if not v.y or v.y == 0 then
 					v.y = self.pos.y
+					v.oY = v.y
 				end
 				
-				if not v.x then
+				if not v.x or v.x == 0 then
 					if k == 1 then
 						v.x = self.pos.x
 					else
@@ -464,8 +486,10 @@ local function obj(t, p)
 							v.x = self.pos.x
 							v.y = self.typewriterText[k - 1].y + lastFont:getHeight(self.typewriterText[k - 1].fullText) 
 							self.h = self.h + font:getHeight(v.fullText)
+							v.oY = v.y
 						end
 					end
+					v.oX = v.x
 				end
 				
 				if v.x == self.pos.x then
@@ -487,6 +511,24 @@ local function obj(t, p)
 		
 		self.defaults = d
 		return self
+	end
+	
+	function t:getData()
+		local d = {}
+		for k,v in pairs(self) do
+			if type(v) ~= "function" then
+				d[k] = v
+			end
+		end
+		return d
+	end
+	
+	function t:getDefault()
+		local d = {}
+		for k,v in pairs(self.defaults) do
+			d[k] = v
+		end
+		return d
 	end
 
 	function t:disable()

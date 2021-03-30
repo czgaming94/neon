@@ -36,8 +36,8 @@ dropdown.guis = {}
 dropdown.fonts = {}
 
 function dropdown:new(n, id, p)
-	local d = object()
-	d.__index = d
+	local d = {}
+	setmetatable(d, object())
 	d.name = n
 	d.id = id
 	d.type = "dropdown"

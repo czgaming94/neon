@@ -160,14 +160,20 @@ function text:new(n, id, p)
 				d[id].finished = false
 				d[id].textPos = 0
 				d[id].timeWaited = 0
+				d[id].x = 0
+				d[id].oX = 0
+				d[id].tX = 0
+				d[id].y = 0
+				d[id].oY = 0
+				d[id].tY = 0
 				d[id].toShow = ""
+				d[id].fullText = ""
 				if b:match("}") then
 					for o in b:gmatch(".-}") do
 						local k = o:gsub("}","")
 						for m in k:gmatch("([^,]+)") do
 							local prefix = m:sub(1,1)
 							if prefix == prefixes.color then
-								print(d[id], d[id].color, m)
 								d[id].color = m:gsub("^" .. prefixes.color .. "=", "")
 							end
 							if prefix == prefixes.delay then

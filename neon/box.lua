@@ -35,8 +35,8 @@ local box = {}
 box.guis = {}
 
 function box:new(n, id, p)
-	local b = object()
-	b.__index = b
+	local b = {}
+	setmetatable(b, object())
 	b.name = n
 	b.id = id
 	b.type = "box"

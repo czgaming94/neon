@@ -35,8 +35,8 @@ local checkbox = {}
 checkbox.guis = {}
 
 function checkbox:new(n, id, p)
-	local c = object()
-	c.__index = c
+	local c = {}
+	setmetatable(c, object())
 	c.name = n
 	c.id = id
 	c.type = "checkbox"
