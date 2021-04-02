@@ -32,7 +32,7 @@ local object = require("neon.object")
 
 local box = {}
 
-box.guis = {}
+local guis = {}
 
 function box:new(n, id, p)
 	local b = object()
@@ -41,8 +41,8 @@ function box:new(n, id, p)
 	b.id = id
 	b.type = "box"
 	if p then 
-		if not self.guis[p.id] then self.guis[p.id] = p end
-		if p.id then b.parent = p.id else b.parent = nil end
+		if not guis[p.id] then guis[p.id] = p end
+		if p.id then b.parent = p else b.parent = nil end
 	end
 	b.border = false
 	b.borderColor = {1,1,1,1}
@@ -56,6 +56,7 @@ function box:new(n, id, p)
 	b.iY = 0
 	b.r = {0,0,0,0}
 	b.rot = 0
+	b.button = false
 	b.keepBackground = false
 	b.paddingLeft = 0
 	b.paddingRight = 0
@@ -161,7 +162,7 @@ function box:setImage(i)
 	
 	if t == "string" then
 		if self.parent then
-			self.image = self.images[i] or box.guis[self.parent].images[i]
+			self.image = self.images[i] or guis[self.parent].images[i]
 		else
 			self.image = self.images[i] or i
 		end

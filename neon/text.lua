@@ -39,7 +39,7 @@ local prefixes = {
 
 local text = {}
 
-text.guis = {}
+local guis = {}
 text.fonts = {}
 
 function text:new(n, id, p)
@@ -49,8 +49,8 @@ function text:new(n, id, p)
 	t.id = id
 	t.type = "text"
 	if p then 
-		if not self.guis[p.id] then self.guis[p.id] = p end
-		if p.id then t.parent = p.id else t.parent = nil end
+		if not guis[p.id] then guis[p.id] = p end
+		if p.id then t.parent = p else t.parent = nil end
 	end
 	t.font = lg.getFont()
 	t.fonts = {}

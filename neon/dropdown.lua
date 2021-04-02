@@ -32,7 +32,7 @@ local object = require("neon.object")
 
 local dropdown = {}
 
-dropdown.guis = {}
+local guis = {}
 dropdown.fonts = {}
 
 function dropdown:new(n, id, p)
@@ -42,8 +42,8 @@ function dropdown:new(n, id, p)
 	d.id = id
 	d.type = "dropdown"
 	if p then 
-		if not self.guis[p.id] then self.guis[p.id] = p end
-		if p.id then d.parent = p.id else d.parent = nil end
+		if not guis[p.id] then guis[p.id] = p end
+		if p.id then d.parent = p else d.parent = nil end
 	end
 	d.dW = 0
 	d.uW = 0

@@ -74,6 +74,7 @@ local function obj(t, p)
 		end
 		return self
 	end
+	
 	function t:animateToPosition(x, y, s, f, e)
 		assert(x, "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Missing param[x]")
 		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
@@ -183,8 +184,8 @@ local function obj(t, p)
 		assert(type(d.x) == "number", "[" .. self.name .. "] FAILURE: " .. self.type .. ":setData() :: Incorrect param[x] - expecting number and got " .. type(d.x))
 		assert(d.y, "[" .. self.name .. "] FAILURE: " .. self.type .. ":setData() :: Missing param[data['y']")
 		assert(type(d.y) == "number", "[" .. self.name .. "] FAILURE: " .. self.type .. ":setData() :: Incorrect param[y] - expecting number and got " .. type(d.y))
-		self.pos.x = d.x
-		self.pos.y = d.y
+		self.pos.x, self.x, self.oX, self.sX = d.x, d.x, d.x, d.x
+		self.pos.y, self.y, self.oY, self.sY = d.y, d.y, d.y, d.y
 		if d.w then 
 			self.w = d.w 
 			if self.uW then
@@ -316,6 +317,11 @@ local function obj(t, p)
 				self.selectedColor[k] = v
 			end
 		end
+		if d.sliderColor then
+			for k,v in ipairs(d.sliderColor) do
+				self.selectedColor[k] = v
+			end
+		end`
 		if d.textColor then
 			for k,v in ipairs(d.textColor) do
 				self.textColor[k] = v

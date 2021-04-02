@@ -32,7 +32,7 @@ local object = require("neon.object")
 
 local textfield = {}
 
-textfield.guis = {}
+local guis = {}
 textfield.fonts = {}
 
 function textfield:new(n, id, p)
@@ -42,8 +42,8 @@ function textfield:new(n, id, p)
 	t.id = id
 	t.type = "textfield"
 	if p then 
-		if not self.guis[p.id] then self.guis[p.id] = p end
-		if p.id then t.parent = p.id else t.parent = nil end
+		if not guis[p.id] then guis[p.id] = p end
+		if p.id then t.parent = p else t.parent = nil end
 	end
 	t.textfield = ""
 	t.keys = {

@@ -256,7 +256,7 @@ function gui:addBox(n, b, f, t)
 	if b then
 		assert(f, "FAILURE: gui:addBox() :: Missing param[function]")
 		assert(type(f) == "string", "FAILURE: gui:addBox() :: Incorrect param[function] - expecting string and got " .. type(f))
-		self.items[id]:registerEvent("onClick", f, t)
+		self.items[id]:registerEvent("onClick", f, t).button = true
 	end
 	return self.items[id]
 end
@@ -605,6 +605,23 @@ function gui:update(dt)
 							end
 						end
 					end
+					if i.type == "slider" then
+						if (x >= i.sX and x <= i.sX + i.h / 4) and (y >= i.sY and x <= i.sY + i.h / 4) then
+							if not i.sliderHovered then i.sliderHovered = true end
+							if lm.isDown(1) then
+								if not i.sliderHeld then i.sliderHeld = true end
+								if x >= i.x and x <= i.x + i.w then
+									i.sX = x
+								else
+									i.sX = min(max(i.x, x), i.x + i.w)
+								end
+							else
+								if i.sliderHeld then i.sliderHeld = false end
+							end
+						else
+							if not i.sliderHeld and i.sliderHovered then i.sliderHovered = false end
+						end
+					end
 					if i.type == "text" then
 						if i.typewriter then
 							i.typewriterWaited = i.typewriterWaited + dt
@@ -950,6 +967,21 @@ function gui:draw()
 				lg.setColor(i.labelColor)
 				lg.setFont(i.labelFont)
 				lg.print(i.label, i.labelPosition.x, i.labelPosition.y)
+			end
+			if i.type == "slider" then
+				if self.border then
+					lg.setColor(i.borderColor)
+					lg.rectangle("line", i.x - 1, i.y - 1, i.w + 2, i.h + 2, i.radius, i.radius)
+				end
+				lg.setColor(i.color)
+				lg.rectangle("fill", i.x, i.y, i.w, i.h, i.radius, i.radius)
+				lg.setColor(i.sliderColor)
+				if i.image then
+					lg.draw(i.x, i.y + i.h / 4, i.h / 2, i.h / 2)
+				else
+					lg.circle(i.sX, i.sY + i.h / 4, i.h / 2, i.h / 2)
+				end
+				lg.setColor(1,1,1,1)
 			end
 			if i.type == "text" then
 				lg.setColor(1,1,1,1)
