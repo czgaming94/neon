@@ -35,8 +35,8 @@ local box = {}
 box.guis = {}
 
 function box:new(n, id, p)
-	local b = {}
-	setmetatable(b, object())
+	local b = object()
+	b.__index = box
 	b.name = n
 	b.id = id
 	b.type = "box"
@@ -74,188 +74,188 @@ function box:new(n, id, p)
 	b.imageAnimateTime = 0
 	b.imageAnimateSpeed = s
 	
-	function b:addImage(i, n, a)
-		assert(i, "[" .. self.name .. "] FAILURE: box:addImage() :: Missing param[img]")
-		assert(type(i) == "userdata", "[" .. self.name .. "] FAILURE: box:addImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))
-		assert(n, "[" .. self.name .. "] FAILURE box:addImage() :: Missing param[name]")
-		assert(type(n) == "string", "[" .. self.name .. "] FAILURE: box:addImage() :: Incorrect param[img] - expecting string and got " .. type(n))
-		self.images[n] = i
-		if a and a == true then self:setImage(n) end
-		return self
+	return setmetatable(b, b)
+end
+
+function box:addImage(i, n, a)
+	assert(i, "[" .. self.name .. "] FAILURE: box:addImage() :: Missing param[img]")
+	assert(type(i) == "userdata", "[" .. self.name .. "] FAILURE: box:addImage() :: Incorrect param[img] - expecting image userdata and got " .. type(i))
+	assert(n, "[" .. self.name .. "] FAILURE box:addImage() :: Missing param[name]")
+	assert(type(n) == "string", "[" .. self.name .. "] FAILURE: box:addImage() :: Incorrect param[img] - expecting string and got " .. type(n))
+	self.images[n] = i
+	if a and a == true then self:setImage(n) end
+	return self
+end
+
+function box:animateBorderToColor(c, s, f)
+	assert(c, "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Missing param[color]")
+	assert(type(c) == "table", "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
+	assert(#c > 2, "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
+	s = s or 2
+	assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
+	if not self.fadedByFunc or f then
+		self.borderColorToAnimateTo = c
+		self.borderColorAnimateSpeed = s
+		self.borderColorAnimateTime = 0
+		self.inAnimation = true
+		self.animateBorderColor = true
+		self.runAnimations = true
 	end
-	
-	function b:animateBorderToColor(c, s, f)
-		assert(c, "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Missing param[color]")
-		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
-		assert(#c > 2, "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
-		s = s or 2
-		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc or f then
-			self.borderColorToAnimateTo = c
-			self.borderColorAnimateSpeed = s
-			self.borderColorAnimateTime = 0
-			self.inAnimation = true
-			self.animateBorderColor = true
-			self.runAnimations = true
-		end
-		return self
+	return self
+end
+
+function box:animateBorderToOpacity(o, s, f)
+	assert(o, "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Missing param[opacity]")
+	assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[opacity] - expecting number and got " .. type(o))
+	s = s or 1
+	assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
+	if not self.fadedByFunc or f then
+		self.opacityToAnimateBorderTo = o
+		self.opacityBorderAnimateTime = 0
+		self.opacityBorderAnimateSpeed = s
+		self.inAnimation = true
+		self.animateBorderOpacity = true
+		self.runAnimations = true
 	end
-	
-	function b:animateBorderToOpacity(o, s, f)
-		assert(o, "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Missing param[opacity]")
-		assert(type(o) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[opacity] - expecting number and got " .. type(o))
-		s = s or 1
-		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateBorderToOpacity() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc or f then
-			self.opacityToAnimateBorderTo = o
-			self.opacityBorderAnimateTime = 0
-			self.opacityBorderAnimateSpeed = s
-			self.inAnimation = true
-			self.animateBorderOpacity = true
-			self.runAnimations = true
-		end
-		return self
-	end
-	
-	function b:animateToImage(i, s, f)
-		assert(i, "[" .. self.name .. "] FAILURE: box:animateToImage() :: Missing param[image]")
-		assert(type(i) == "string" or type(i) == "userdata", "[" .. self.name .. "] FAILURE: box:animateToImage() :: Incorrect param[image] - expecting image userdata or string and got " .. type(i))
-		s = s or 3
-		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateToImage() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc or f then
-			self.oldImage = self.image
-			self.imageAnimateFilter = {0,0,0,1}
-			if type(i) == "string" then
-				self.imageToAnimateTo = self.images[i]
-			else
-				self.imageToAnimateTo = i
-			end
-			self.imageAnimateTime = 0
-			self.imageAnimateSpeed = s
-			self.inAnimation = true
-			self.animateImage = true
-			self.runAnimations = true
-		end
-		return self
-	end
-	
-	function b:setBorderColor(bC)
-		assert(bC, "[" .. self.name .. "] FAILURE: box:setBorderColor() :: Missing param[color]")
-		assert(type(bC) == "table", "[" .. self.name .. "] FAILURE: box:setBorderColor() :: Incorrect param[color] - expecting table and got " .. type(bC))
-		assert(#bC == 4, "[" .. self.name .. "] FAILURE: box:setBorderColor() :: Incorrect param[color] - table length 4 expected and got " .. #bC)
-		self.borderColor = bC
-		return self
-	end
-	
-	function b:getBorderColor()
-		return self.borderColor
-	end
-	
-	function b:setImage(i)
-		assert(i, "[" .. self.name .. "] FAILURE: box:setImage() :: Missing param[img]")
-		local t = type(i)
-		assert(t == "string" or t == "userdata", "[" .. self.name .. "] FAILURE: box:setImage() :: Incorrect param[img] - expecting string or image userdata and got " .. type(t))
-		
-		if t == "string" then
-			if self.parent then
-				self.image = self.images[i] or box.guis[self.parent].images[i]
-			else
-				self.image = self.images[i] or i
-			end
-		else self.image = i end
-		return self
-	end
-	
-	function b:getImage()
-		return self.image
-	end
-	
-	function b:unsetImage()
-		self.image = nil
-		return self
-	end
-	
-	function b:setImageOffset(o)
-		assert(o, "[" .. self.name .. "] FAILURE: box:setImageOffset() :: Missing param[offset]")
-		assert(type(o) == "table", "[" .. self.name .. "] FAILURE: box:setImageOffset() :: Incorrect param[offset] - expecting table and got " .. type(o))
-		if o.x then
-			self.iX, self.iY = o.x, o.y
+	return self
+end
+
+function box:animateToImage(i, s, f)
+	assert(i, "[" .. self.name .. "] FAILURE: box:animateToImage() :: Missing param[image]")
+	assert(type(i) == "string" or type(i) == "userdata", "[" .. self.name .. "] FAILURE: box:animateToImage() :: Incorrect param[image] - expecting image userdata or string and got " .. type(i))
+	s = s or 3
+	assert(type(s) == "number", "[" .. self.name .. "] FAILURE: box:animateToImage() :: Incorrect param[speed] - expecting number and got " .. type(s))
+	if not self.fadedByFunc or f then
+		self.oldImage = self.image
+		self.imageAnimateFilter = {0,0,0,1}
+		if type(i) == "string" then
+			self.imageToAnimateTo = self.images[i]
 		else
-			self.iX, self.iY = unpack(o)
+			self.imageToAnimateTo = i
 		end
-		return self
+		self.imageAnimateTime = 0
+		self.imageAnimateSpeed = s
+		self.inAnimation = true
+		self.animateImage = true
+		self.runAnimations = true
 	end
+	return self
+end
+
+function box:setBorderColor(bC)
+	assert(bC, "[" .. self.name .. "] FAILURE: box:setBorderColor() :: Missing param[color]")
+	assert(type(bC) == "table", "[" .. self.name .. "] FAILURE: box:setBorderColor() :: Incorrect param[color] - expecting table and got " .. type(bC))
+	assert(#bC == 4, "[" .. self.name .. "] FAILURE: box:setBorderColor() :: Incorrect param[color] - table length 4 expected and got " .. #bC)
+	self.borderColor = bC
+	return self
+end
+
+function box:getBorderColor()
+	return self.borderColor
+end
+
+function box:setImage(i)
+	assert(i, "[" .. self.name .. "] FAILURE: box:setImage() :: Missing param[img]")
+	local t = type(i)
+	assert(t == "string" or t == "userdata", "[" .. self.name .. "] FAILURE: box:setImage() :: Incorrect param[img] - expecting string or image userdata and got " .. type(t))
 	
-	function b:getImageOffset()
-		return {x = self.iX, y = self.iY}
-	end
-	
-	function b:setPadding(p)
-		assert(p, "[" .. self.name .. "] FAILURE: box:setPadding() :: Missing param[padding]")
-		assert(type(p) == "table", "[" .. self.name .. "] FAILURE: box:setPadding() :: Incorrect param[padding] - expecting table and got " .. type(p))
-		assert(#p == 4, "[" .. self.name .. "] FAILURE: box:setPadding() :: Incorrect param[padding] - expecting table length 4 and got " .. #p)
-		if p.top or p.paddingTop then
-			self.paddingTop = p.paddingTop or p.top
-			self.paddingRight = p.paddingRight or p.right or self.paddingRight
-			self.paddingBottom = p.paddingBottom or p.bottom or self.paddingBottom
-			self.paddingLeft = p.paddingLeft or p.left or self.paddingLeft
+	if t == "string" then
+		if self.parent then
+			self.image = self.images[i] or box.guis[self.parent].images[i]
 		else
-			self.paddingTop, self.paddingRight, self.paddingBottom, self.paddingTop = unpack(p)
+			self.image = self.images[i] or i
 		end
-		return self
+	else self.image = i end
+	return self
+end
+
+function box:getImage()
+	return self.image
+end
+
+function box:unsetImage()
+	self.image = nil
+	return self
+end
+
+function box:setImageOffset(o)
+	assert(o, "[" .. self.name .. "] FAILURE: box:setImageOffset() :: Missing param[offset]")
+	assert(type(o) == "table", "[" .. self.name .. "] FAILURE: box:setImageOffset() :: Incorrect param[offset] - expecting table and got " .. type(o))
+	if o.x then
+		self.iX, self.iY = o.x, o.y
+	else
+		self.iX, self.iY = unpack(o)
 	end
-	
-	function b:setPaddingBottom(p)
-		assert(p, "[" .. self.name .. "] FAILURE: box:setPaddingBottom() :: Missing param[padding]")
-		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: box:setPaddingBottom() :: Incorrect param[padding] - expecting number and got " .. type(p))
-		self.paddingBottom = p
-		return self
+	return self
+end
+
+function box:getImageOffset()
+	return {x = self.iX, y = self.iY}
+end
+
+function box:setPadding(p)
+	assert(p, "[" .. self.name .. "] FAILURE: box:setPadding() :: Missing param[padding]")
+	assert(type(p) == "table", "[" .. self.name .. "] FAILURE: box:setPadding() :: Incorrect param[padding] - expecting table and got " .. type(p))
+	assert(#p == 4, "[" .. self.name .. "] FAILURE: box:setPadding() :: Incorrect param[padding] - expecting table length 4 and got " .. #p)
+	if p.top or p.paddingTop then
+		self.paddingTop = p.paddingTop or p.top
+		self.paddingRight = p.paddingRight or p.right or self.paddingRight
+		self.paddingBottom = p.paddingBottom or p.bottom or self.paddingBottom
+		self.paddingLeft = p.paddingLeft or p.left or self.paddingLeft
+	else
+		self.paddingTop, self.paddingRight, self.paddingBottom, self.paddingTop = unpack(p)
 	end
-	
-	function b:setPaddingLeft(p)
-		assert(p, "[" .. self.name .. "] FAILURE: box:setPaddingLeft() :: Missing param[padding]")
-		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: box:setPaddingLeft() :: Incorrect param[padding] - expecting number and got " .. type(p))
-		self.paddingLeft = p
-		return self
-	end
-	
-	function b:setPaddingRight(p)
-		assert(p, "[" .. self.name .. "] FAILURE: box:setPaddingRight() :: Missing param[padding]")
-		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: box:setPaddingRight() :: Incorrect param[padding] - expecting number and got " .. type(p))
-		self.paddingRight = p
-		return self
-	end
-	
-	function b:setPaddingTop(p)
-		assert(p, "[" .. self.name .. "] FAILURE: box:setPaddingTop() :: Missing param[padding]")
-		assert(type(p) == "number", "[" .. self.name .. "] FAILURE: box:setPaddingTop() :: Incorrect param[padding] - expecting number and got " .. type(p))
-		self.paddingTop = p
-		return self
-	end
-	
-	function b:setRounded(r)
-		assert(r ~= nil, "[" .. self.name .. "] FAILURE: box:setRounded() :: Missing param[round]")
-		assert(type(r) == "boolean", "[" .. self.name .. "] FAILURE: box:setRounded() :: Incorrect param[round] - expecting boolean and got " .. type(r))
-		self.round = r
-		return self
-	end
-	
-	function b:isRounded()
-		return self.round
-	end
-	
-	function b:setUseBorder(uB)
-		assert(uB ~= nil, "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Missing param[useBorder]")
-		assert(type(uB) == "boolean", "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(uB))
-		self.border = uB
-		return self
-	end
-	
-	function b:getUseBorder()
-		return self.border
-	end
-	
-	return b
+	return self
+end
+
+function box:setPaddingBottom(p)
+	assert(p, "[" .. self.name .. "] FAILURE: box:setPaddingBottom() :: Missing param[padding]")
+	assert(type(p) == "number", "[" .. self.name .. "] FAILURE: box:setPaddingBottom() :: Incorrect param[padding] - expecting number and got " .. type(p))
+	self.paddingBottom = p
+	return self
+end
+
+function box:setPaddingLeft(p)
+	assert(p, "[" .. self.name .. "] FAILURE: box:setPaddingLeft() :: Missing param[padding]")
+	assert(type(p) == "number", "[" .. self.name .. "] FAILURE: box:setPaddingLeft() :: Incorrect param[padding] - expecting number and got " .. type(p))
+	self.paddingLeft = p
+	return self
+end
+
+function box:setPaddingRight(p)
+	assert(p, "[" .. self.name .. "] FAILURE: box:setPaddingRight() :: Missing param[padding]")
+	assert(type(p) == "number", "[" .. self.name .. "] FAILURE: box:setPaddingRight() :: Incorrect param[padding] - expecting number and got " .. type(p))
+	self.paddingRight = p
+	return self
+end
+
+function box:setPaddingTop(p)
+	assert(p, "[" .. self.name .. "] FAILURE: box:setPaddingTop() :: Missing param[padding]")
+	assert(type(p) == "number", "[" .. self.name .. "] FAILURE: box:setPaddingTop() :: Incorrect param[padding] - expecting number and got " .. type(p))
+	self.paddingTop = p
+	return self
+end
+
+function box:setRounded(r)
+	assert(r ~= nil, "[" .. self.name .. "] FAILURE: box:setRounded() :: Missing param[round]")
+	assert(type(r) == "boolean", "[" .. self.name .. "] FAILURE: box:setRounded() :: Incorrect param[round] - expecting boolean and got " .. type(r))
+	self.round = r
+	return self
+end
+
+function box:isRounded()
+	return self.round
+end
+
+function box:setUseBorder(uB)
+	assert(uB ~= nil, "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Missing param[useBorder]")
+	assert(type(uB) == "boolean", "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(uB))
+	self.border = uB
+	return self
+end
+
+function box:getUseBorder()
+	return self.border
 end
 
 return setmetatable(box, box)

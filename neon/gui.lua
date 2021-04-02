@@ -69,9 +69,11 @@ end
 function gui:new(item)
 	if not self.enabled then return false end
 	item = item or self
-	local new = self:generate(item, nil, "items")
+	local new = self:copy(item, "items")
+	new.__index = gui
+	setmetatable(new, new)
 	new.id = #items + 1
-	items[#items + 1] = new
+	items[new.id] = new
 	return new
 end
 
@@ -244,13 +246,18 @@ function gui:add(t, n)
 	return self.items[id]
 end
 
-function gui:addBox(n)
+function gui:addBox(n, b, f, t)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addBox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addBox() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
 	self.items[id] = self.handles.box:new(n, id, self)
 	self.needToSort = true
+	if b then
+		assert(f, "FAILURE: gui:addBox() :: Missing param[function]")
+		assert(type(f) == "string", "FAILURE: gui:addBox() :: Incorrect param[function] - expecting string and got " .. type(f))
+		self.items[id]:registerEvent("onClick", f, t)
+	end
 	return self.items[id]
 end
 

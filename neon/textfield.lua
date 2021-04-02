@@ -36,8 +36,8 @@ textfield.guis = {}
 textfield.fonts = {}
 
 function textfield:new(n, id, p)
-	local t = {}
-	setmetatable(t, object())
+	local t = object()
+	t.__index = textfield
 	t.name = n
 	t.id = id
 	t.type = "textfield"
@@ -75,56 +75,56 @@ function textfield:new(n, id, p)
 	t.opacityBorderAnimateTime = 0
 	t.opacityBorderAnimateSpeed = 0
 	
-	function t:addFont(f, n)
-		assert(f, "[" .. self.name .. "] FAILURE: textfield:addFont() :: Missing param[font]")
-		assert(type(f) == "userdata", "[" .. self.name .. "] FAILURE: textfield:addFont() :: Incorrect param[font] - expecting font userdata and got " .. type(f))
-		assert(n, "[" .. self.name .. "] FAILURE: textfield:addFont() :: Missing param[name]")
-		assert(type(n) == "string", "[" .. self.name .. "] FAILURE: textfield:addFont() :: Incorrect param[name] - expecting string and got " .. type(n))
-		self.fonts[n] = f
-		return self
-	end
-	
-	function t:setFont(n)
-		assert(n, "[" .. self.name .. "] FAILURE: textfield:setFont() :: Missing param[name]")
-		assert(type(n) == "string", "[" .. self.name .. "] FAILURE: textfield:setFont() :: Incorrect param[name] - expecting string and got " .. type(n))
-		self.font = self.fonts[n]
-		return self
-	end
-	
-	function t:setText(txt)
-		assert(txt ~= nil, "[" .. self.name .. "] FAILURE: textfield:setText() :: Missing param[text]")
-		assert(type(txt) == "string", "[" .. self.name .. "] FAILURE: textfield:setText() :: Incorrect param[text] - expecting string and got " .. type(txt))
-		self.text = txt
-		return self
-	end
-	
-	function t:getText()
-		return self.textfield
-	end
-	
-	function t:setUseable(u)
-		assert(u ~= nil, "[" .. self.name .. "] FAILURE: textfield:setX() :: Missing param[useable]")
-		assert(type(u) == "boolean", "[" .. self.name .. "] FAILURE: textfield:setX() :: Incorrect param[useable] - expecting boolean and got " .. type(u))
-		self.useable = u
-		return self
-	end
-	
-	function t:getUseable()
-		return self.getUseable
-	end
-	
-	function t:val()
-		local result = ""
-		for k,v in ipairs(self.options) do
-			if #v == 1 and v == " " then
-				v = "\n"
-			end
-			result = result .. v
+	return setmetatable(t, t)
+end
+
+function textfield:addFont(f, n)
+	assert(f, "[" .. self.name .. "] FAILURE: textfield:addFont() :: Missing param[font]")
+	assert(type(f) == "userdata", "[" .. self.name .. "] FAILURE: textfield:addFont() :: Incorrect param[font] - expecting font userdata and got " .. type(f))
+	assert(n, "[" .. self.name .. "] FAILURE: textfield:addFont() :: Missing param[name]")
+	assert(type(n) == "string", "[" .. self.name .. "] FAILURE: textfield:addFont() :: Incorrect param[name] - expecting string and got " .. type(n))
+	self.fonts[n] = f
+	return self
+end
+
+function textfield:setFont(n)
+	assert(n, "[" .. self.name .. "] FAILURE: textfield:setFont() :: Missing param[name]")
+	assert(type(n) == "string", "[" .. self.name .. "] FAILURE: textfield:setFont() :: Incorrect param[name] - expecting string and got " .. type(n))
+	self.font = self.fonts[n]
+	return self
+end
+
+function textfield:setText(txt)
+	assert(txt ~= nil, "[" .. self.name .. "] FAILURE: textfield:setText() :: Missing param[text]")
+	assert(type(txt) == "string", "[" .. self.name .. "] FAILURE: textfield:setText() :: Incorrect param[text] - expecting string and got " .. type(txt))
+	self.text = txt
+	return self
+end
+
+function textfield:getText()
+	return self.textfield
+end
+
+function textfield:setUseable(u)
+	assert(u ~= nil, "[" .. self.name .. "] FAILURE: textfield:setX() :: Missing param[useable]")
+	assert(type(u) == "boolean", "[" .. self.name .. "] FAILURE: textfield:setX() :: Incorrect param[useable] - expecting boolean and got " .. type(u))
+	self.useable = u
+	return self
+end
+
+function textfield:getUseable()
+	return self.getUseable
+end
+
+function textfield:val()
+	local result = ""
+	for k,v in ipairs(self.options) do
+		if #v == 1 and v == " " then
+			v = "\n"
 		end
-		return result
+		result = result .. v
 	end
-	
-	return t
+	return result
 end
 
 return setmetatable(textfield, textfield)

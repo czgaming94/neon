@@ -37,7 +37,7 @@ slider.fonts = {}
 
 function slider:new(n, id, p)
 	local s = object()
-	s.__index = s
+	s.__index = slider
 	s.name = n
 	s.id = id
 	s.type = "slider"
@@ -45,6 +45,8 @@ function slider:new(n, id, p)
 		if not self.guis[p.id] then self.guis[p.id] = p end
 		if p.id then s.parent = p.id else s.parent = nil end
 	end
+	
+	return setmetatable(s, s)
 end
 
 return setmetatable(slider, slider)

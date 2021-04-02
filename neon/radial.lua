@@ -37,7 +37,7 @@ radial.fonts = {}
 
 function radial:new(n, id, p)
 	local r = object()
-	r.__index = r
+	r.__index = radial
 	r.name = n
 	r.id = id
 	r.type = "radial"
@@ -45,6 +45,8 @@ function radial:new(n, id, p)
 		if not self.guis[p.id] then self.guis[p.id] = p end
 		if p.id then r.parent = p.id else r.parent = nil end
 	end
+	
+	return setmetatable(r, r)
 end
 
 return setmetatable(radial, radial)
