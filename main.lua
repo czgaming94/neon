@@ -13,6 +13,7 @@ local myDropdown = Neon:addDropdown("myDropdown")
 local myTextfield = Neon:addTextfield("myTextfield")
 local myBox3 = Neon2:addBox("myBox3")
 local myBox4 = Neon2:addBox("myBox4")
+local slider = Neon:addSlider("slider1")
 
 local myText = Neon2:addText("continue")
 
@@ -110,6 +111,11 @@ function love.load()
 		useBorder = true, borderColor = colors("yellow"),
 		round = true, radius = 6,
 		closeOnUnfocus = true
+	})
+	slider:setData({
+		w = 200, h = 20, x = 500, y = 200,
+		sliderBorder = true, sliderBorderColor = {0,1,0,1},
+		color = {.8,.8,.7,1}, sliderColor = {.5,.4,.9,1}
 	})
 	myTextfield:setData({
 		w = 150, h = 125, x = 100, y = 50, z = 2,

@@ -65,11 +65,7 @@ function textfield:new(n, id, p)
 	t.fonts = {}
 	t.active = false
 	t.useable = true
-	t.paddingLeft = 0
 	t.r = {0,0,0,0}
-	t.paddingRight = 0
-	t.paddingTop = 0
-	t.paddingBottom = 0
 	t.animateBorderOpacity = true
 	t.opacityToAnimateBorderTo = 0
 	t.opacityBorderAnimateTime = 0

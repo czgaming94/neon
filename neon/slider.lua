@@ -48,6 +48,8 @@ function slider:new(n, id, p)
 	s.border = false
 	s.borderColor = {1,1,1,1}
 	s.sliderColor = {1,1,1,1}
+	s.sliderBorder = false
+	s.sliderBorderColor = {1,1,1,1}
 	s.round = false
 	s.label = ""
 	s.radius = 0

@@ -58,10 +58,6 @@ function box:new(n, id, p)
 	b.rot = 0
 	b.button = false
 	b.keepBackground = false
-	b.paddingLeft = 0
-	b.paddingRight = 0
-	b.paddingTop = 0
-	b.paddingBottom = 0
 	b.animateBorderColor = false
 	b.borderColorToAnimateTo = {1,1,1,1}
 	b.borderColorAnimateSpeed = 0

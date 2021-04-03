@@ -57,11 +57,7 @@ function text:new(n, id, p)
 	t.fancy = false
 	t.shadow = false
 	t.align = "center"
-	t.paddingLeft = 0
 	t.text = ""
-	t.paddingRight = 0
-	t.paddingTop = 0
-	t.paddingBottom = 0
 	t.typewriter = false
 	t.typewriterText = {}
 	t.typewriterPrint = ""

@@ -57,6 +57,10 @@ local function obj(t, p)
 	t.opacityAnimateSpeed = 0
 	t.opacityToAnimateTo = 0
 	t.opacityAnimateTime = 0
+	t.paddingLeft = 0
+	t.paddingRight = 0
+	t.paddingTop = 0
+	t.paddingBottom = 0
 	
 	function t:animateToColor(c, s, f)
 		assert(c, "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToColor() :: Missing param[color]")
@@ -307,6 +311,11 @@ local function obj(t, p)
 				self.overlayColor[k] = v
 			end
 		end
+		if d.sliderBorderColor then 
+			for k,v in ipairs(d.sliderBorderColor) do
+				self.sliderBorderColor[k] = v
+			end
+		end
 		if d.labelColor then
 			for k,v in ipairs(d.labelColor) do
 				self.labelColor[k] = v
@@ -319,9 +328,9 @@ local function obj(t, p)
 		end
 		if d.sliderColor then
 			for k,v in ipairs(d.sliderColor) do
-				self.selectedColor[k] = v
+				self.sliderColor[k] = v
 			end
-		end`
+		end
 		if d.textColor then
 			for k,v in ipairs(d.textColor) do
 				self.textColor[k] = v

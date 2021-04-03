@@ -60,10 +60,6 @@ function dropdown:new(n, id, p)
 	d.borderColor = {1,1,1,1}
 	d.overlayColor = {1,1,1,.5}
 	d.optionsColor = {1,1,1,1}
-	d.paddingLeft = 0
-	d.paddingRight = 0
-	d.paddingTop = 0
-	d.paddingBottom = 0
 	d.r = {0,0,0,0}
 	d.font = lg.getFont()
 	d.optionFont = lg.getFont()

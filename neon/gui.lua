@@ -26,7 +26,7 @@
 
 
 
-local lg, lt = love.graphics, love.timer
+local lg, lt, lm = love.graphics, love.timer, love.mouse
 local min, max = math.min, math.max
 
 local gui = {}
@@ -301,6 +301,16 @@ function gui:addRadial(n)
 	return self.items[id]
 end
 
+function gui:addSlider(n)
+	if not self.enabled then return false end
+	assert(n, "FAILURE: gui:addSlider() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addSlider() :: Incorrect param[name] - expecting string and got " .. type(n))
+	local id = #self.items + 1
+	self.items[id] = self.handles.slider:new(n, id, self)
+	self.needToSort = true
+	return self.items[id]
+end
+
 function gui:addText(n)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addText() :: Missing param[name]")
@@ -317,7 +327,7 @@ function gui:update(dt)
 		if v.enabled and v.allowUpdate then
 			for _,i in ipairs(v.items) do 
 				if not i.hidden then 
-					local x,y = love.mouse.getPosition()
+					local x,y = lm.getPosition()
 					local hover = (x >= i.pos.x + i.paddingLeft and x <= i.pos.x + i.w + i.paddingRight) and (y >= i.pos.y + i.paddingTop and y <= i.pos.y + i.h + i.paddingBottom)
 					local event = {x=x,y=y}
 					if i.type == "text" then
@@ -595,7 +605,7 @@ function gui:update(dt)
 					end
 					if i.type == "dropdown" then
 						if i.open then
-							local x,y = love.mouse.getPosition()
+							local x,y = lm.getPosition()
 							for k,v in ipairs(i.options) do
 								if x >= v.x - i.optionPaddingLeft / 2 and x <= v.x + v.w + i.optionPaddingLeft and y >= v.y - i.optionPaddingTop - i.optionPaddingBottom and y <= v.y + v.h - i.optionPaddingTop - i.optionPaddingBottom then
 									if not v.hovered then v.hovered = true end
@@ -606,14 +616,15 @@ function gui:update(dt)
 						end
 					end
 					if i.type == "slider" then
-						if (x >= i.sX and x <= i.sX + i.h / 4) and (y >= i.sY and x <= i.sY + i.h / 4) then
+						if (x >= i.sX - (i.h / 4) and x <= i.sX + (i.h / 2)) and (y >= i.sY and y <= i.sY + i.h) or i.sliderHeld then
 							if not i.sliderHovered then i.sliderHovered = true end
 							if lm.isDown(1) then
+								print(1)
 								if not i.sliderHeld then i.sliderHeld = true end
 								if x >= i.x and x <= i.x + i.w then
 									i.sX = x
 								else
-									i.sX = min(max(i.x, x), i.x + i.w)
+									i.sX = min(max(i.x, x), (i.x + i.w) - 3)
 								end
 							else
 								if i.sliderHeld then i.sliderHeld = false end
@@ -979,7 +990,12 @@ function gui:draw()
 				if i.image then
 					lg.draw(i.x, i.y + i.h / 4, i.h / 2, i.h / 2)
 				else
-					lg.circle(i.sX, i.sY + i.h / 4, i.h / 2, i.h / 2)
+					if i.sliderBorder then
+						lg.setColor(i.sliderBorderColor)
+						lg.circle("line", i.sX + (i.h / 2) - 1, (i.sY + i.h / 3) - 1, (i.h / 2) + 2, (i.h / 2) + 2)
+						lg.setColor(i.sliderColor)
+					end
+					lg.circle("fill", i.sX, i.sY + i.h / 2, i.h / 2, i.h / 2)
 				end
 				lg.setColor(1,1,1,1)
 			end
