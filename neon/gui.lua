@@ -626,7 +626,21 @@ function gui:update(dt)
 						if (x >= i.sX - (i.h / 4) and x <= i.sX + (i.h / 2)) and (y >= i.sY and y <= i.sY + i.h) or i.sliderHeld then
 							if not i.sliderHovered then i.sliderHovered = true end
 							if lm.isDown(1) then
-								if not i.sliderHeld then i.sliderHeld = true end
+								if not i.sliderHeld then 
+									i.sliderHeld = true 
+									if i.events.onGrab then 
+										for _,v in ipairs(i.events.onGrab) do
+											v.fn(i, v.target, i.percent)
+										end
+									end
+									if events.onGrab then 
+										for _,v in ipairs(events.onGrab) do
+											if v.o == i.type then
+												v.fn(i, v.target, i.percent)
+											end
+										end
+									end
+								end
 								if x >= i.pos.x and x <= i.pos.x + i.w then
 									i.sX = x
 								else
@@ -646,7 +660,21 @@ function gui:update(dt)
 									end
 								end
 							else
-								if i.sliderHeld then i.sliderHeld = false end
+								if i.sliderHeld then 
+									i.sliderHeld = false 
+								end
+								if i.events.onRelease then 
+									for _,v in ipairs(i.events.onRelease) do
+										v.fn(i, v.target, i.percent)
+									end
+								end
+								if events.onRelease then 
+									for _,v in ipairs(events.onRelease) do
+										if v.o == i.type then
+											v.fn(i, v.target, i.percent)
+										end
+									end
+								end
 							end
 						else
 							if not i.sliderHeld and i.sliderHovered then i.sliderHovered = false end
