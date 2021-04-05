@@ -113,7 +113,7 @@ function love.load()
 		closeOnUnfocus = true
 	})
 	mySlider:setData({
-		w = 200, h = 20, x = 500, y = 200,
+		w = 200, h = 15, x = 500, y = 200,
 		sliderColor = {1,1,1,1}, sliderBorder = true, sliderBorderColor = {1,0,0,.7},
 		color = {.2,.2,.2,1}, useBorder = true, borderColor = {1,1,1,1},
 		round = true, radius = 6

@@ -346,6 +346,7 @@ function gui:update(dt)
 							hover = i.open and (x >= i.pos.x and x <= i.pos.x + i.dW + i.optionPaddingLeft + i.optionPaddingRight and y >= i.pos.y and y <= i.pos.y + i.h + i.dH) or (x >= i.pos.x and x <= i.pos.x + i.w and y >= i.pos.y and y <= i.pos.y + i.h)
 						end
 					end
+					-- HOVER UPDATE
 					if hover then
 						if i.hovered then
 							if i.events.whileHovering then 
@@ -386,7 +387,7 @@ function gui:update(dt)
 							i.hovered = false 
 						end
 					end
-					
+					-- ANIMATION UPDATE
 					if i:isAnimating() then
 						local allColorsMatch = true
 						local allBorderColorsMatch = true
@@ -570,9 +571,11 @@ function gui:update(dt)
 							end
 						end
 					end
+					-- BOX UPDATE
 					if i.type == "box" then
 					
 					end
+					-- CHECKBOX UPDATE
 					if i.type == "checkbox" then
 						for k,v in ipairs(i.options) do
 							if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
@@ -610,6 +613,7 @@ function gui:update(dt)
 							end
 						end
 					end
+					-- DROPDOWN UPDATE
 					if i.type == "dropdown" then
 						if i.open then
 							local x,y = lm.getPosition()
@@ -622,6 +626,7 @@ function gui:update(dt)
 							end
 						end
 					end
+					-- SLIDER UPDATE
 					if i.type == "slider" then
 						if (x >= i.sX - (i.h / 4) and x <= i.sX + (i.h / 2)) and (y >= i.sY and y <= i.sY + i.h) or i.sliderHeld then
 							if not i.sliderHovered then i.sliderHovered = true end
@@ -680,6 +685,7 @@ function gui:update(dt)
 							if not i.sliderHeld and i.sliderHovered then i.sliderHovered = false end
 						end
 					end
+					-- TEXT UPDATE
 					if i.type == "text" then
 						if i.typewriter then
 							i.typewriterWaited = i.typewriterWaited + dt
@@ -744,6 +750,7 @@ function gui:update(dt)
 							end
 						end
 					end
+					-- TEXTFIELD UPDATE
 					if i.type == "textfield" then
 						if i.active then
 							i.cursorTime = i.cursorTime + dt
@@ -1043,20 +1050,32 @@ function gui:draw()
 				lg.setColor(i.sliderColor)
 				
 				if i.image then
-					lg.draw(i.x, i.y + i.h / 4, i.h / 2, i.h / 2)
+					lg.draw(i.x, i.y + i.h * 0.66, i.h / 2, i.h / 2)
 				else
-					lg.circle("fill", i.sX, i.sY + i.h / 2, i.h / 2, i.h / 2)
+					if i.border then
+						lg.circle("fill", i.sX,(i.sY + i.h * 0.5) + 1, i.h * 0.66)
+					else
+						lg.circle("fill", i.sX, i.sY + i.h * 0.5, i.h * 0.66)
+					end
 					shaders.slider:send('inColor', i.inColor)
 					shaders.slider:send('outColor', i.outColor)
 					shaders.slider:send('centerX', i.sX + (i.w / 2))
 					shaders.slider:send('centerY', i.sY + (i.h / 2))
 					lg.setShader(shaders.slider)
-					lg.circle("fill", i.sX, i.sY + i.h / 2, i.h / 2, i.h / 2)
+					if i.border then
+						lg.circle("fill", i.sX,(i.sY + i.h * 0.5) + 1, i.h * 0.66)
+					else
+						lg.circle("fill", i.sX, i.sY + i.h * 0.5, i.h * 0.66)
+					end
 					lg.setShader()
 					if i.sliderBorder then
 						lg.setColor(i.sliderBorderColor)
 						lg.setLineWidth(2)
-						lg.circle("line", i.sX + 1, (i.sY + i.h / 2), (i.h / 2), (i.h / 2))
+						if i.border then
+							lg.circle("line", i.sX, (i.sY + i.h * 0.5) + 1, (i.h * 0.66))
+						else
+							lg.circle("line", i.sX, (i.sY + i.h * 0.5), (i.h * 0.66))
+						end
 						lg.setLineWidth(1)
 						lg.setColor(i.sliderColor)
 					end
