@@ -53,6 +53,7 @@ function slider:new(n, id, p)
 	s.radius = 0
 	s.images = {}
 	s.image = nil
+	s.sliderImage = nil
 	s.inColor = {0.38,0.95,1,1}
 	s.outColor = {0.76,0.98,1,0}
 	s.percent = 0
@@ -173,6 +174,17 @@ end
 
 function slider:isRounded()
 	return self.round
+end
+
+function slider:setSliderImage(i)
+	assert(i, "[" .. self.name .. "] FAILURE: slider:setSliderImage() :: Missing param[image]")
+	assert(type(i) == "userdata", "[" .. self.name .. "] FAILURE: slider:setSliderImage() :: Incorrect param[image] - expecting image userdata and got " .. type(i))
+	self.sliderImage = i
+	return self
+end
+
+function slider:getSliderImage()
+	return self.sliderImage
 end
 
 function slider:getPercent()

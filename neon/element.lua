@@ -184,6 +184,7 @@ local function new(t, p)
 		assert(type(d.x) == "number", "[" .. self.name .. "] FAILURE: " .. self.type .. ":setData() :: Incorrect param[x] - expecting number and got " .. type(d.x))
 		assert(d.y, "[" .. self.name .. "] FAILURE: " .. self.type .. ":setData() :: Missing param[data['y']")
 		assert(type(d.y) == "number", "[" .. self.name .. "] FAILURE: " .. self.type .. ":setData() :: Incorrect param[y] - expecting number and got " .. type(d.y))
+		if not self.events then self.events = {} end
 		self.pos.x, self.x, self.oX, self.sX = d.x, d.x, d.x, d.x
 		self.pos.y, self.y, self.oY, self.sY = d.y, d.y, d.y, d.y
 		if d.w then 
@@ -246,6 +247,7 @@ local function new(t, p)
 		if d.z then self.pos.z = d.z end
 		if d.rot then self.rot = d.rot end
 		if d.image then self.image = self.images[d.image] or d.image end
+		if d.sliderImage then self.sliderImage = self.images[d.sliderImage] or d.sliderImage end
 		if d.font then self.font = d.font end
 		if self.type == "text" and self.text then
 			if not d.w and not d.width then
