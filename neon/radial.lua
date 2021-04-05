@@ -28,21 +28,21 @@
 
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
-local object = require("neon.object")
+local element = require("neon.element")
 
 local radial = {}
+local guis = {}
 
-radial.guis = {}
 radial.fonts = {}
 
 function radial:new(n, id, p)
-	local r = object()
+	local r = element()
 	r.__index = radial
 	r.name = n
 	r.id = id
 	r.type = "radial"
 	if p then 
-		if not self.guis[p.id] then self.guis[p.id] = p end
+		if not guis[p.id] then guis[p.id] = p end
 		if p.id then r.parent = p.id else r.parent = nil end
 	end
 	

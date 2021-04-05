@@ -13,7 +13,7 @@ local myDropdown = Neon:addDropdown("myDropdown")
 local myTextfield = Neon:addTextfield("myTextfield")
 local myBox3 = Neon2:addBox("myBox3")
 local myBox4 = Neon2:addBox("myBox4")
-local slider = Neon:addSlider("slider1")
+local mySlider = Neon:addSlider("mySlider")
 
 local myText = Neon2:addText("continue")
 
@@ -112,10 +112,11 @@ function love.load()
 		round = true, radius = 6,
 		closeOnUnfocus = true
 	})
-	slider:setData({
+	mySlider:setData({
 		w = 200, h = 20, x = 500, y = 200,
-		sliderBorder = true, sliderBorderColor = {0,1,0,1},
-		color = {.8,.8,.7,1}, sliderColor = {.5,.4,.9,1}
+		sliderColor = {1,1,1,1}, sliderBorder = true, sliderBorderColor = {1,0,0,.7},
+		color = {.2,.2,.2,1}, useBorder = true, borderColor = {1,1,1,1},
+		round = true, radius = 6
 	})
 	myTextfield:setData({
 		w = 150, h = 125, x = 100, y = 50, z = 2,
@@ -152,11 +153,12 @@ function love.load()
 	myCheckbox:registerEvent("onOptionClick", function(self, option, target, evt) Neon:child("myBox2"):setColor(colors(option.text:lower())) end)
 end
 
--- Use a single source for love callbacks
+-- Use can use a single Neon source for love callbacks
 function love.update(dt)
 	Neon:update(dt)
 end
 
+-- use :drawAll() if you don't want to individually :draw() each GUI
 function love.draw()
 	Neon:drawAll()
 end

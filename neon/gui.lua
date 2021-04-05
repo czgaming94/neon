@@ -26,12 +26,18 @@
 
 
 
-local lg, lt, lm = love.graphics, love.timer, love.mouse
-local min, max = math.min, math.max
+local lf, lg, lt, lm = love.filesystem, love.graphics, love.timer, love.mouse
+local min, max, sqrt = math.min, math.max, math.sqrt
 
 local gui = {}
 local events = {}
 local items = {}
+
+local shaders = {
+	fadeOut = lg.newShader(lf.read("/neon/shaders/fadeOut.shader")),
+	fadeIn = lg.newShader(lf.read("/neon/shaders/fadeIn.shader")),
+	slider = lg.newShader(lf.read("/neon/shaders/sliderRadialGradient.shader"))
+}
 
 local colors = {
 	red = {1,0,0,1},
@@ -40,6 +46,7 @@ local colors = {
 	yellow = {1,1,0,1},
 	purple = {1,0,1,1}
 }
+
 gui.handles = {
 	box = require("neon.box"),
 	checkbox = require("neon.checkbox"),
@@ -619,12 +626,24 @@ function gui:update(dt)
 						if (x >= i.sX - (i.h / 4) and x <= i.sX + (i.h / 2)) and (y >= i.sY and y <= i.sY + i.h) or i.sliderHeld then
 							if not i.sliderHovered then i.sliderHovered = true end
 							if lm.isDown(1) then
-								print(1)
 								if not i.sliderHeld then i.sliderHeld = true end
-								if x >= i.x and x <= i.x + i.w then
+								if x >= i.pos.x and x <= i.pos.x + i.w then
 									i.sX = x
 								else
-									i.sX = min(max(i.x, x), (i.x + i.w) - 3)
+									i.sX = min(max(i.pos.x, x), (i.pos.x + i.w) - 3)
+								end
+								i.percent = (i.sX - i.pos.x) / (i.w - 3)
+								if i.events.onChange then 
+									for _,v in ipairs(i.events.onChange) do
+										v.fn(i, v.target, i.percent)
+									end
+								end
+								if events.onChange then 
+									for _,v in ipairs(events.onChange) do
+										if v.o == i.type then
+											v.fn(i, v.target, i.percent)
+										end
+									end
 								end
 							else
 								if i.sliderHeld then i.sliderHeld = false end
@@ -718,8 +737,9 @@ function gui:enable()
 	return self
 end
 
-function gui:disable(kill)
+function gui:disable(kill, keep)
 	if kill ~= nil then kill = kill else kill = true end
+	if keep ~= nil then keep = keep else keep = false end
 	if kill then
 		for _,i in ipairs(self.items) do
 			i.hovered = false
@@ -733,7 +753,9 @@ function gui:disable(kill)
 			i.animateOpacity = false
 			i.animateBorderColor = false
 			i.animateBorderOpacity = false
-			i:setData(i.defaults)
+			if not keep then
+				i:setData(i.defaults)
+			end
 		end
 	end
 	self.enabled = false
@@ -787,6 +809,7 @@ function gui:draw()
 	for _,i in ipairs(self.items) do 
 		lg.push("all")
 		if not i.hidden then 
+			-- BOX DRAW
 			if i.type == "box" then
 				lg.setColor(1,1,1,1)
 				local x,y
@@ -831,11 +854,11 @@ function gui:draw()
 					end
 					if i.animateImage then
 						lg.setBlendMode("alpha", "alphamultiply")
-						i.shaders.fadeIn:send('time', max(0, min(1, i.imageAnimateTime / i.imageAnimateSpeed)))
-						lg.setShader(i.shaders.fadeIn)
+						shaders.fadeIn:send('time', max(0, min(1, i.imageAnimateTime / i.imageAnimateSpeed)))
+						lg.setShader(shaders.fadeIn)
 						lg.draw(i.imageToAnimateTo, x + i.iX, y + i.iY, i.rot)
-						i.shaders.fadeOut:send('time', max(0, min(1, i.imageAnimateTime / i.imageAnimateSpeed)))
-						lg.setShader(i.shaders.fadeOut)
+						shaders.fadeOut:send('time', max(0, min(1, i.imageAnimateTime / i.imageAnimateSpeed)))
+						lg.setShader(shaders.fadeOut)
 						lg.draw(i.image, x + i.iX, y + i.iY, i.rot)
 						lg.setShader()
 						lg.setBlendMode("alpha")
@@ -856,6 +879,7 @@ function gui:draw()
 					end
 				end
 			end
+			-- CHECKBOX DRAW
 			if i.type == "checkbox" then
 				lg.setColor(1,1,1,1)
 				lg.setFont(i.font)
@@ -918,6 +942,7 @@ function gui:draw()
 				end
 				lg.print(i.label, i.labelPosition.x, i.labelPosition.y)
 			end
+			-- DROPDOWN DRAW
 			if i.type == "dropdown" then
 				lg.setColor(i.color)
 				lg.setFont(i.font)
@@ -979,26 +1004,38 @@ function gui:draw()
 				lg.setFont(i.labelFont)
 				lg.print(i.label, i.labelPosition.x, i.labelPosition.y)
 			end
+			-- SLIDER DRAW
 			if i.type == "slider" then
-				if self.border then
+				if i.border then
 					lg.setColor(i.borderColor)
 					lg.rectangle("line", i.x - 1, i.y - 1, i.w + 2, i.h + 2, i.radius, i.radius)
 				end
 				lg.setColor(i.color)
 				lg.rectangle("fill", i.x, i.y, i.w, i.h, i.radius, i.radius)
 				lg.setColor(i.sliderColor)
+				
 				if i.image then
 					lg.draw(i.x, i.y + i.h / 4, i.h / 2, i.h / 2)
 				else
+					lg.circle("fill", i.sX, i.sY + i.h / 2, i.h / 2, i.h / 2)
+					shaders.slider:send('inColor', i.inColor)
+					shaders.slider:send('outColor', i.outColor)
+					shaders.slider:send('centerX', i.sX + (i.w / 2))
+					shaders.slider:send('centerY', i.sY + (i.h / 2))
+					lg.setShader(shaders.slider)
+					lg.circle("fill", i.sX, i.sY + i.h / 2, i.h / 2, i.h / 2)
+					lg.setShader()
 					if i.sliderBorder then
 						lg.setColor(i.sliderBorderColor)
-						lg.circle("line", i.sX + (i.h / 2) - 1, (i.sY + i.h / 3) - 1, (i.h / 2) + 2, (i.h / 2) + 2)
+						lg.setLineWidth(2)
+						lg.circle("line", i.sX + 1, (i.sY + i.h / 2), (i.h / 2), (i.h / 2))
+						lg.setLineWidth(1)
 						lg.setColor(i.sliderColor)
 					end
-					lg.circle("fill", i.sX, i.sY + i.h / 2, i.h / 2, i.h / 2)
 				end
 				lg.setColor(1,1,1,1)
 			end
+			-- TEXT DRAW
 			if i.type == "text" then
 				lg.setColor(1,1,1,1)
 				lg.setFont(i.font)
@@ -1095,6 +1132,7 @@ function gui:draw()
 				end
 				lg.setColor(1,1,1,1)
 			end
+			-- TEXTFIELD DRAW
 			if i.type == "textfield" then
 				lg.setFont(i.font)
 				lg.setColor(i.color)
@@ -1131,7 +1169,8 @@ function gui:draw()
 				end
 				lg.setColor(1,1,1,1)
 			end
-			if i.draw then i.draw(i) end
+			-- ELEMENT SELF DRAW
+			if i.draw then i:draw() end
 		end
 		lg.pop("all")
 	end
@@ -1260,18 +1299,23 @@ function gui:keypressed(key, scan, isRepeat)
 		if v.enabled then
 			for _,i in ipairs(v.items) do
 				if i.keypressed then i:keypressed(event) end
+				-- BOX KEYPRESS
 				if i.type == "box" then
 				
 				end
+				-- CHECKBOX KEYPRESS
 				if i.type == "checkbox" then
 				
 				end
+				-- DROPDOWN KEYPRESS
 				if i.type == "dropdown" then
 				
 				end
+				-- TEXT KEYPRESS
 				if i.type == "text" then
 				
 				end
+				-- TEXTFIELD KEYPRESS
 				if i.type == "textfield" then
 					if not i.useable then return false end
 					if keyIsDown then return false end
@@ -1458,124 +1502,131 @@ function gui:mousepressed(x, y, button, istouch, presses)
 					return a.pos.z > b.pos.z
 				end
 			end)
-			for k,v in ipairs(o.items) do
-				local i = self:child(v.name)
-				if i then
-					if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
-						if i.moveable then
-							i.held = true
-							local heldID = #self.held + 1
-							self.held[heldID] = {id = heldID, obj = i}
-						end
-						if i.mousepressed then i:mousepressed(event) end
-						
-						if i.type == "box" then
-						
-						end
-						if i.type == "checkbox" then
-							if button == 1 then
-								local oneIsSelected = false
-								for k,v in ipairs(i.options) do
-									if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
-										if i.single then
-											for _,o in ipairs(i.options) do
-												o.selected = false
-											end
-										end
-										v.selected = not v.selected
-										if i.forceOption then
-											local haveSelected = false
-											for _,o in ipairs(i.options) do
-												if o.selected then 
-													haveSelected = true 
-												end
-											end
-											if not haveSelected then
-												v.selected = true
-											end
-										end
-										if i.events.onOptionClick then 
-											for _,e in ipairs(i.events.onOptionClick) do
-												e.fn(i, i.options[k], e.t, {x=x, y=y, button=button, istouch=istouch, presses=presses})
-											end
-										end
-									end
-								end
-							end
-						end
-						if i.type == "dropdown" then
-							if button == 1 then
-								if i.open then
-									local hitTarget = false
-									for k,v in ipairs(i.options) do
-										if v.hovered then
-											i.selected = k
-											hitTarget = true
-											if i.events.onOptionClick then 
-												for _,e in ipairs(i.events.onOptionClick) do
-													e.fn(i, i.options[k], e.t, event)
-												end
-											end
-										end
-									end
-									if not hitTarget then
-										i.open = false
-									end
-								else
-									i.open = true
-								end
-							end
-						end
-						if i.type == "text" then
-						
-						end
-						if i.type == "textfield" then
-							if button == 1 then
-								if not i.active then
-									i.active = true
-								end
-							end
-						end
-						
+			for _,v in ipairs(o.items) do
+				if not hitTarget and v.hovered and v.clickable and not v.hidden and not v.faded then
+					if v.moveable then
+						v.held = true
+						local heldID = #self.held + 1
+						self.held[heldID] = {id = heldID, obj = i}
+					end
+					if v.mousepressed then i:mousepressed(event) end
+					
+					
+					-- BOX CLICK
+					if v.type == "box" then
+					
+					end
+					-- CHECKBOX CLICK
+					if v.type == "checkbox" then
 						if button == 1 then
-							if i.events.onClick then 
-								for j,e in ipairs(i.events.onClick) do
-									e.fn(i, e.target, event)
-								end
-							end
-							if events.onClick then
-								for _,e in ipairs(events.onClick) do
-									if e.o == i.type then
-										e.fn(i, e.target, event)
+							local oneIsSelected = false
+							for k,v in ipairs(v.options) do
+								if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
+									if v.single then
+										for _,o in ipairs(v.options) do
+											o.selected = false
+										end
 									end
-								end
-							end
-						else
-							if i.events.onRightClick then 
-								for j,e in ipairs(i.events.onRightClick) do
-									e.fn(i, e.target, event)
-								end
-							end
-							if events.onRightClick then
-								for _,e in ipairs(events.onRightClick) do
-									if e.o == i.type then
-										e.fn(i, e.target, event)
+									v.selected = not v.selected
+									if v.forceOption then
+										local haveSelected = false
+										for _,o in ipairs(v.options) do
+											if o.selected then 
+												haveSelected = true 
+											end
+										end
+										if not haveSelected then
+											v.selected = true
+										end
+									end
+									if v.events.onOptionClick then 
+										for _,e in ipairs(v.events.onOptionClick) do
+											e.fn(v, v.options[k], e.t, event)
+										end
 									end
 								end
 							end
 						end
-						if not i.hollow then hitTarget = true end
 					end
-					if i.type == "dropdown" and i.open and not i.hovered then
-						local optionHit = false
-						for k,v in ipairs(i.options) do
-							if v.hovered then optionHit = true end
+					-- DROPDOWN CLICK
+					if v.type == "dropdown" then
+						if button == 1 then
+							if v.open then
+								local hitTarget = false
+								for k,v in ipairs(v.options) do
+									if v.hovered then
+										v.selected = k
+										hitTarget = true
+										if v.events.onOptionClick then 
+											for _,e in ipairs(v.events.onOptionClick) do
+												e.fn(v, v.options[k], e.t, event)
+											end
+										end
+									end
+								end
+								if not hitTarget then
+									v.open = false
+								end
+							else
+								v.open = true
+							end
 						end
-						if not optionHit then i.open = false end
 					end
-					if i.type == "textfield" and i.active and not i.hovered then
-						i.active = false
+					-- SLIDER CLICK
+					if v.type == "slider" then
+					
 					end
+					-- TEXT CLICK
+					if v.type == "text" then
+					
+					end
+					-- TEXTFIELD CLICK
+					if v.type == "textfield" then
+						if button == 1 then
+							if not v.active then
+								v.active = true
+							end
+						end
+					end
+					
+					if button == 1 then
+						if v.events.onClick then 
+							for j,e in ipairs(v.events.onClick) do
+								e.fn(v, e.target, event)
+							end
+						end
+						if events.onClick then
+							for _,e in ipairs(events.onClick) do
+								if e.o == v.type then
+									e.fn(v, e.target, event)
+								end
+							end
+						end
+					else
+						if v.events.onRightClick then 
+							for j,e in ipairs(v.events.onRightClick) do
+								e.fn(v, e.target, event)
+							end
+						end
+						if events.onRightClick then
+							for _,e in ipairs(events.onRightClick) do
+								if e.o == v.type then
+									e.fn(v, e.target, event)
+								end
+							end
+						end
+					end
+					if not v.hollow then hitTarget = true end
+				end
+				if v.type == "dropdown" and v.open and not v.hovered then
+					local optionHit = false
+					for _,v in ipairs(v.options) do
+						if v.hovered then optionHit = true end
+					end
+					if not optionHit then v.open = false end
+				end
+				if v.type == "textfield" and v.active and not v.hovered then
+					v.active = false
 				end
 			end
 			table.sort(o.items, function(a,b) 
@@ -1661,13 +1712,21 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 		end
 	end)
 	local hitTarget = false
-	for _,o in ipairs(objs) do
+	for _,o in ipairs(items) do
 		if o.enabled then
 			table.sort(o.items, function(a,b) 
 				if not a or not b then return false end
 				if a.pos.z == b.pos.z then
 					if a.id == b.id then
-						return false
+						if a.pos.x == b.pos.x then
+							if a.pos.y == b.pos.y then
+								return false
+							else
+								return a.pos.y < b.pos.y
+							end
+						else
+							return a.pos.x > b.pos.x
+						end
 					else
 						return a.id < b.id
 					end
@@ -1675,75 +1734,151 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 					return a.pos.z > b.pos.z
 				end
 			end)
-			for k,v in ipairs(obj.items) do
-				local i = self:child(v.name)
-				if i then
-					if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
-						if i.moveable then
-							i.held = true
-							local heldID = #self.held + 1
-							self.held[heldID] = {id = heldID, obj = i}
-						end
-						if i.touchpressed then i:touchpressed(event) end
+			for _,v in ipairs(o.items) do
+				if not hitTarget and v.hovered and v.clickable and not v.hidden and not v.faded then
+					if v.moveable then
+						v.held = true
+						local heldID = #self.held + 1
+						self.held[heldID] = {id = heldID, obj = i}
+					end
+					if v.touchpressed then i:touchpressed(event) end
+					
+					if v.type == "box" then
+					
+					end
+					if v.type == "checkbox" then
 						if id == 1 then
-							if i.events.onTouch then 
-								for j,e in ipairs(i.events.onTouch) do
-									e.fn(i, e.target, event)
-								end
-							end
-							if events.onTouch then
-								for _,e in ipairs(events.onTouch) do
-									if e.o == i.type then
-										e.fn(i, e.target, event)
+							local oneIsSelected = false
+							for k,v in ipairs(v.options) do
+								if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
+									if v.single then
+										for _,o in ipairs(v.options) do
+											o.selected = false
+										end
+									end
+									v.selected = not v.selected
+									if v.forceOption then
+										local haveSelected = false
+										for _,o in ipairs(v.options) do
+											if o.selected then 
+												haveSelected = true 
+											end
+										end
+										if not haveSelected then
+											v.selected = true
+										end
+									end
+									if v.events.onOptionTouch then 
+										for _,e in ipairs(v.events.onOptionTouch) do
+											e.fn(v, v.options[k], e.t, event)
+										end
 									end
 								end
 							end
-						elseif id == 2 then
-							if i.events.onDoubleTouch then 
-								for j,e in ipairs(i.events.onDoubleTouch) do
-									e.fn(i, e.target, event)
+						end
+					end
+					if v.type == "dropdown" then
+						if id == 1 then
+							if v.open then
+								local hitTarget = false
+								for k,v in ipairs(v.options) do
+									if v.hovered then
+										v.selected = k
+										hitTarget = true
+										if v.events.onOptionTouch then 
+											for _,e in ipairs(v.events.onOptionTouch) do
+												e.fn(v, v.options[k], e.t, event)
+											end
+										end
+									end
+								end
+								if not hitTarget then
+									v.open = false
+								end
+							else
+								v.open = true
+							end
+						end
+					end
+					if v.type == "text" then
+					
+					end
+					if v.type == "textfield" then
+						if id == 1 then
+							if not v.active then
+								v.active = true
+							end
+						end
+					end
+					
+					if id == 1 then
+						if v.events.onTouch then 
+							for j,e in ipairs(v.events.onTouch) do
+								e.fn(v, e.target, event)
+							end
+						end
+						if events.onTouch then
+							for _,e in ipairs(events.onTouch) do
+								if e.o == v.type then
+									e.fn(v, e.target, event)
+								end
+							end
+						end
+					else
+						if id == 2 then
+							if v.events.onDoubleTouch then 
+								for j,e in ipairs(v.events.onDoubleTouch) do
+									e.fn(v, e.target, event)
 								end
 							end
 							if events.onDoubleTouch then
 								for _,e in ipairs(events.onDoubleTouch) do
-									if e.o == i.type then
-										e.fn(i, e.target, event)
+									if e.o == v.type then
+										e.fn(v, e.target, event)
 									end
 								end
 							end
 						else
-							if i.events.onMultiTouch then 
-								for j,e in ipairs(i.events.onMultiTouch) do
-									e.fn(i, e.target, event)
+							if v.events.onMultiTouch then 
+								for j,e in ipairs(v.events.onMultiTouch) do
+									e.fn(v, e.target, event)
 								end
 							end
 							if events.onMultiTouch then
 								for _,e in ipairs(events.onMultiTouch) do
-									if e.o == i.type then
-										e.fn(i, e.target, event)
+									if e.o == v.type then
+										e.fn(v, e.target, event)
 									end
 								end
 							end
 						end
-						if not i.hollow then hitTarget = true end
 					end
-					if i.type == "dropdown" and i.open and not i.hovered then
-						local optionHit = false
-						for k,v in ipairs(i.options) do
-							if v.hovered then optionHit = true end
-						end
-						if not optionHit then i.open = false end
+					if not v.hollow then hitTarget = true end
+				end
+				if v.type == "dropdown" and v.open and not v.hovered then
+					local optionHit = false
+					for _,v in ipairs(v.options) do
+						if v.hovered then optionHit = true end
 					end
-					if i.type == "textfield" and i.active and not i.hovered then
-						i.active = false
-					end
+					if not optionHit then v.open = false end
+				end
+				if v.type == "textfield" and v.active and not v.hovered then
+					v.active = false
 				end
 			end
 			table.sort(o.items, function(a,b) 
 				if not a or not b then return false end
 				if a.pos.z == b.pos.z then
 					if a.id == b.id then
-						return false
+						if a.pos.x == b.pos.x then
+							if a.pos.y == b.pos.y then
+								return false
+							else
+								return a.pos.y > b.pos.y
+							end
+						else
+							return a.pos.x < b.pos.x
+						end
 					else
 						return a.id > b.id
 					end
@@ -1759,10 +1894,10 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 			if a.id == b.id then
 				return false
 			else
-				return a.id > b.id
+				return a.id < b.id
 			end
 		else
-			return a.z < b.z
+			return a.z > b.z
 		end
 	end)
 end
@@ -1823,6 +1958,10 @@ end
 
 function gui:getZ()
 	return self.z
+end
+
+function gui:dist(x1,x2,y1,y2)
+	sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
 end
 
 return gui

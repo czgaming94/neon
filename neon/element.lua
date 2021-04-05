@@ -1,17 +1,13 @@
 local lg, lt = love.graphics, love.timer
 local floor, random, min, max = math.floor, love.math.random, math.min, math.max
 local guis = {}
-local function obj(t, p)
+local function new(t, p)
 	if p and p.id and not guis[p.id] then guis[p.id] = p end
 	t = t or {}
 	t.__index = t
 	t.new = t.new or t.init or t[1] or function() end
 	t.w = 0
 	t.h = 0
-	t.shaders = {
-		fadeOut = lg.newShader(love.filesystem.read("/neon/shaders/fadeOut.shader")),
-		fadeIn = lg.newShader(love.filesystem.read("/neon/shaders/fadeIn.shader"))
-	}
 	t.pos = {
 		x = 0,
 		y = 0,
@@ -264,7 +260,7 @@ local function obj(t, p)
 		if d.s then self.speed = d.s end
 		if d.speed then self.speed = d.speed end
 		if d.align then self.align = d.align end
-		
+		if d.border ~= nil then self.border = d.border end
 		if d.useBorder ~= nil then self.border = d.useBorder end
 		if d.clickable ~= nil then self.clickable = d.clickable end
 		if d.moveable ~= nil then self.moveable = d.moveable end
@@ -283,6 +279,7 @@ local function obj(t, p)
 		if d.tRepeat ~= nil then self.typewriterRepeat = d.tRepeat end
 		if d.shadow ~= nil then self.shadow = d.shadow end
 		if d.closeOnUnfocus ~= nil then self.closeOnUnfocus = d.closeOnUnfocus end
+		if d.sliderBorder ~= nil then self.sliderBorder = d.sliderBorder end
 		
 		if d.radius then
 			if type(d.radius) == "table" then
@@ -290,6 +287,7 @@ local function obj(t, p)
 			else
 				for k,v in ipairs(self.r) do self.r[k] = d.radius end
 			end
+			self.radius = d.radius
 		end
 		if d.color then
 			for k,v in ipairs(d.color) do
@@ -319,6 +317,16 @@ local function obj(t, p)
 		if d.labelColor then
 			for k,v in ipairs(d.labelColor) do
 				self.labelColor[k] = v
+			end
+		end
+		if d.inColor then
+			for k,v in ipairs(d.inColor) do
+				self.inColor[k] = v
+			end
+		end
+		if d.outColor then
+			for k,v in ipairs(d.outColor) do
+				self.outColor[k] = v
 			end
 		end
 		if d.selectedColor then
@@ -781,9 +789,9 @@ local function obj(t, p)
 	
 	return setmetatable(t, {__call = function(o, ...)
 		local e = setmetatable({}, o)
-		e:obj(...)
+		e:new(...)
 		return e
 	end})
 end
 
-return setmetatable({obj = obj}, {__call = function(_,...) return obj(...) end})
+return setmetatable({new = new}, {__call = function(_,...) return new(...) end})

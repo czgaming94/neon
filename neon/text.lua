@@ -28,7 +28,7 @@
 
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
-local object = require("neon.object")
+local element = require("neon.element")
 local prefixes = {
 	color = "c",
 	delay = "d",
@@ -43,7 +43,7 @@ local guis = {}
 text.fonts = {}
 
 function text:new(n, id, p)
-	local t = object()
+	local t = element()
 	t.__index = text
 	t.name = n
 	t.id = id

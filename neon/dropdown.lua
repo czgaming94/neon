@@ -28,7 +28,7 @@
 
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
-local object = require("neon.object")
+local element = require("neon.element")
 
 local dropdown = {}
 
@@ -36,7 +36,7 @@ local guis = {}
 dropdown.fonts = {}
 
 function dropdown:new(n, id, p)
-	local d = object()
+	local d = element()
 	d.__index = dropdown
 	d.name = n
 	d.id = id
@@ -56,8 +56,6 @@ function dropdown:new(n, id, p)
 		y = 0,
 		z = 0
 	}
-	d.border = false
-	d.borderColor = {1,1,1,1}
 	d.overlayColor = {1,1,1,.5}
 	d.optionsColor = {1,1,1,1}
 	d.r = {0,0,0,0}

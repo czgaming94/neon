@@ -28,20 +28,20 @@
 
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
-local object = require("neon.object")
+local element = require("neon.element")
 
 local checkbox = {}
 
-checkbox.guis = {}
+local guis = {}
 
 function checkbox:new(n, id, p)
-	local c = object()
+	local c = element()
 	c.__index = checkbox
 	c.name = n
 	c.id = id
 	c.type = "checkbox"
 	if p then 
-		if not self.guis[p.id] then self.guis[p.id] = p end
+		if not guis[p.id] then guis[p.id] = p end
 		if p.id then c.parent = p.id else c.parent = nil end
 	end
 	c.uW = 0
@@ -53,8 +53,6 @@ function checkbox:new(n, id, p)
 		y = 0,
 		z = 0
 	}
-	c.border = false
-	c.borderColor = {1,1,1,1}
 	c.overlayColor = {1,1,1,.5}
 	c.optionsColor = {1,1,1,1}
 	c.paddingLeft = 0

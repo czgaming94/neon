@@ -28,7 +28,7 @@
 
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
-local object = require("neon.object")
+local element = require("neon.element")
 
 local slider = {}
 
@@ -36,7 +36,7 @@ local guis = {}
 slider.fonts = {}
 
 function slider:new(n, id, p)
-	local s = object()
+	local s = element()
 	s.__index = slider
 	s.name = n
 	s.id = id
@@ -45,8 +45,6 @@ function slider:new(n, id, p)
 		if not guis[p.id] then guis[p.id] = p end
 		if p.id then s.parent = p else s.parent = nil end
 	end
-	s.border = false
-	s.borderColor = {1,1,1,1}
 	s.sliderColor = {1,1,1,1}
 	s.sliderBorder = false
 	s.sliderBorderColor = {1,1,1,1}
@@ -55,6 +53,9 @@ function slider:new(n, id, p)
 	s.radius = 0
 	s.images = {}
 	s.image = nil
+	s.inColor = {0.38,0.95,1,1}
+	s.outColor = {0.76,0.98,1,0}
+	s.percent = 0
 	s.oldImage = nil
 	s.imageBlend = "premultiply"
 	s.iX = 0
@@ -172,6 +173,14 @@ end
 
 function slider:isRounded()
 	return self.round
+end
+
+function slider:getPercent()
+	return self.percent
+end
+
+function slider:val()
+	return self.percent
 end
 
 return setmetatable(slider, slider)

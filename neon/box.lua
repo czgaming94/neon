@@ -28,14 +28,14 @@
 
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
-local object = require("neon.object")
+local element = require("neon.element")
 
 local box = {}
 
 local guis = {}
 
 function box:new(n, id, p)
-	local b = object()
+	local b = element()
 	b.__index = box
 	b.name = n
 	b.id = id
@@ -44,8 +44,6 @@ function box:new(n, id, p)
 		if not guis[p.id] then guis[p.id] = p end
 		if p.id then b.parent = p else b.parent = nil end
 	end
-	b.border = false
-	b.borderColor = {1,1,1,1}
 	b.round = false
 	b.radius = 0
 	b.images = {}

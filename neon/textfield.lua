@@ -28,7 +28,7 @@
 
 local lg, lt = love.graphics, love.timer
 local min, max = math.min, math.max
-local object = require("neon.object")
+local element = require("neon.element")
 
 local textfield = {}
 
@@ -36,7 +36,7 @@ local guis = {}
 textfield.fonts = {}
 
 function textfield:new(n, id, p)
-	local t = object()
+	local t = element()
 	t.__index = textfield
 	t.name = n
 	t.id = id
