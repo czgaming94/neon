@@ -31,6 +31,7 @@ local min, max = math.min, math.max
 local element = require("neon.element")
 
 local checkbox = {}
+checkbox.defaultFont = lg.getFont()
 
 local guis = {}
 
@@ -60,8 +61,8 @@ function checkbox:new(n, id, p)
 	c.paddingTop = 0
 	c.paddingBottom = 0
 	c.r = {0,0,0,0}
-	c.font = lg.getFont()
-	c.labelFont = lg.getFont()
+	c.font = self.defaultFont
+	c.labelFont = self.defaultFont
 	c.vertical = false
 	c.round = false
 	c.shadowLabel = false

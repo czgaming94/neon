@@ -14,6 +14,7 @@ local myTextfield = Neon:addTextfield("myTextfield")
 local myBox3 = Neon2:addBox("myBox3")
 local myBox4 = Neon2:addBox("myBox4")
 local mySlider = Neon:addSlider("mySlider")
+local myRadial = Neon:addRadial("myRadial")
 
 local myText = Neon2:addText("continue")
 
@@ -42,12 +43,13 @@ function love.load()
 		color = colors("green"), 
 		useBorder = true, borderColor = colors("black")
 	})
+	-- chain functions off each other if they don't return a specific value from an element
 	myBox3:setData({
 		w = 225, h = 65, x = 105, y = 485, z = 2,
 		color = colors("alphaRed"), 
 		moveable = true,
 		useBorder = false
-	})
+	}):registerEvent("onFadeOut", function(self) print("Faded") end)
 	myText:setData({
 		width = 115, height = 40,
 		x = 110, y = 490, z = 2, 
@@ -84,6 +86,14 @@ function love.load()
 		round = true, radius = 6,
 		size = 12
 	})
+	myRadial:setData({
+		size = 6, x = 500, y = 400, z = 1, 
+		label = "Music", labelColor = colors("black"), labelFont = myFont, labelPos = {503, 355, 1},
+		options = {"On", "Off"}, optionsColor = colors("blue"), default = "On",
+		color = colors("eggshell"), 
+		useBorder = true, borderColor = colors("red"),
+		overlayColor = colors("alphaRed")
+	})
 	myTextfield:setData({
 		w = 150, h = 125, x = 100, y = 50, z = 2,
 		textColor = colors("green"),
@@ -109,7 +119,6 @@ function love.load()
 		Neon:removeGlobalEvent("onClick", "box", "boxOnClick") 
 	end, nil, "boxOnClick")
 	Neon:child("myBox2"):registerEvent("onClick", function(self, a) a:fadeOut(true, true) end, myBox3)
-	myBox3:registerEvent("onFadeOut", function(self) print("Faded") end)
 	myBox3:registerEvent("onMove", function(self) print("x", self.x, "y", self.y) end)
 	Neon:registerEvent("onClick", Neon:child("myBox2"), function(self) Neon:enableAll() Neon:child("myBox2"):animateBorderToColor(colors("red")) end)
 	Neon:registerEvent("onClick", Neon:child("myBox2"), function(self) Neon:child("myBox2"):animateToColor(colors("black")) end)

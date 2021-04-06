@@ -31,6 +31,7 @@ local min, max = math.min, math.max
 local element = require("neon.element")
 
 local dropdown = {}
+dropdown.defaultFont = lg.getFont()
 
 local guis = {}
 dropdown.fonts = {}
@@ -59,8 +60,8 @@ function dropdown:new(n, id, p)
 	d.overlayColor = {1,1,1,.5}
 	d.optionsColor = {1,1,1,1}
 	d.r = {0,0,0,0}
-	d.font = lg.getFont()
-	d.optionFont = lg.getFont()
+	d.font = self.defaultFont
+	d.optionFont = self.defaultFont
 	d.open = false
 	d.closeOnUnfocus = false
 	d.vertical = false

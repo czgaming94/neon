@@ -1,9 +1,6 @@
 # NEON [Newbie, Experienced, or Neither]
 This API's goal is to make laying out your application GUI simple and efficient. The secondary goal of this API 
-is to be as easy to grasp as possible for beginners, as well as users coming from other scripting languages. <br>
-This API is based off of a modified version of the [standard metatable table.deepcopy function](http://lua-users.org/wiki/CopyTable).<br>
-> The deepcopy function creates a special instance of a table, allowing the user to create multiple instance
-> without overwriting the original.
+is to be as easy to grasp as possible for even the mediocre Lua user, as well as users coming from other scripting languages.<br>
 #### [If you aren't quite understanding how to start using the API, check out this quick starters guide!](https://github.com/czgaming94/neon/blob/main/docs/examples/StartGuide.md)
 
 ### GUI Handles
@@ -16,6 +13,7 @@ local Neon = require("neon")
 local Game = {}
 Game.mainMenu = Neon:new()
 ```
+> Can also be used to create a new instance of any table or variable.
 ##### :duplicate(item)
 > Creates a new instance of an already existing item.
 ```lua
@@ -37,12 +35,12 @@ local Neon = require("neon")
 Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
 Neon:animateToColor(Neon:child("myBox"), {1,1,1,1}, 5)
 ```
-##### :animateToBorderColor(object, color, speed)
+##### :animateBorderToColor(object, color, speed)
 > Animate an object through the GUI parent, to a specified border color, at an optional speed. Speed defaults to `2`
 ```lua
 local Neon = require("neon")
 Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}, borderColor = {.5,1,1,1}})
-Neon:animateToBorderColor(Neon:child("myBox"), {1,1,1,1}, 5)
+Neon:animateBorderToColor(Neon:child("myBox"), {1,1,1,1}, 5)
 ```
 ##### :animateToPosition(object, position, speed)
 > Animate an object through the GUI parent, to a specified position, at an optional speed. Speed defaults to `2`
@@ -51,12 +49,31 @@ local Neon = require("neon")
 Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
 Neon:animateToPosition(Neon:child("myBox"), 20, 20, 5)
 ```
+##### :animateBorderToOpacity(object, opacity, speed)
+> Animate an object through the GUI parent, to a specified border color, at an optional speed. Speed defaults to `2`
+```lua
+local Neon = require("neon")
+Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}, borderColor = {.5,1,1,1}})
+Neon:animateBorderToOpacity(Neon:child("myBox"), .2, 5)
+```
 ##### :animateToOpacity(object, color, speed)
 > Animate an object through the GUI parent, to a specified opacity, at an optional speed. Speed defaults to `1`
 ```lua
 local Neon = require("neon")
 Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
 Neon:animateToOpacity(Neon:child("myBox"), .2, 5)
+```
+##### :canUpdate(canUpdate)
+> Returns whether GUI can update if canUpdate is not supplied
+> Set whether a GUI can update if canUpdate is supplied
+```lua
+local Neon = require("neon")
+Neon:canUpdate(false)
+function love.mousepressed()
+	if not Neon:canUpdate() then
+		Neon:canUpdate(true)
+	end
+end
 ```
 ##### :addColor(color, name)
 > Add a color to the global GUI interface with the given name. Call with `Neon.color("name")`
@@ -74,11 +91,16 @@ Neon:add("box", "myBox")
 -- or
 local myBox = Neon:add("box", "myBox")
 ```
-##### :addBox(name)
+##### :addBox(name, button, function, target)
 > Add a box element to the GUI interface.
+> If button is set as true, define box as a button, with a default onClick function and target
 ```lua
 local Neon = require("neon")
 Neon:addBox("myBox")
+or
+Neon:addBox("myButton", true, function(self, target, event)
+	print(self.type) -- will be button, not box
+end)
 ```
 ##### :addText(name)
 > Add a text element to the GUI interface.
@@ -99,9 +121,17 @@ local Neon = require("neon")
 Neon:addDropdown("myDropdown")
 ```
 ##### :addSlider(name)
-> __Coming Soon__
+> Add a slider element to the GUI interface.
+```lua
+local Neon = require("neon")
+Neon:addSlider("mySlider")
+```
 ##### :addRadial(name)
-> __Coming Soon__
+> Add a radial element to the GUI interface.
+```lua
+local Neon = require("neon")
+Neon:addRadial("myRadial")
+```
 ##### :addTextfield(name)
 > Add a textfield element to the GUI interface.
 ```lua
@@ -134,6 +164,38 @@ function love.keypressed(key)
 	 --]]
 end
 ```
+##### :drawAll()
+> Tell GUI system to draw all GUI parents.
+```lua
+local Neon = require("neon")
+Neon2 = Neon:new()
+Neon3 = Neon:new()
+Neon:addBox("myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
+Neon2:addBox("myBox2"):setData({x = 30, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
+Neon3:addBox("myBox3"):setData({x = 50, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
+
+function love.draw()
+	Neon:drawAll()
+end
+```
+##### :child(name, ignore)
+> Get a child element from a GUI parent if it's active.
+> Will get child even if parent isn't active, if ignore is true.
+```lua
+local Neon = require("neon")
+Neon:addBox("myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
+local box = Neon:child("myBox")
+```
+##### :children(type, ignore)
+> Get all children from an element if the GUI parent is active.
+> Will get all children even if parent isn't active, if ignore is true.
+```lua
+local Neon = require("neon")
+Neon:addBox("myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
+Neon:addBox("myBox2"):setData({x = 30, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
+Neon:addBox("myBox3"):setData({x = 50, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
+local boxes = Neon:childred("box")
+```
 ##### :getHeld()
 > Returns a table of items that are held by the mouse. Only works with `moveable = true` on the object.
 ```lua
@@ -159,8 +221,8 @@ function love.keypressed(key)
 	if key == "e" then Neon:enableAll() end
 end
 ```
-##### :disableAllElements(only)
-> Fully disable every element, if only is true then it will only disable in the specific GUI.
+##### :enableAllElements(only)
+> Fully enable every element, if only is true then it will only enable in the specific GUI.
 ```lua
 local Neon = require("neon")
 local Neon2 = Neon:new()
@@ -168,6 +230,21 @@ Neon:addBox("myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}
 Neon:addBox("myBox"):setData({x = 10, y = 60, w = 50, h = 50, color = {1,.5,1,1}}):disable()
 Neon2:addBox("myBox"):setData({x = 10, y = 110, w = 50, h = 50, color = {1,.5,1,1}}):disable()
 Neon2:addBox("myBox"):setData({x = 10, y = 160, w = 50, h = 50, color = {1,.5,1,1}}):disable()
+function love.keypressed(key)
+	if key == "d" then Neon:enableAllElements() end
+	-- or, to only disable the elements within the specific GUI
+	if key == "d" then Neon2:enableAllElements(true) end
+end
+```
+##### :disableAllElements(only)
+> Fully disable every element, if only is true then it will only disable in the specific GUI.
+```lua
+local Neon = require("neon")
+local Neon2 = Neon:new()
+Neon:addBox("myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
+Neon:addBox("myBox"):setData({x = 10, y = 60, w = 50, h = 50, color = {1,.5,1,1}})
+Neon2:addBox("myBox"):setData({x = 10, y = 110, w = 50, h = 50, color = {1,.5,1,1}})
+Neon2:addBox("myBox"):setData({x = 10, y = 160, w = 50, h = 50, color = {1,.5,1,1}})
 function love.keypressed(key)
 	if key == "d" then Neon:disableAllElements() end
 	-- or, to only disable the elements within the specific GUI
@@ -233,10 +310,24 @@ Neon:registerGlobalEvent("onClick", "box", function(self)
 	Neon:removeGlobalEvent("onClick", "box", "boxClickEvent")
 end, x, "boxClickEvent") 
 ```
+##### :setZ(z)
+> Set the parent Z index of the GUI. GUI's are sorted by their Z before draw.
+```lua
+local Neon = require("neon"):setZ(1)
+local Neon2 = Neon:new():setZ(2)
+local Neon3 = Neon:new():setZ(3)
+```
+###### :getZ()
+> Get the Z index of the GUI parent.
+```lua
+local Neon = require("neon"):setZ(1):getZ() -- 1
+```
 ### Elements
 There are several different commonly used GUI tools brought with this API, as well as a few special ones.<br>
-Click the header for the element type to read the API for that specific element. Each element shares most<br>
-functions, but each one has individual functions that are specific to only it.<br>
+Click the header for the element type to read the API for that specific element. <br>
+[Element Methods](https://github.com/czgaming94/neon/blob/main/docs/Element.md) | [Element Callbacks](https://github.com/czgaming94/neon/blob/main/docs/Element.md#Callbacks)
+------------|------------
+Each element shares most methods, but each one has individual methods that are specific to only it. Read about the shared methods [here](https://github.com/czgaming94/neon/blob/main/docs/Element.md). | Each element shares most callbacks, but each one has individual callbacks that are specific to only it. Read about the shared callbacks [here](https://github.com/czgaming94/neon/blob/main/docs/Element.md#Callbacks).
 [Boxes](https://github.com/czgaming94/neon/blob/main/docs/Box.md) | [Text](https://github.com/czgaming94/neon/blob/main/docs/Text.md) | [Checkboxes](https://github.com/czgaming94/neon/blob/main/docs/Checkbox.md) | [Dropdowns](https://github.com/czgaming94/neon/blob/main/docs/Dropdown.md) | [Radials](https://github.com/czgaming94/neon/blob/main/docs/Radial.md) | [Sliders](https://github.com/czgaming94/neon/blob/main/docs/Slider.md) | [Textfields](https://github.com/czgaming94/neon/blob/main/docs/Textfield.md)
 ------------|------------|------------|------------|------------|------------|------------
 The goal of the box object is for backgrounds, buttons, and HUD containers. This is the most commonly used type of object in a GUI. | The text object has a few abilities. It can be treated as regular static text, or it can be treated as a typewriter, and given syntax coding to morph and affect how the text is displayed. | The checkbox is designed to be used for taking user input on choices. A top use for the checkbox is for Poll option selection. Checkboxes can accept multiple selections, or be limited to a single selection. | The dropdown is just as it sounds; A menu of options that drops down when clicked on. This is commonly used for toggling between user input options, form submissions, etc. | __Coming Soon__ | __Coming Soon__ | Textfields are as they sound. A field that text can be put. Either you the dev, can put the text that will be there in, or, you can allow the user to type into it. To disable user typing, add `useable = false` to the `setData` function, or use `:useable(false)` on the textfield object.

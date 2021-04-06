@@ -205,10 +205,26 @@ function gui:animateToPosition(o, x, y, s)
 	return o
 end
 
+function gui:animateBorderToOpacity(obj, o, s)
+	if not self.enabled then return false end
+	assert(obj, "FAILURE: gui:animateBorderToOpacity() :: Missing param[object]")
+	assert(type(obj) == "table", "FAILURE: gui:animateBorderToOpacity() :: Incorrect param[object] - expecting table and got " .. type(obj))
+	assert(o, "FAILURE: gui:animateBorderToOpacity() :: Missing param[o]")
+	assert(type(o) == "number", "FAILURE: gui:animateBorderToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
+	s = s or 2
+	assert(type(s) == "number", "FAILURE: gui:animateBorderToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
+	o.opacityToAnimateBorderTo = c
+	o.opacityBorderAnimateSpeed = s
+	o.opacityBorderAnimateTime = 0
+	o.inAnimation = true
+	o.animateBorderOpacity = true
+	return o
+end
+
 function gui:animateToOpacity(obj, o, s)
 	if not self.enabled then return false end
-	assert(obj, "FAILURE: gui:animateToColor() :: Missing param[object]")
-	assert(type(obj) == "table", "FAILURE: gui:animateToColor() :: Incorrect param[object] - expecting table and got " .. type(obj))
+	assert(obj, "FAILURE: gui:animateToOpacity() :: Missing param[object]")
+	assert(type(obj) == "table", "FAILURE: gui:animateToOpacity() :: Incorrect param[object] - expecting table and got " .. type(obj))
 	assert(o, "FAILURE: gui:animateToOpacity() :: Missing param[o]")
 	assert(type(o) == "number", "FAILURE: gui:animateToOpacity() :: Incorrect param[o] - expecting number and got " .. type(o))
 	s = s or 1
@@ -337,14 +353,16 @@ function gui:update(dt)
 					local x,y = lm.getPosition()
 					local hover = (x >= i.pos.x + i.paddingLeft and x <= i.pos.x + i.w + i.paddingRight) and (y >= i.pos.y + i.paddingTop and y <= i.pos.y + i.h + i.paddingBottom)
 					local event = {x=x,y=y}
-					if i.type == "text" then
+					if i:is("text") then
 						hover = (x >= i.pos.x and x <= i.pos.x + i.w) and (y >= i.pos.y and y <= i.pos.y + i.h)
-					elseif i.type == "dropdown" then
+					elseif i:is("dropdown") then
 						if i.border then
 							hover = i.open and (x >= i.pos.x and x <= i.pos.x + i.dW + i.optionPaddingLeft + i.optionPaddingRight + 2 and y >= i.pos.y and y <= i.pos.y + i.h + i.dH) or (x >= i.pos.x and x <= i.pos.x + i.w and y >= i.pos.y and y <= i.pos.y + i.h)
 						else
 							hover = i.open and (x >= i.pos.x and x <= i.pos.x + i.dW + i.optionPaddingLeft + i.optionPaddingRight and y >= i.pos.y and y <= i.pos.y + i.h + i.dH) or (x >= i.pos.x and x <= i.pos.x + i.w and y >= i.pos.y and y <= i.pos.y + i.h)
 						end
+					elseif i:is("radial") then
+						hover = (x >= i.pos.x - i.size and x <= i.pos.x + i.w) and (y >= i.pos.y - i.size and y <= i.pos.y + i.h)
 					end
 					-- HOVER UPDATE
 					if hover then
@@ -363,7 +381,7 @@ function gui:update(dt)
 							end
 							if events.onHoverEnter then
 								for _,v in ipairs(events.onHoverEnter) do
-									if v.o == i.type then
+									if i:is(v.o) then
 										v.fn(i, v.target, event)
 									end
 								end
@@ -379,7 +397,7 @@ function gui:update(dt)
 							end
 							if events.onHoverExit then
 								for _,v in ipairs(events.onHoverExit) do
-									if v.o == i.type then
+									if i:is(v.o) then
 										v.fn(i, v.target, event)
 									end
 								end
@@ -405,7 +423,7 @@ function gui:update(dt)
 							end
 							if events.onAnimationStart then
 								for _,v in ipairs(events.onAnimationStart) do
-									if v.o == i.type then
+									if i:is(v.o) then
 										v.fn(i, v.target, animEvent)
 									end
 								end
@@ -469,7 +487,7 @@ function gui:update(dt)
 										end
 										if events.afterFadeIn then
 											for _,v in ipairs(events.afterFadeIn) do
-												if v.o == i.type then
+												if i:is(v.o) then
 													v.fn(i, v.target)
 												end
 											end
@@ -482,7 +500,7 @@ function gui:update(dt)
 										end
 										if events.afterFadeOut then
 											for _,v in ipairs(events.afterFadeOut) do
-												if v.o == i.type then
+												if i:is(v.o) then
 													v.fn(i, v.target)
 												end
 											end
@@ -524,7 +542,7 @@ function gui:update(dt)
 										end
 										if events.afterFadeIn then
 											for _,v in ipairs(events.afterFadeIn) do
-												if v.o == i.type then
+												if i:is(v.o) then
 													v.fn(i, v.target)
 												end
 											end
@@ -537,7 +555,7 @@ function gui:update(dt)
 										end
 										if events.afterFadeOut then
 											for _,v in ipairs(events.afterFadeOut) do
-												if v.o == i.type then
+												if i:is(v.o) then
 													v.fn(i, v.target)
 												end
 											end
@@ -564,7 +582,7 @@ function gui:update(dt)
 							end
 							if events.onAnimationComplete then
 								for _,v in ipairs(events.onAnimationComplete) do
-									if v.o == i.type then
+									if i:is(v.o) then
 										v.fn(i, v.target)
 									end
 								end
@@ -572,11 +590,11 @@ function gui:update(dt)
 						end
 					end
 					-- BOX UPDATE
-					if i.type == "box" then
+					if i:is("box") then
 					
 					end
 					-- CHECKBOX UPDATE
-					if i.type == "checkbox" then
+					if i:is("checkbox") then
 						for k,v in ipairs(i.options) do
 							if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
 								if not v.hovered then 
@@ -612,9 +630,9 @@ function gui:update(dt)
 								end
 							end
 						end
-					end
+					end					
 					-- DROPDOWN UPDATE
-					if i.type == "dropdown" then
+					if i:is("dropdown") then
 						if i.open then
 							local x,y = lm.getPosition()
 							for k,v in ipairs(i.options) do
@@ -626,8 +644,46 @@ function gui:update(dt)
 							end
 						end
 					end
+					-- RADIAL UPDATE
+					if i:is("radial") then
+						for _,v in ipairs(i.options) do
+							if x >= v.x - i.size and x <= v.x + i.size and y >= v.y - i.size and y <= v.y + i.size then
+								if not v.hovered then 
+									v.hovered = true 
+									if i.events.onOptionHover then
+										for _,e in ipairs(i.events.onOptionHover) do
+											e.fn(i, v)
+										end
+									end
+									if events.onOptionHover then
+										for _,e in ipairs(events.onOptionHover) do
+											if i.type == e.o then
+												e.fn(i, v)
+											end
+										end
+									end
+								end
+							else
+								if v.hovered then 
+									v.hovered = false 
+									if i.events.onOptionHoverExit then
+										for _,e in ipairs(i.events.onOptionHoverExit) do
+											e.fn(i, v)
+										end
+									end
+									if events.onOptionHoverExit then
+										for _,e in ipairs(events.onOptionHoverExit) do
+											if i.type == e.o then
+												e.fn(i, v)
+											end
+										end
+									end
+								end
+							end
+						end
+					end
 					-- SLIDER UPDATE
-					if i.type == "slider" then
+					if i:is("slider") then
 						if (x >= i.sX - (i.h / 4) and x <= i.sX + (i.h / 2)) and (y >= i.sY and y <= i.sY + i.h) or i.sliderHeld then
 							if not i.sliderHovered then i.sliderHovered = true end
 							if lm.isDown(1) then
@@ -640,7 +696,7 @@ function gui:update(dt)
 									end
 									if events.onGrab then 
 										for _,v in ipairs(events.onGrab) do
-											if v.o == i.type then
+											if i:is(v.o) then
 												v.fn(i, v.target, i.percent)
 											end
 										end
@@ -659,7 +715,7 @@ function gui:update(dt)
 								end
 								if events.onChange then 
 									for _,v in ipairs(events.onChange) do
-										if v.o == i.type then
+										if i:is(v.o) then
 											v.fn(i, v.target, i.percent)
 										end
 									end
@@ -675,7 +731,7 @@ function gui:update(dt)
 								end
 								if events.onRelease then 
 									for _,v in ipairs(events.onRelease) do
-										if v.o == i.type then
+										if i:is(v.o) then
 											v.fn(i, v.target, i.percent)
 										end
 									end
@@ -686,7 +742,7 @@ function gui:update(dt)
 						end
 					end
 					-- TEXT UPDATE
-					if i.type == "text" then
+					if i:is("text") then
 						if i.typewriter then
 							i.typewriterWaited = i.typewriterWaited + dt
 							if i.fancy then
@@ -751,7 +807,7 @@ function gui:update(dt)
 						end
 					end
 					-- TEXTFIELD UPDATE
-					if i.type == "textfield" then
+					if i:is("textfield") then
 						if i.active then
 							i.cursorTime = i.cursorTime + dt
 							if i.cursorTime >= 1 then
@@ -844,8 +900,9 @@ function gui:draw()
 	for _,i in ipairs(self.items) do
 		lg.push("all")
 		if not i.hidden then
+			lg.setColor(1,1,1,1)
 			-- BOX DRAW
-			if i.type == "box" then
+			if i:is("box") then
 				lg.setColor(1,1,1,1)
 				local x,y
 				if love.math.random(0,100) > 50 then
@@ -915,8 +972,8 @@ function gui:draw()
 				end
 			end
 			-- CHECKBOX DRAW
-			if i.type == "checkbox" then
-				lg.setColor(1,1,1,1)
+			if i:is("checkbox") then
+				lg.setColor(i.color)
 				lg.setFont(i.font)
 				for k,v in ipairs(i.options) do
 					if v.text then
@@ -978,7 +1035,7 @@ function gui:draw()
 				lg.print(i.label, i.labelPosition.x, i.labelPosition.y)
 			end
 			-- DROPDOWN DRAW
-			if i.type == "dropdown" then
+			if i:is("dropdown") then
 				lg.setColor(i.color)
 				lg.setFont(i.font)
 
@@ -1040,7 +1097,7 @@ function gui:draw()
 				lg.print(i.label, i.labelPosition.x, i.labelPosition.y)
 			end
 			-- SLIDER DRAW
-			if i.type == "slider" then
+			if i:is("slider") then
 				if i.border then
 					lg.setColor(i.borderColor)
 					lg.rectangle("line", i.x - 1, i.y - 1, i.w + 2, i.h + 2, i.radius, i.radius)
@@ -1079,9 +1136,55 @@ function gui:draw()
 				end
 				lg.setColor(1,1,1,1)
 			end
+			-- RADIAL DRAW
+			if i:is("radial") then
+				lg.setColor(i.color)
+				lg.setFont(i.font)
+				for k,v in ipairs(i.options) do
+					if v.text then
+						lg.push()
+						if i.border then
+							if i.parent and items[i.parent] and items[i.parent].use255 then
+								lg.setColor(love.math.colorFromBytes(i.borderColor))
+								if v.selected then
+									lg.setColor(love.math.colorFromBytes(i.selectedBorder))
+								end
+							else
+								lg.setColor(i.borderColor)
+								if v.selected then
+									lg.setColor(i.selectedBorder)
+								end
+							end
+							lg.circle("line", v.x, v.y, i.size + 1)
+						end
+						if i.parent and items[i.parent] and items[i.parent].use255 then
+							lg.setColor(love.math.colorFromBytes(i.color))
+						else
+							lg.setColor(i.color)
+						end
+						lg.circle("fill", v.x, v.y, i.size)
+						
+						if v.selected then
+							lg.setColor(i.overlayColor)
+							lg.circle("fill", v.x, v.y, i.size)
+						end
+						lg.setColor(i.optionsColor)
+						lg.print(v.text, v.x + i.size + 5, v.y - (i.font:getHeight() / 2))
+						lg.pop()
+					end
+				end
+				lg.setColor(i.labelColor)
+				lg.setFont(i.labelFont)
+				if i.shadowLabel then
+					lg.setColor(0,0,0,.2)
+					lg.print(i.label, i.labelPosition.x + 1, i.labelPosition.y + 1)
+					lg.setColor(i.labelColor)
+				end
+				lg.print(i.label, i.labelPosition.x, i.labelPosition.y)
+			end
 			-- TEXT DRAW
-			if i.type == "text" then
-				lg.setColor(1,1,1,1)
+			if i:is("text") then
+				lg.setColor(i.color)
 				lg.setFont(i.font)
 				if i.typewriter then
 					if i.fancy then
@@ -1177,7 +1280,7 @@ function gui:draw()
 				lg.setColor(1,1,1,1)
 			end
 			-- TEXTFIELD DRAW
-			if i.type == "textfield" then
+			if i:is("textfield") then
 				lg.setFont(i.font)
 				lg.setColor(i.color)
 				lg.rectangle("fill", i.pos.x, i.pos.y, i.w, i.h)
@@ -1241,14 +1344,18 @@ end
 function gui:children(t, i)
 	if not self.enabled then return false end
 	local children = {}
-	for _,g in ipairs(items) do
-		if g.enabled or i then
-			for _,v in ipairs(g.items) do
-				if v.type == t then
-					children[#children + 1] = v
+	if t then
+		for _,g in ipairs(items) do
+			if g.enabled or i then
+				for _,v in ipairs(g.items) do
+					if v.type == t then
+						children[v.name] = v
+					end
 				end
 			end
 		end
+	else
+		children = self.items
 	end
 	return children
 end
@@ -1268,10 +1375,25 @@ function gui:enableAll()
 	return self
 end
 
+function gui:enableAllElements(only)
+	if only then
+		for _,v in ipairs(self.items) do
+			if v.hidden then v.hidden = false end
+		end
+	else
+		for _,v in ipairs(items) do
+			for _,i in ipairs(v.items) do
+				if not i.hidden then i.hidden = false end
+			end
+		end
+	end
+	return self
+end
+
 function gui:disableAllElements(only)
 	if only then
 		for _,v in ipairs(self.items) do
-			if v.enabled then v.enabled = false end
+			if v.hidden then v.hidden = true end
 		end
 	else
 		for _,v in ipairs(items) do
@@ -1344,23 +1466,31 @@ function gui:keypressed(key, scan, isRepeat)
 			for _,i in ipairs(v.items) do
 				if i.keypressed then i:keypressed(event) end
 				-- BOX KEYPRESS
-				if i.type == "box" then
+				if i:is("box") then
 				
 				end
 				-- CHECKBOX KEYPRESS
-				if i.type == "checkbox" then
+				if i:is("checkbox") then
 				
 				end
 				-- DROPDOWN KEYPRESS
-				if i.type == "dropdown" then
+				if i:is("dropdown") then
+				
+				end
+				-- SLIDER KEYPRESS
+				if i:is("slider") then
+				
+				end
+				-- RADIAL KEYPRESS
+				if i:is("radial") then
 				
 				end
 				-- TEXT KEYPRESS
-				if i.type == "text" then
+				if i:is("text") then
 				
 				end
 				-- TEXTFIELD KEYPRESS
-				if i.type == "textfield" then
+				if i:is("textfield") then
 					if not i.useable then return false end
 					if keyIsDown then return false end
 					keyIsDown = true
@@ -1501,6 +1631,13 @@ function gui:mousemoved(x, y, dx, dy, istouch)
 								e.fn(i, e.target, event)
 							end
 						end
+						if events.onMove then
+							for _,e in ipairs(events.onMove) do
+								if i.is(e.o) then
+									e.fn(i, e.target, event)
+								end
+							end
+						end
 					end
 				end
 			end 
@@ -1555,11 +1692,11 @@ function gui:mousepressed(x, y, button, istouch, presses)
 					end
 					if i.mousepressed then i:mousepressed(event) end
 					-- BOX CLICK
-					if i.type == "box" then
+					if i:is("box") then
 					
 					end
 					-- CHECKBOX CLICK
-					if i.type == "checkbox" then
+					if i:is("checkbox") then
 						if button == 1 then
 							local oneIsSelected = false
 							for k,v in ipairs(i.options) do
@@ -1591,7 +1728,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 						end
 					end
 					-- DROPDOWN CLICK
-					if i.type == "dropdown" then
+					if i:is("dropdown") then
 						if button == 1 then
 							if i.open then
 								local hitTarget = false
@@ -1615,15 +1752,31 @@ function gui:mousepressed(x, y, button, istouch, presses)
 						end
 					end
 					-- SLIDER CLICK
-					if i.type == "slider" then
+					if i:is("slider") then
 					
 					end
+					-- RADIAL CLICK
+					if i:is("radial") then
+						if button == 1 then
+							for k,v in ipairs(i.options) do
+								v.selected = false
+								if v.hovered then
+									v.selected = true
+									if i.events.onOptionClick then 
+										for _,e in ipairs(i.events.onOptionClick) do
+											e.fn(i, i.options[k], e.t, event)
+										end
+									end
+								end
+							end
+						end
+					end
 					-- TEXT CLICK
-					if i.type == "text" then
+					if i:is("text") then
 					
 					end
 					-- TEXTFIELD CLICK
-					if i.type == "textfield" then
+					if i:is("textfield") then
 						if button == 1 then
 							if not i.active then
 								i.active = true
@@ -1639,7 +1792,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 						end
 						if events.onClick then
 							for _,e in ipairs(events.onClick) do
-								if e.o == i.type then
+								if i:is(e.o) then
 									e.fn(i, e.target, event)
 								end
 							end
@@ -1652,7 +1805,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 						end
 						if events.onRightClick then
 							for _,e in ipairs(events.onRightClick) do
-								if e.o == i.type then
+								if i:is(e.o) then
 									e.fn(i, e.target, event)
 								end
 							end
@@ -2002,7 +2155,7 @@ function gui:getZ()
 	return self.z
 end
 
-function gui:dist(x1,x2,y1,y2)
+function gui:dist(x1,y1,x2,y2)
 	sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
 end
 

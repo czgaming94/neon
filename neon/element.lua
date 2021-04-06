@@ -244,6 +244,7 @@ local function new(t, p)
 				self.fonts[k] = v
 			end
 		end
+		if d.size then self.size = d.size end
 		if d.sliderWidth then self.sW = d.sliderWidth end
 		if d.sliderHeight then self.sH = d.sliderHeight end
 		if d.size then self.size = d.size end
@@ -252,7 +253,7 @@ local function new(t, p)
 		if d.image then self.image = self.images[d.image] or d.image end
 		if d.sliderImage then self.sliderImage = self.images[d.sliderImage] or d.sliderImage end
 		if d.font then self.font = d.font end
-		if self.type == "text" and self.text then
+		if self:is("text") and self.text then
 			if not d.w and not d.width then
 				self.w = self.font:getWidth(self.text)
 			end
@@ -382,7 +383,7 @@ local function new(t, p)
 				self.options = {}
 			end
 			local w, h = 0, 0
-			if self.type == "checkbox" then
+			if self:is("checkbox") then
 				for k,v in ipairs(d.options) do
 					if k == 1 then
 						self.options[k] = {
@@ -433,7 +434,7 @@ local function new(t, p)
 						self.h = self.paddingTop + self.uH + self.paddingBottom
 					end
 				end
-			else
+			elseif self:is("dropdown") then
 				for k,v in ipairs(d.options) do
 					if k == 1 then
 						self.options[k] = {
@@ -465,23 +466,76 @@ local function new(t, p)
 				for k,v in ipairs(self.options) do v.w = w end
 				self.dW = w
 				self.dH = h
+			elseif self:is("radial") then
+				for k,v in ipairs(d.options) do
+					if k == 1 then
+						self.options[k] = {
+							text = v, 
+							x = self.pos.x, 
+							y = self.pos.y,
+							w = self.paddingLeft + self.size + self.font:getWidth(v) + self.paddingRight,
+							h = self.paddingTop + self.size + self.paddingBottom
+						}
+						if self.fixPadding then
+							self.options[k].x = self.pos.x
+						end
+					else
+						self.options[k] = {
+							text = v, 
+							x = self.options[k - 1].x + (self.font:getWidth(self.options[k - 1].text) * 2) + 4 + (self.paddingLeft * 2) + self.size + self.paddingRight, 
+							y = self.paddingTop + self.pos.y + self.paddingBottom,
+							w = self.paddingLeft + self.size + self.font:getWidth(v) + self.paddingRight,
+							h = self.paddingTop + self.size + self.paddingBottom
+						}
+						if d.verticalOptions then
+							self.vertical = true
+							self.options[k].x = self.pos.x + self.paddingRight
+							self.options[k].y = self.options[k - 1].y + self.font:getHeight(v)
+						else
+							self.options[k].y = self.pos.y
+						end
+					end
+					w = (self.paddingLeft * 2) + w + (self.size + self.font:getWidth(v)) + self.paddingRight
+					h = self.paddingTop + h + (self.size + self.font:getHeight(v)) + 2 + self.paddingBottom
+					if self.border then
+						w = w + 2
+						h = h + 2
+					end
+				end
+				if self.vertical then 
+					if self.border then
+						self.w = self.paddingLeft + self.size + 2 + self.paddingRight
+					else
+						self.w = self.paddingLeft + self.size + self.paddingRight
+					end
+					self.h = h
+				else 
+					self.w = w
+					if self.border then
+						self.h = self.paddingTop + self.size + 2 + self.paddingBottom
+					else
+						self.h = self.paddingTop + self.size + self.paddingBottom
+					end
+				end
 			end
 		end
 		if d.default then
-			if self.type == "checkbox" then
+			if self:is("checkbox") or self:is("radial") then
 				for k,v in ipairs(self.options) do 
 					if d.default == "all" then
 						v.selected = true
 					else
 						if v.text == d.default then
 							v.selected = true
+							break
 						end
 					end
 				end 
 			else
 				for k,v in ipairs(self.options) do 
 					if v.text == t.default then
-						self.selected = k 
+						self.selected = k
+						break
 					end 
 				end 
 			end
@@ -630,6 +684,10 @@ local function new(t, p)
 
 	function t:isHollow()
 		return self.hollow
+	end
+	
+	function t:is(o)
+		return t.type == o
 	end
 
 	function t:startAnimation()
