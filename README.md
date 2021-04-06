@@ -354,7 +354,7 @@ local Neon = require("neon"):setZ(1):getZ() -- 1
 ### Element Use
 There are several different commonly used GUI tools brought with this API, as well as a few special ones.<br>
 Click the header for the element type to read the API for that specific element. <br>
-[Element Methods](https://github.com/czgaming94/neon/blob/main/docs/Element.md) | [Element Callbacks](https://github.com/czgaming94/neon/blob/main/docs/Element.md#Callbacks)
+[Element Methods](https://github.com/czgaming94/neon/blob/main/docs/Element.md) | [Element Callbacks](https://github.com/czgaming94/neon/blob/main/docs/Element.md#api-callbacks)
 :--|:--
 Each element shares most methods, but each one has individual methods that are specific to only it. Read about the shared methods [here](https://github.com/czgaming94/neon/blob/main/docs/Element.md). | Each element shares most callbacks, but each one has individual callbacks that are specific to only it. Read about the shared callbacks [here](https://github.com/czgaming94/neon/blob/main/docs/Element.md#Callbacks).
 ### Element Types
