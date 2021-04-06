@@ -244,6 +244,9 @@ local function new(t, p)
 				self.fonts[k] = v
 			end
 		end
+		if d.sliderWidth then self.sW = d.sliderWidth end
+		if d.sliderHeight then self.sH = d.sliderHeight end
+		if d.size then self.size = d.size end
 		if d.z then self.pos.z = d.z end
 		if d.rot then self.rot = d.rot end
 		if d.image then self.image = self.images[d.image] or d.image end
@@ -538,16 +541,6 @@ local function new(t, p)
 		return self
 	end
 	
-	function t:getData()
-		local d = {}
-		for k,v in pairs(self) do
-			if type(v) ~= "function" then
-				d[k] = v
-			end
-		end
-		return d
-	end
-	
 	function t:getDefault()
 		local d = {}
 		for k,v in pairs(self.defaults) do
@@ -713,6 +706,16 @@ local function new(t, p)
 
 	function t:getOpacity()
 		return self.color[4]
+	end
+	
+	function t:pack()
+		local d = {}
+		for k,v in pairs(self) do
+			if type(v) ~= "function" then
+				d[k] = v
+			end
+		end
+		return d
 	end
 
 	function t:registerEvent(n, f, trg, i)

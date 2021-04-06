@@ -64,6 +64,7 @@ function slider:new(n, id, p)
 	s.r = {0,0,0,0}
 	s.sX = 0
 	s.sY = 0
+	s.size = "auto"
 	s.sliderHeld = false
 	s.sliderHovered = false
 	s.rot = 0

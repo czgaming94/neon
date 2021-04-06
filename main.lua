@@ -27,46 +27,11 @@ function love.load()
 	Neon:addColor({0,0,0,1}, "black")
 	Neon:addColor({0,0,0,0}, "empty")
 	Neon:addColor({1,0,0,.5}, "alphaRed")
-	Neon:addColor({.92,.97,.92,1}, "eggshell")
+	Neon:addColor({.97,.93,.94,1}, "eggshell")
 	
 	-- Add images to your box, easily.
-	-- image (userdata)
-	-- name (string)
-	-- automatic (boolean)
 	myBox:addImage(lg.newImage("res/img/background.png"), "background")
-	
-	-- [PARAMS]
-	-- borderColor  (table)
-	-- clickable    (boolean)
-	-- color        (table)
-	-- h | height   (number)
-	-- image        (string)
-	-- moveable		(boolean)
-	-- opacity      (number)
-	-- padding      (numbers)(top, right, bottom, left)
-	-- useBorder    (boolean)
-	-- w | width    (number)
-	-- x            (number)
-	-- y            (number)
-	-- z            (number)
 	myBox:setData({ w = 800, h = 600, x = 0, y = 0, z = 0, image = "background"})
-	-- This function can do the same as these 13. Order does not matter. Assosciative table required.
-
-	--[[
-		myBox:setBorderColor({1,0,1,1})
-		myBox:setClickable(false)
-		myBox:setColor({0,0,1,1})
-		myBox:setHeight(50)
-		myBox:setImage(love.graphics.newImage("path/to/image.png"))
-		myBox:setMoveable(true)
-		myBox:setOpacity(0.5)
-		myBox:setPadding(0,5,0,5)
-		myBox:setUseBorder(true)
-		myBox:setWidth(50)
-		myBox:setX(5)
-		myBox:setY(10)
-		myBox:setZ(2)
-	--]]
 	
 	-- You can disable whether or not a box is read as a clickable object.
 	-- Clicks will pass through this object.
@@ -96,7 +61,7 @@ function love.load()
 		w = 10, h = 10, x = 250, y = 150, z = 1, 
 		label = "Favorite Color?", labelColor = colors("black"), labelFont = myFont, labelPos = {290, 105, 1},
 		padding = {10,10,10,10}, fixPadding = true, 
-		options = {"Red", "Blue", "Green", "Yellow"}, optionColor = colors("blue"), singleSelection = true, default = "Green",
+		options = {"Red", "Blue", "Green", "Yellow"}, optionsColor = colors("blue"), singleSelection = true, default = "Green",
 		color = colors("eggshell"), 
 		useBorder = true, borderColor = colors("red"),
 		round = true, radius = 3,
@@ -113,10 +78,11 @@ function love.load()
 		closeOnUnfocus = true
 	})
 	mySlider:setData({
-		w = 200, h = 18, x = 500, y = 200,
-		sliderColor = {1,1,1,1}, sliderBorder = true, sliderBorderColor = {1,0,0,.7},
+		w = 250, h = 12, x = 500, y = 200,
+		sliderColor = {1,1,1,1}, sliderBorder = true, sliderBorderColor = {.6,.6,.6,1},
 		color = {.2,.2,.2,1}, useBorder = true, borderColor = {1,1,1,1},
-		round = true, radius = 6
+		round = true, radius = 6,
+		size = 12
 	})
 	myTextfield:setData({
 		w = 150, h = 125, x = 100, y = 50, z = 2,

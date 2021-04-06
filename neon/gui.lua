@@ -762,7 +762,7 @@ function gui:update(dt)
 					end
 					if i.update then i:update(dt) end
 				end
-			end 
+			end
 		end
 	end
 end
@@ -799,7 +799,7 @@ end
 
 function gui:drawAll()
 	if not self.enabled then return false end
-	table.sort(items, function(a,b) 
+	table.sort(items, function(a,b)
 		if not a or not b then return false end
 		if a.z == b.z then
 			if a.id == b.id then
@@ -819,7 +819,7 @@ end
 function gui:draw()
 	if not self.enabled then return false end
 	if self.needToSort then
-		table.sort(self.items, function(a,b) 
+		table.sort(self.items, function(a,b)
 			if not a or not b then return false end
 			if a.pos.z == b.pos.z then
 				if a.id == b.id then
@@ -841,9 +841,9 @@ function gui:draw()
 		end)
 		self.needToSort = false
 	end
-	for _,i in ipairs(self.items) do 
+	for _,i in ipairs(self.items) do
 		lg.push("all")
-		if not i.hidden then 
+		if not i.hidden then
 			-- BOX DRAW
 			if i.type == "box" then
 				lg.setColor(1,1,1,1)
@@ -1060,30 +1060,19 @@ function gui:draw()
 						lg.draw(i.sliderImage, i.sX, (i.y + i.h * 0.66))
 					end
 				else
-					if i.border then
-						lg.circle("fill", i.sX, (i.sY + i.h * 0.5) + 1, i.h * 0.66)
-					else
-						lg.circle("fill", i.sX, i.sY + i.h * 0.5, i.h * 0.66)
-					end
+					local size = i.size == "auto" and i.h * 0.66 or i.size 
+					lg.circle("fill", i.sX, i.sY + i.h * 0.5, size)
 					shaders.slider:send('inColor', i.inColor)
 					shaders.slider:send('outColor', i.outColor)
-					shaders.slider:send('centerX', i.sX + (i.w / 2))
+					shaders.slider:send('centerX', i.sX + (i.h / 2))
 					shaders.slider:send('centerY', i.sY + (i.h / 2))
 					lg.setShader(shaders.slider)
-					if i.border then
-						lg.circle("fill", i.sX,(i.sY + i.h * 0.5) + 1, i.h * 0.66)
-					else
-						lg.circle("fill", i.sX, i.sY + i.h * 0.5, i.h * 0.66)
-					end
+					lg.circle("fill", i.sX, i.sY + i.h * 0.5, size)
 					lg.setShader()
 					if i.sliderBorder then
 						lg.setColor(i.sliderBorderColor)
 						lg.setLineWidth(2)
-						if i.border then
-							lg.circle("line", i.sX, (i.sY + i.h * 0.5) + 1, (i.h * 0.66))
-						else
-							lg.circle("line", i.sX, (i.sY + i.h * 0.5), (i.h * 0.66))
-						end
+						lg.circle("line", i.sX, (i.sY + i.h * 0.5), size)
 						lg.setLineWidth(1)
 						lg.setColor(i.sliderColor)
 					end
