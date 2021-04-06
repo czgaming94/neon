@@ -1,94 +1,94 @@
 ## Data Handling
 These functions provide the ability to directly modify many variables of your elements. The way these work currently may change.<br>
 The biggest change that may happen, is accepting additional parameter types. No old elements will be broken by updates.
-##### :isAnimating()
+#### :isAnimating()
 > Returns true/false depending on whether the element is in the process of any animation.
-##### :setClickable(boolean clickable)
+#### :setClickable(boolean clickable)
 > Set whether the element will register as a clickable element.
-##### :isClickable()
+#### :isClickable()
 > Returns whether the element is clickable.
-##### :setColor(table color)
+#### :setColor(table color)
 > Set the color of your element as a new color. Default is white.
-##### :getColor()
+#### :getColor()
 > Returns a table of the current element color.
-##### :setHeight(number height)
+#### :setHeight(number height)
 > Set the height of the current element
-##### :getHeight()
+#### :getHeight()
 > Get the height of the current element
-##### :setHollow(boolean hollow)
+#### :setHollow(boolean hollow)
 > Sets whether an element is detected as hollow. When an element is hollow, it will allow the user to click through it,<br>
 > while also triggering its own onClick() function.
-##### :getHollow()
+#### :getHollow()
 > Returns whether an element is hollow.
-##### :isHovered()
+#### :isHovered()
 > Returns whether an element is hovered.
-##### :setMoveable(boolean canMove)
+#### :setMoveable(boolean canMove)
 > Set whether an element is moveable.
-##### :getMoveable()
+#### :getMoveable()
 > Get whether the element is moveable.
-##### :setOpacity(number opacity)
+#### :setOpacity(number opacity)
 > Set the opacity of the current element
-##### :getOpacity()
+#### :getOpacity()
 > Get the opacity of the current element
-##### :getParent()
+#### :getParent()
 > Returns the parent GUI element of the current element.
-##### :setWidth(number width)
+#### :setWidth(number width)
 > Set the width of the current element.
-##### :getWidth()
+#### :getWidth()
 > Get the width of the current element.
-##### :setX(number x)
+#### :setX(number x)
 > Set the X position of the current element.
-##### :getX()
+#### :getX()
 > Get the X position of the current element.
-##### :setY(number y)
+#### :setY(number y)
 > Set the Y position of the current element.
-##### :getY()
+#### :getY()
 > Get the Y position of the current element.
-##### :setZ(number z)
+#### :setZ(number z)
 > Set the Z position of the current element.
-##### :getZ()
+#### :getZ()
 > Get the Z position of the current element.
 ## Object Manipulation
 These functions are used for animating, enabling, and disabling elements.
-##### :animateToColor(table color, number speed)
+#### :animateToColor(table color, number speed)
 > Animate the current element to a new color, at the provided speed, or at 2s without a speed given.
-##### :animateToPosition(number x, number y, number speed)
+#### :animateToPosition(number x, number y, number speed)
 > Animate the current element to a new position, at the provided speed, or at 2s without a speed given.
-##### :animateToOpacity(number opacity, number speed)
+#### :animateToOpacity(number opacity, number speed)
 > Animate the current element to a new opacity, at the provided speed, or at 2s without a speed given.
-##### :disable()
+#### :disable()
 > Fully disable and hide the element.
-##### :enable()
+#### :enable()
 > Enable and show the element if it was hidden.
-##### :fadeIn()
+#### :fadeIn()
 > Fade the element in from X opacity to full 1.0 opacity.
-##### :fadeOut(boolean disableClick, boolean haltAnimations)
+#### :fadeOut(boolean disableClick, boolean haltAnimations)
 > Fade the element out to 0 opacity.
 > <br>`disableClick` will prevent the API from performing click operations on the element while it is faded out.
 > <br>`haltAnimations` will stop the element in its animation state and fade out to 0 opacity.
-##### :startAnimation()
+#### :startAnimation()
 > Resumes any halted animations.
-##### :stopAnimation()
+#### :stopAnimation()
 > Halts any currently progressing animations.
 ## API Callbacks
 This API brings several user defined callbacks which allow you to customize what happens when a user interacts with your elements.<br>
 Any callback with an `event` paramter has a table provided to it with data accessible to the user. You can easily define these<br>
 with `registerEvent` or by using `registerGlobalEvent` through the parent GUI.
-##### onClick(self, target, event) -- {x, y, button, istouch, presses}
+#### onClick(self, target, event) -- {x, y, button, istouch, presses}
 > Triggered when a user clicks on the element.
 ```lua
 myBox:registerEvent("onClick", function(self, target, event)
 	print(target.name, event.x, event.y) 
 end, yourTargetelement)
 ```
-##### onTouch(self, target, event) -- {id, x, y, dx, dy, pressure}
+#### onTouch(self, target, event) -- {id, x, y, dx, dy, pressure}
 > Triggered when a user taps on the element on mobile.
 ```lua
 myBox:registerEvent("onTouch", function(self, target, event)
 	print(target.name, event.x, event.y) 
 end, yourTargetelement)
 ```
-##### onHoverEnter(self, target, event) -- {x, y}
+#### onHoverEnter(self, target, event) -- {x, y}
 > Triggered when a user initially hovers over an element.
 ```lua
 myBox:registerEvent("onHoverEnter", function(self, target, event)
@@ -119,14 +119,14 @@ myBox:registerEvent("onHoverEnter", function(self, target, event)
 	end
 end)
 ```
-##### onHoverExit(self, target, event) -- {x, y}
+#### onHoverExit(self, target, event) -- {x, y}
 > Triggered when a user initially stops hovering an element.
 ```lua
 myBox:registerEvent("onHoverExit", function(self, target, event)
 	self:animateToOpacity(0.4)
 end, yourTargetelement)
 ```
-##### beforeFadeIn(self, target)
+#### beforeFadeIn(self, target)
 > Triggered when an element is about to fade in.
 ```lua
 myBox:registerEvent("beforeFadeIn", function(self, target, event)
@@ -135,14 +135,14 @@ myBox:registerEvent("beforeFadeIn", function(self, target, event)
 	end
 end, yourTargetelement)
 ```
-##### onFadeIn(self, target)
+#### onFadeIn(self, target)
 > Triggered when an element is fading in.
 ```lua
 myBox:registerEvent("onFadeIn", function(self, target, event)
 	Game.hasAnimatingBox = true
 end, yourTargetelement)
 ```
-##### afterFadeIn(self, target)
+#### afterFadeIn(self, target)
 > Triggered after an element fades in.
 ```lua
 myBox:registerEvent("afterFadeIn", function(self, target, event)
@@ -150,7 +150,7 @@ myBox:registerEvent("afterFadeIn", function(self, target, event)
 	Game.hasAnimatingBox = false
 end, yourTargetelement)
 ```
-##### beforeFadeOut(self, target)
+#### beforeFadeOut(self, target)
 > Triggered when an element is about to fade out.
 ```lua
 myBox:registerEvent("beforeFadeOut", function(self, target, event)
@@ -159,14 +159,14 @@ myBox:registerEvent("beforeFadeOut", function(self, target, event)
 	end
 end, yourTargetelement)
 ```
-##### onFadeOut(self, target)
+#### onFadeOut(self, target)
 > Triggered when an element is fading out.
 ```lua
 myBox:registerEvent("onFadeOut", function(self, target, event)
 	Game.hasAnimatingBox = true
 end, yourTargetelement)
 ```
-##### afterFadeOut(self, target)
+#### afterFadeOut(self, target)
 > Triggered after an element fades out.
 ```lua
 myBox:registerEvent("afterFadeIn", function(self, target, event)
@@ -174,7 +174,7 @@ myBox:registerEvent("afterFadeIn", function(self, target, event)
 	Game.hasAnimatingBox = false
 end, yourTargetelement)
 ```
-##### onAnimationStart(self, target)
+#### onAnimationStart(self, target)
 > Triggered after an element fades out.
 ```lua
 Neon:child("myBox"):registerEvent("onAnimationStart", function(self, target, animating)
@@ -184,7 +184,7 @@ Neon:child("myBox"):registerEvent("onAnimationStart", function(self, target, ani
 end), Neon:child("myBox2"), "moveMyBox2")
 -- tell box2 to move where you are moving, at the same speed
 ```
-##### onAnimationComplete(self, target)
+#### onAnimationComplete(self, target)
 > Triggered after an element fades out.
 ```lua
 Neon:child("myBox"):registerEvent("onAnimationStart", function(self, target, animating)
