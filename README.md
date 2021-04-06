@@ -21,6 +21,7 @@ local Neon = require("neon")
 local myBox = Neon:add("box", "myBox"):setData({x = 20, y = 30, w = 10, h = 10})
 local newBox = Neon:duplicate(myBox)
 ```
+`boolean use255`
 ##### :setUse255(use255)
 > Tell the GUI whether you are using a 255 color scheme. It will automatically divide your colors for you.
 ```lua
@@ -28,6 +29,7 @@ local Neon = require("neon")
 Neon:setUse255(true) -- works like love.graphics.setColor(love.math.colorFromBytes(180, 120, 190, 255))
 Neon:setUse255(false) -- works like love.graphics.setColor(.6, .4, .7, 1)
 ```
+`table object, table color, number speed`
 ##### :animateToColor(object, color, speed)
 > Animate an object through the GUI parent, to a specified color, at an optional speed. Speed defaults to `2`
 ```lua
@@ -35,6 +37,7 @@ local Neon = require("neon")
 Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
 Neon:animateToColor(Neon:child("myBox"), {1,1,1,1}, 5)
 ```
+`table object, table color, number speed`
 ##### :animateBorderToColor(object, color, speed)
 > Animate an object through the GUI parent, to a specified border color, at an optional speed. Speed defaults to `2`
 ```lua
@@ -42,6 +45,7 @@ local Neon = require("neon")
 Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}, borderColor = {.5,1,1,1}})
 Neon:animateBorderToColor(Neon:child("myBox"), {1,1,1,1}, 5)
 ```
+`table object, table position, number speed`
 ##### :animateToPosition(object, position, speed)
 > Animate an object through the GUI parent, to a specified position, at an optional speed. Speed defaults to `2`
 ```lua
@@ -49,6 +53,7 @@ local Neon = require("neon")
 Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
 Neon:animateToPosition(Neon:child("myBox"), 20, 20, 5)
 ```
+`table object, number opacity, number speed`
 ##### :animateBorderToOpacity(object, opacity, speed)
 > Animate an object through the GUI parent, to a specified border color, at an optional speed. Speed defaults to `2`
 ```lua
@@ -56,13 +61,15 @@ local Neon = require("neon")
 Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}, borderColor = {.5,1,1,1}})
 Neon:animateBorderToOpacity(Neon:child("myBox"), .2, 5)
 ```
-##### :animateToOpacity(object, color, speed)
+`table object, number opacity, number speed`
+##### :animateToOpacity(object, opacity, speed)
 > Animate an object through the GUI parent, to a specified opacity, at an optional speed. Speed defaults to `1`
 ```lua
 local Neon = require("neon")
 Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
 Neon:animateToOpacity(Neon:child("myBox"), .2, 5)
 ```
+`boolean canUpdate`
 ##### :canUpdate(canUpdate)
 > Returns whether GUI can update if canUpdate is not supplied
 > Set whether a GUI can update if canUpdate is supplied
@@ -75,6 +82,7 @@ function love.mousepressed()
 	end
 end
 ```
+`table color, string name`
 ##### :addColor(color, name)
 > Add a color to the global GUI interface with the given name. Call with `Neon.color("name")`
 ```lua
@@ -83,7 +91,8 @@ Neon:addColor({1,1,1,1}, opaqueWhite)
 Neon:addColor({1,1,1,.5}, transparentWhite)
 Neon:addColor({1,1,1,.25}, seeThroughWhite)
 ```
-##### :add(type, name)
+`string type, string name, boolean button, function func, var target`
+##### :add(type, name, button, func, target)
 > Add an element of the given type to the GUI interface with the given name. Call with `Neon:child("name")`
 ```lua
 local Neon = require("neon")
@@ -91,7 +100,8 @@ Neon:add("box", "myBox")
 -- or
 local myBox = Neon:add("box", "myBox")
 ```
-##### :addBox(name, button, function, target)
+`string name, boolean button, function func, var target`
+##### :addBox(name, button, func, target)
 > Add a box element to the GUI interface.
 > If button is set as true, define box as a button, with a default onClick function and target
 ```lua
@@ -103,36 +113,42 @@ Neon:addBox("myButton", true, function(self, target, event)
 	print(self.button) -- true
 end)
 ```
+`string name`
 ##### :addText(name)
 > Add a text element to the GUI interface.
 ```lua
 local Neon = require("neon")
 Neon:addText("myText")
 ```
+`string name`
 ##### :addCheckbox(name)
 > Add a checkbox element to the GUI interface.
 ```lua
 local Neon = require("neon")
 Neon:addCheckbox("myCheckbox")
 ```
+`string name`
 ##### :addDropdown(name)
 > Add a dropdown element to the GUI interface.
 ```lua
 local Neon = require("neon")
 Neon:addDropdown("myDropdown")
 ```
+`string name`
 ##### :addSlider(name)
 > Add a slider element to the GUI interface.
 ```lua
 local Neon = require("neon")
 Neon:addSlider("mySlider")
 ```
+`string name`
 ##### :addRadial(name)
 > Add a radial element to the GUI interface.
 ```lua
 local Neon = require("neon")
 Neon:addRadial("myRadial")
 ```
+`string name`
 ##### :addTextfield(name)
 > Add a textfield element to the GUI interface.
 ```lua
@@ -179,6 +195,7 @@ function love.draw()
 	Neon:drawAll()
 end
 ```
+`string name, boolean ignore`
 ##### :child(name, ignore)
 > Get a child element from a GUI parent if it's active.
 > Will get child even if parent isn't active, if ignore is true.
@@ -187,6 +204,7 @@ local Neon = require("neon")
 Neon:addBox("myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
 local box = Neon:child("myBox")
 ```
+`string type, boolean ignore`
 ##### :children(type, ignore)
 > Get all children from an element if the GUI parent is active.
 > Will get all children even if parent isn't active, if ignore is true.
@@ -222,6 +240,7 @@ function love.keypressed(key)
 	if key == "e" then Neon:enableAll() end
 end
 ```
+`boolean only`
 ##### :enableAllElements(only)
 > Fully enable every element, if only is true then it will only enable in the specific GUI.
 ```lua
@@ -237,6 +256,7 @@ function love.keypressed(key)
 	if key == "d" then Neon2:enableAllElements(true) end
 end
 ```
+`boolean only`
 ##### :disableAllElements(only)
 > Fully disable every element, if only is true then it will only disable in the specific GUI.
 ```lua
@@ -252,6 +272,7 @@ function love.keypressed(key)
 	if key == "d" then Neon2:disableAllElements(true) end
 end
 ```
+`string eventType, table object, function func, var target, string eventName`
 ##### :registerEvent(eventType, object, func, target, eventName)
 > Specify an callback to trigger on a specific event, on a specific target.<br>
 > `eventType` will be such as `"onClick"` or `"onHoverEnter"`.<br>
@@ -267,6 +288,7 @@ Neon:registerEvent("onClick", Neon:child("myBox"), function(self)
 	print(self.name, target)
 end, x, "myBoxClickEvent") 
 ```
+`string eventType, table object, string eventName`
 ##### :removeEvent(eventType, object, eventName)
 > Remove an event from an object.
 ```lua
@@ -278,6 +300,7 @@ Neon:registerEvent("onClick", Neon:child("myBox"), function(self)
 	Neon:removeEvent("onClick", self, "myBoxClickEvent")
 end, x, "myBoxClickEvent") 
 ```
+`string eventType, string objectType, function func, var target, string eventName`
 ##### :registerGlobalEvent(eventType, objectType, func, target, eventName)
 > Specify an callback to trigger on a specific event, on a specific target objectType.<br>
 > Any element that is defined by the same objectType, will trigger the callback when the event happens.<br>
@@ -298,6 +321,7 @@ Neon:registerGlobalEvent("onClick", "box", function(self)
 	print(self.name, target)
 end, x, "boxClickEvent") 
 ```
+`string eventType, string objectType, string eventName`
 ##### :removeGlobalEvent(eventType, objectType, eventName)
 > Remove an event from the global callback system.
 ```lua
@@ -311,6 +335,7 @@ Neon:registerGlobalEvent("onClick", "box", function(self)
 	Neon:removeGlobalEvent("onClick", "box", "boxClickEvent")
 end, x, "boxClickEvent") 
 ```
+`number z`
 ##### :setZ(z)
 > Set the parent Z index of the GUI. GUI's are sorted by their Z before draw.
 ```lua
