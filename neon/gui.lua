@@ -258,13 +258,23 @@ function gui:addColor(c, n)
 	return self
 end
 
-function gui:add(t, n)
+function gui:add(t, n, b, f, tar)
 	assert(t, "FAILURE: gui:addBox() :: Missing param[type]")
 	assert(type(t) == "string", "FAILURE: gui:addBox() :: Incorrect param[type] - expecting string and got " .. type(t))
 	assert(n, "FAILURE: gui:addBox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addBox() :: Incorrect param[name] - expecting string and got " .. type(n))
 	local id = #self.items + 1
+	local button = false
+	if t == "button" then
+		t = "box"
+		button = true
+	end
 	self.items[id] = self.handles[t]:new(n, id, self)
+	if button then
+		assert(f, "FAILURE: gui:addBox() :: Missing param[function]")
+		assert(type(f) == "function", "FAILURE: gui:addBox() :: Incorrect param[function] - expecting function and got " .. type(f))
+		self.items[id]:registerEvent("onClick", f, t).button = true
+	end
 	self.needToSort = true
 	return self.items[id]
 end
@@ -278,7 +288,7 @@ function gui:addBox(n, b, f, t)
 	self.needToSort = true
 	if b then
 		assert(f, "FAILURE: gui:addBox() :: Missing param[function]")
-		assert(type(f) == "string", "FAILURE: gui:addBox() :: Incorrect param[function] - expecting string and got " .. type(f))
+		assert(type(f) == "function", "FAILURE: gui:addBox() :: Incorrect param[function] - expecting function and got " .. type(f))
 		self.items[id]:registerEvent("onClick", f, t).button = true
 	end
 	return self.items[id]
