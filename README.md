@@ -339,5 +339,5 @@ The checkbox is designed to be used for taking user input on choices. A top use 
 Radials are a circular "checkbox" design. These never have more than one option selected at a time. These are often used for toggles. |  Sliders are most often used for setting volumes, but they can be used for many things, including scaling and color changes.
 
 [Textfields](https://github.com/czgaming94/neon/blob/main/docs/Textfield.md)
-:-:
+:--
 Textfields are as they sound. A field that text can be put. Either you the dev, can put the text that will be there in, or, you can allow the user to type into it. To disable user typing, add `useable = false` to the `setData` function, or use `:useable(false)` on the textfield object.
