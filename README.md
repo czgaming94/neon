@@ -1,10 +1,10 @@
 # NEON [Newbie, Experienced, or Neither]
 This API's goal is to make laying out your application GUI simple and efficient. The secondary goal of this API 
 is to be as easy to grasp as possible for even the mediocre Lua user, as well as users coming from other scripting languages.<br>
-#### [If you aren't quite understanding how to start using the API, check out this quick starters guide!](https://github.com/czgaming94/neon/blob/main/docs/examples/StartGuide.md)
+> ###### [If you aren't quite understanding how to start using the API, check out this quick starters guide!](https://github.com/czgaming94/neon/blob/main/docs/examples/StartGuide.md)
 
 ### GUI Handles
-The GUI lib brings a few handles and callbacks that allow the user to have full control.
+The GUI lib brings a few handles and callbacks that allow the user to have full control.<br>
 ##### :new(item)
 `var item`
 > Create a new instance of the GUI. This is used for when you do not want every element in one GUI.

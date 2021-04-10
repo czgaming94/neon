@@ -33,7 +33,7 @@ local function new(t, p)
 	t.events = {}
 	t.noiseX = false
 	t.noiseY = false
-	t.noiseStrength = 4
+	t.noiseStrength = 0
 	t.inAnimation = false
 	t.runAnimations = false
 	t.animateColor = false
