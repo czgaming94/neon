@@ -37,9 +37,9 @@ Neon:setUse255(true) -- works like love.graphics.setColor(love.math.colorFromByt
 Neon:setUse255(false) -- works like love.graphics.setColor(.6, .4, .7, 1)
 ```
 
-#### :animateToColor(object, color, speed)
-`table object, table color, number speed`
-> Animate an object through the GUI parent, to a specified color, at an optional speed. Speed defaults to `2`
+#### :animateToColor(element, color, speed)
+`table element, table color, number speed`
+> Animate an element through the GUI parent, to a specified color, at an optional speed. Speed defaults to `2`
 
 ```lua
 local Neon = require("neon")
@@ -47,9 +47,9 @@ Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,
 Neon:animateToColor(Neon:child("myBox"), {1,1,1,1}, 5)
 ```
 
-#### :animateBorderToColor(object, color, speed)
-`table object, table color, number speed`
-> Animate an object through the GUI parent, to a specified border color, at an optional speed. Speed defaults to `2`
+#### :animateBorderToColor(element, color, speed)
+`table element, table color, number speed`
+> Animate an element through the GUI parent, to a specified border color, at an optional speed. Speed defaults to `2`
 
 ```lua
 local Neon = require("neon")
@@ -57,17 +57,17 @@ Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,
 Neon:animateBorderToColor(Neon:child("myBox"), {1,1,1,1}, 5)
 ```
 
-#### :animateToPosition(object, position, speed)
-`table object, table position, number speed`
-> Animate an object through the GUI parent, to a specified position, at an optional speed. Speed defaults to `2`
+#### :animateToPosition(element, position, speed)
+`table element, table position, number speed`
+> Animate an element through the GUI parent, to a specified position, at an optional speed. Speed defaults to `2`
 ```lua
 local Neon = require("neon")
 Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,1,1}})
 Neon:animateToPosition(Neon:child("myBox"), 20, 20, 5)
 ```
-#### :animateBorderToOpacity(object, opacity, speed)
-`table object, number opacity, number speed`
-> Animate an object through the GUI parent, to a specified border color, at an optional speed. Speed defaults to `2`
+#### :animateBorderToOpacity(element, opacity, speed)
+`table element, number opacity, number speed`
+> Animate an element through the GUI parent, to a specified border color, at an optional speed. Speed defaults to `2`
 
 ```lua
 local Neon = require("neon")
@@ -75,9 +75,9 @@ Neon:add("box", "myBox"):setData({x = 10, y = 10, w = 50, h = 50, color = {1,.5,
 Neon:animateBorderToOpacity(Neon:child("myBox"), .2, 5)
 ```
 
-#### :animateToOpacity(object, opacity, speed)
-`table object, number opacity, number speed`
-> Animate an object through the GUI parent, to a specified opacity, at an optional speed. Speed defaults to `1`
+#### :animateToOpacity(element, opacity, speed)
+`table element, number opacity, number speed`
+> Animate an element through the GUI parent, to a specified opacity, at an optional speed. Speed defaults to `1`
 
 ```lua
 local Neon = require("neon")
@@ -263,7 +263,7 @@ local boxes = Neon:childred("box")
 ```
 
 #### :getHeld()
-> Returns a table of items that are held by the mouse. Only works with `moveable = true` on the object.
+> Returns a table of items that are held by the mouse. Only works with `moveable = true` on the element.
 
 ```lua
 local Neon = require("neon")
@@ -327,11 +327,11 @@ function love.keypressed(key)
 end
 ```
 
-#### :registerEvent(eventType, object, func, target, eventName)
-`string eventType, table object, function func, var target, string eventName`
+#### :registerEvent(eventType, element, func, target, eventName)
+`string eventType, table element, function func, var target, string eventName`
 > Specify an callback to trigger on a specific event, on a specific target.<br>
 > `eventType` will be such as `"onClick"` or `"onHoverEnter"`.<br>
-> `object` is the element that the callback will happen on.<br>
+> `element` is the element that the callback will happen on.<br>
 > `func` is the function defined by the user that will happen when the callback is triggered.<br>
 > `target` is the arg sent to the callback as `target` to be used as the user wants.<br>
 > `eventName` allows the user to name a specific event, such as an `"onClick"` having a `"quitGame"` tag.
@@ -345,9 +345,9 @@ Neon:registerEvent("onClick", Neon:child("myBox"), function(self)
 end, x, "myBoxClickEvent") 
 ```
 
-#### :removeEvent(eventType, object, eventName)
-`string eventType, table object, string eventName`
-> Remove an event from an object.
+#### :removeEvent(eventType, element, eventName)
+`string eventType, table element, string eventName`
+> Remove an event from an element.
 
 ```lua
 local Neon = require("neon")
@@ -359,14 +359,14 @@ Neon:registerEvent("onClick", Neon:child("myBox"), function(self)
 end, x, "myBoxClickEvent") 
 ```
 
-#### :registerGlobalEvent(eventType, objectType, func, target, eventName)
-`string eventType, string objectType, function func, var target, string eventName`
-> Specify an callback to trigger on a specific event, on a specific target objectType.<br>
-> Any element that is defined by the same objectType, will trigger the callback when the event happens.<br>
+#### :registerGlobalEvent(eventType, elementType, func, target, eventName)
+`string eventType, string elementType, function func, var target, string eventName`
+> Specify an callback to trigger on a specific event, on a specific target elementType.<br>
+> Any element that is defined by the same elementType, will trigger the callback when the event happens.<br>
 > This is especially useful for creating multiple boxes, buttons, or texts that should all do the same thing when<br>
 > the user interacts with them.<br>
 > `eventType` will be such as `"onClick"` or `"onHoverEnter"`.<br>
-> `objectType` is the type of element that the callback will happen on, such as `"box"`.<br>
+> `elementType` is the type of element that the callback will happen on, such as `"box"`.<br>
 > `func` is the function defined by the user that will happen when the callback is triggered.<br>
 > `target` is the arg sent to the callback as `target` to be used as the user wants.<br>
 > `eventName` allows the user to name a specific event, such as an `"onClick"` having a `"quitGame"` tag.
@@ -382,8 +382,8 @@ Neon:registerGlobalEvent("onClick", "box", function(self)
 end, x, "boxClickEvent") 
 ```
 
-#### :removeGlobalEvent(eventType, objectType, eventName)
-`string eventType, string objectType, string eventName`
+#### :removeGlobalEvent(eventType, elementType, eventName)
+`string eventType, string elementType, string eventName`
 > Remove an event from the global callback system.
 
 ```lua
@@ -424,7 +424,7 @@ Each element shares most methods, but each one has individual methods that are s
 ## Element Types
 [Boxes](https://github.com/czgaming94/neon/blob/main/docs/Box.md) | [Text](https://github.com/czgaming94/neon/blob/main/docs/Text.md) 
 :--|:--
-The goal of the box object is for backgrounds, buttons, and HUD containers. This is the most commonly used type of object in a GUI. | The text object has a few abilities. It can be treated as regular static text, or it can be treated as a typewriter, and given syntax coding to morph and affect how the text is displayed. 
+The goal of the box element is for backgrounds, buttons, and HUD containers. This is the most commonly used type of element in a GUI. | The text element has a few abilities. It can be treated as regular static text, or it can be treated as a typewriter, and given syntax coding to morph and affect how the text is displayed. 
 [Checkboxes](https://github.com/czgaming94/neon/blob/main/docs/Checkbox.md) | [Dropdowns](https://github.com/czgaming94/neon/blob/main/docs/Dropdown.md) 
 The checkbox is designed to be used for taking user input on choices. A top use for the checkbox is for Poll option selection. Checkboxes can accept multiple selections, or be limited to a single selection. | The dropdown is just as it sounds; A menu of options that drops down when clicked on. This is commonly used for toggling between user input options, form submissions, etc.
 [Radials](https://github.com/czgaming94/neon/blob/main/docs/Radial.md) | [Sliders](https://github.com/czgaming94/neon/blob/main/docs/Slider.md) 
@@ -432,4 +432,4 @@ Radials are a circular "checkbox" design. These never have more than one option 
 
 [Textfields](https://github.com/czgaming94/neon/blob/main/docs/Textfield.md)
 :--
-Textfields are as they sound. A field that text can be put. Either you the dev, can put the text that will be there in, or, you can allow the user to type into it. To disable user typing, add `useable = false` to the `setData` function, or use `:useable(false)` on the textfield object.
+Textfields are as they sound. A field that text can be put. Either you the dev, can put the text that will be there in, or, you can allow the user to type into it. To disable user typing, add `useable = false` to the `setData` function, or use `:useable(false)` on the textfield element.
