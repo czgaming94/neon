@@ -24,28 +24,18 @@ Neon:child("myBox"):addImage(background, "background", true)
 > Returns a table of the current element border color.
 #### :setData(table data)
 There are several options you can set in the `setData` function. Here is a list that will work on any element:
-var type | var name | var default
-:--|:--|:--
-boolean | border | `false`
-table | borderColor | `{1,1,1,1}`
-table | color | `{1,1,1,1}`
-boolean | clickable | `false`
-boolean | moveable | `false`
-boolean | noiseX | `false`
-boolean | noiseY | `false`
-number | noiseStrength | `0`
-number | height / h | `0`
-number | opacity | `1`
-table | padding | `{0,0,0,0}`
-number | paddingLeft | `0`
-number | paddingRight | `0`
-number | paddingTop | `0`
-number | paddingBottom | `0`
-boolean | useBorder | `false`
-number | width / w | `0`
-number | x | `0`
-number | y | `0`
-number | z | `0`
+var type | var name | var default | var type | var name | var default
+:--|:--|:--|:--|:--|:--
+boolean | border | `false` | table | borderColor | `{1,1,1,1}`
+table | color | `{1,1,1,1}` | boolean | clickable | `false`
+boolean | moveable | `false` | boolean | noiseX | `false`
+boolean | noiseY | `false` | number | noiseStrength | `0`
+number | height / h | `0` | number | opacity | `1`
+table | padding | `{0,0,0,0}` | number | paddingLeft | `0`
+number | paddingRight | `0` | number | paddingTop | `0`
+number | paddingBottom | `0` | boolean | useBorder | `false`
+number | width / w | `0` | number | x | `0`
+number | y | `0` | number | z | `0`
 
 And here is a list that will also work for the box elements:
 var type | var name | var default
