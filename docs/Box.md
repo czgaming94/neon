@@ -70,3 +70,27 @@ These functions are used for animating, enabling, and disabling elements.<br>
 > Animate the current element to a new border color, at the provided speed, or at 2s without a speed given.
 #### :animateBorderToOpacity(number opacity, number speed)
 > Animate the current element to a new opacity, at the provided speed, or at 2s without a speed given.
+#### :setImage(userdata/string image)
+> Set the displayed image of the box to the given userdata/stored data of given name.
+#### :getImage()
+> Get an instance of the currently displayed image of the box.
+#### :unsetImage()
+> Remove amy instanced image from the boxes display.
+#### :setImageOffset(table offset)
+> Set the offset of the image to the given coordinate differential. {10,10} would move image 10px right 10px down.
+#### :getImageOffset()
+> Get the current offset of the boxes displayed image.
+#### :setPadding(table padding)
+> Set the full padding pattern for the box. {top,right,bottom,left}
+#### :setPaddingBottom(number padding)
+> Set the bottom padding to the specified number.
+#### :setPaddingLeft(number padding)
+> Set the left padding to the specified number.
+#### :setPaddingRight(number padding)
+> Set the right padding to the specified number.
+#### :setPaddingTop(number padding)
+> Set the top padding to the specified number.
+#### :setRounded(boolean round)
+> Set whether the box should be rounded at the corners.
+#### :isRounded()
+> Get whether the box is rounded at the corners or not.

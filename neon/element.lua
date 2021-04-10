@@ -800,6 +800,17 @@ local function new(t, p)
 		return self
 	end
 
+	function t:setUseBorder(uB)
+		assert(uB ~= nil, "[" .. self.name .. "] FAILURE: " .. self.type .. ":setUseBorder() :: Missing param[useBorder]")
+		assert(type(uB) == "boolean", "[" .. self.name .. "] FAILURE: " .. self.type .. ":setUseBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(uB))
+		self.border = uB
+		return self
+	end
+
+	function t:getUseBorder()
+		return self.border
+	end
+
 	function t:setWidth(w)
 		assert(w, "[" .. self.name .. "] FAILURE: " .. self.type .. ":setWidth() :: Missing param[width]")
 		assert(type(w) == "number", "[" .. self.name .. "] FAILURE: " .. self.type .. ":setWidth() :: Incorrect param[width] - expecting number and got " .. type(w))

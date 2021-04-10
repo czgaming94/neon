@@ -242,15 +242,4 @@ function box:isRounded()
 	return self.round
 end
 
-function box:setUseBorder(uB)
-	assert(uB ~= nil, "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Missing param[useBorder]")
-	assert(type(uB) == "boolean", "[" .. self.name .. "] FAILURE: box:setUseBorder() :: Incorrect param[useBorder] - expecting boolean and got " .. type(uB))
-	self.border = uB
-	return self
-end
-
-function box:getUseBorder()
-	return self.border
-end
-
 return setmetatable(box, box)
