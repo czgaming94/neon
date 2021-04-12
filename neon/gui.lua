@@ -107,12 +107,12 @@ function gui:duplicate(i)
 	assert(i, "FAILURE: gui:duplicate() :: Missing param[item]")
 	assert(type(i) == "number" or type(i) == "string", "FAILURE: gui:duplicate() :: Incorrect param[item] - expecting boolean and got " .. type(i))
 	if type(i) == "string" then
-		return self:child(i)
+		return self:copy(self:child(i))
 	else
 		for _,v in ipairs(items) do
-			for k,t in ipairs(v.items) do
+			for k,t in self:sort(v.items) do
 				if t.id == i then
-					return t
+					return self:copy(v[k])
 				end
 			end
 		end
@@ -263,102 +263,94 @@ function gui:add(t, n, b, f, tar)
 	assert(type(t) == "string", "FAILURE: gui:addBox() :: Incorrect param[type] - expecting string and got " .. type(t))
 	assert(n, "FAILURE: gui:addBox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addBox() :: Incorrect param[name] - expecting string and got " .. type(n))
-	local id = #self.items + 1
 	local button = false
 	if t == "button" then
 		t = "box"
 		button = true
 	end
-	self.items[id] = self.handles[t]:new(n, id, self)
+	self.items[n] = self.handles[t]:new(n, #self.items + 1, self)
 	if button then
 		assert(f, "FAILURE: gui:addBox() :: Missing param[function]")
 		assert(type(f) == "function", "FAILURE: gui:addBox() :: Incorrect param[function] - expecting function and got " .. type(f))
-		self.items[id]:registerEvent("onClick", f, t).button = true
+		self.items[n]:registerEvent("onClick", f, tar).button = true
 	end
 	self.needToSort = true
-	return self.items[id]
+	return self.items[n]
 end
 
 function gui:addBox(n, b, f, t)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addBox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addBox() :: Incorrect param[name] - expecting string and got " .. type(n))
-	local id = #self.items + 1
-	self.items[id] = self.handles.box:new(n, id, self)
+	self.items[n] = self.handles.box:new(n, #self.items + 1, self)
 	self.needToSort = true
 	if b then
 		assert(f, "FAILURE: gui:addBox() :: Missing param[function]")
-		assert(type(f) == "function", "FAILURE: gui:addBox() :: Incorrect param[function] - expecting function and got " .. type(f))
-		self.items[id]:registerEvent("onClick", f, t).button = true
+		assert(type(f) == "string", "FAILURE: gui:addBox() :: Incorrect param[function] - expecting string and got " .. type(f))
+		self.items[n]:registerEvent("onClick", f, t)
 	end
-	return self.items[id]
+	return self.items[n]
 end
 
 function gui:addCheckbox(n)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addCheckbox() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addCheckbox() :: Incorrect param[name] - expecting string and got " .. type(n))
-	local id = #self.items + 1
-	self.items[id] = self.handles.checkbox:new(n, id, self)
+	self.items[n] = self.handles.checkbox:new(n, #self.items + 1, self)
 	self.needToSort = true
-	return self.items[id]
+	return self.items[n]
 end
 
 function gui:addDropdown(n)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addDropdown() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addDropdown() :: Incorrect param[name] - expecting string and got " .. type(n))
-	local id = #self.items + 1
-	self.items[id] = self.handles.dropdown:new(n, id, self)
+	self.items[n] = self.handles.dropdown:new(n, #self.items + 1, self)
 	self.needToSort = true
-	return self.items[id]
+	return self.items[n]
 end
 
 function gui:addTextfield(n)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addTextfield() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addTextfield() :: Incorrect param[name] - expecting string and got " .. type(n))
-	local id = #self.items + 1
-	self.items[id] = self.handles.textfield:new(n, id, self)
+	self.items[n] = self.handles.textfield:new(n, #self.items + 1, self)
 	self.needToSort = true
-	return self.items[id]
-end
-
-function gui:addRadial(n)
-	if not self.enabled then return false end
-	assert(n, "FAILURE: gui:addRadial() :: Missing param[name]")
-	assert(type(n) == "string", "FAILURE: gui:addRadial() :: Incorrect param[name] - expecting string and got " .. type(n))
-	local id = #self.items + 1
-	self.items[id] = self.handles.radial:new(n, id, self)
-	self.needToSort = true
-	return self.items[id]
+	return self.items[n]
 end
 
 function gui:addSlider(n)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addSlider() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addSlider() :: Incorrect param[name] - expecting string and got " .. type(n))
-	local id = #self.items + 1
-	self.items[id] = self.handles.slider:new(n, id, self)
+	self.items[n] = self.handles.slider:new(n, #self.items + 1, self)
 	self.needToSort = true
-	return self.items[id]
+	return self.items[n]
+end
+
+function gui:addRadial(n)
+	if not self.enabled then return false end
+	assert(n, "FAILURE: gui:addRadial() :: Missing param[name]")
+	assert(type(n) == "string", "FAILURE: gui:addRadial() :: Incorrect param[name] - expecting string and got " .. type(n))
+	self.items[n] = self.handles.radial:new(n, #self.items + 1, self)
+	self.needToSort = true
+	return self.items[n]
 end
 
 function gui:addText(n)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:addText() :: Missing param[name]")
 	assert(type(n) == "string", "FAILURE: gui:addText() :: Incorrect param[name] - expecting string and got " .. type(n))
-	local id = #self.items + 1
-	self.items[id] = self.handles.text:new(n, id, self)
+	self.items[n] = self.handles.text:new(n, #self.items + 1, self)
 	self.needToSort = true
-	return self.items[id]
+	return self.items[n]
 end
 
 function gui:update(dt)
 	if not self.enabled then return false end
 	for _,v in ipairs(items) do 
 		if v.enabled and v.allowUpdate then
-			for _,i in ipairs(v.items) do 
+			for _,i in self:sort(v.items) do 
 				if not i.hidden then 
 					local x,y = lm.getPosition()
 					local hover = (x >= i.pos.x + i.paddingLeft and x <= i.pos.x + i.w + i.paddingRight) and (y >= i.pos.y + i.paddingTop and y <= i.pos.y + i.h + i.paddingBottom)
@@ -694,7 +686,7 @@ function gui:update(dt)
 					end
 					-- SLIDER UPDATE
 					if i:is("slider") then
-						if (x >= i.sX - (i.h / 4) and x <= i.sX + (i.h / 2)) and (y >= i.sY and y <= i.sY + i.h) or i.sliderHeld then
+						if (x >= i.sX - (i.h / 2) and x <= i.sX + (i.h / 2)) and (y >= i.sY and y <= i.sY + i.h) or i.sliderHeld then
 							if not i.sliderHovered then i.sliderHovered = true end
 							if lm.isDown(1) then
 								if not i.sliderHeld then 
@@ -842,7 +834,7 @@ function gui:disable(kill, keep)
 	if kill ~= nil then kill = kill else kill = true end
 	if keep ~= nil then keep = keep else keep = false end
 	if kill then
-		for _,i in ipairs(self.items) do
+		for _,i in self:sort(self.items) do
 			i.hovered = false
 			i.active = false
 			i.clicked = false
@@ -907,7 +899,7 @@ function gui:draw()
 		end)
 		self.needToSort = false
 	end
-	for _,i in ipairs(self.items) do
+	for _,i in self:sort(self.items) do
 		lg.push("all")
 		if not i.hidden then
 			lg.setColor(1,1,1,1)
@@ -1337,14 +1329,17 @@ function gui:child(n, i)
 	if not self.enabled then return false end
 	assert(n, "FAILURE: gui:child() :: Missing param[name]")
 	assert(type(n) == "string" or type(n) == "number", "FAILURE: gui:child() :: Incorrect param[name] - expecting string and got " .. type(n))
-	for _,g in ipairs(items) do
-		if g.enabled or i then
-			for _,v in ipairs(g.items) do
-				if type(n) == "string" then
-					if v.name == n then return v end
-				else
-					if v.id == n then return v end
-				end
+	if type(n) == "string" then
+		if self.items[n] then return self.items[n] end
+		if i then
+			for _,v in ipairs(items) do
+				if v[n] then return v[n] end
+			end
+		end
+	else
+		for i,v in ipairs(items) do
+			for k,e in self:sort(v.items) do
+				if e.id == n then return items[i][k] end
 			end
 		end
 	end
@@ -1357,7 +1352,7 @@ function gui:children(t, i)
 	if t then
 		for _,g in ipairs(items) do
 			if g.enabled or i then
-				for _,v in ipairs(g.items) do
+				for _,v in self:sort(g.items) do
 					if v.type == t then
 						children[v.name] = v
 					end
@@ -1365,7 +1360,7 @@ function gui:children(t, i)
 			end
 		end
 	else
-		children = self.items
+		return self.items
 	end
 	return children
 end
@@ -1378,7 +1373,7 @@ end
 function gui:enableAll()
 	for _,v in ipairs(items) do
 		if not v.enabled then v.enabled = true end
-		for _,i in ipairs(v.items) do
+		for _,i in self:sort(v.items) do
 			if i.hidden then i.hidden = false end
 		end
 	end
@@ -1387,12 +1382,12 @@ end
 
 function gui:enableAllElements(only)
 	if only then
-		for _,v in ipairs(self.items) do
+		for _,v in self:sort(self.items) do
 			if v.hidden then v.hidden = false end
 		end
 	else
 		for _,v in ipairs(items) do
-			for _,i in ipairs(v.items) do
+			for _,i in self:sort(v.items) do
 				if not i.hidden then i.hidden = false end
 			end
 		end
@@ -1407,7 +1402,7 @@ function gui:disableAllElements(only)
 		end
 	else
 		for _,v in ipairs(items) do
-			for _,i in ipairs(v.items) do
+			for _,i in self:sort(v.items) do
 				if not i.hidden then i.hidden = true end
 			end
 		end
@@ -1473,7 +1468,7 @@ function gui:keypressed(key, scan, isRepeat)
 	local event = {key=key, scancode=scan, isRepeat=isRepeat}
 	for _,v in ipairs(items) do
 		if v.enabled then
-			for _,i in ipairs(v.items) do
+			for _,i in self:sort(v.items) do
 				if i.keypressed then i:keypressed(event) end
 				-- BOX KEYPRESS
 				if i:is("box") then
@@ -1611,7 +1606,7 @@ function gui:keyreleased(key, scan)
 	local event = {key=key, scancode=scan}
 	for _,v in ipairs(items) do
 		if v.enabled then
-			for _,i in ipairs(v.items) do
+			for _,i in self:sort(v.items) do
 				if i.keyreleased then i:keyreleased(event) end
 			end
 		end
@@ -1623,7 +1618,7 @@ function gui:mousemoved(x, y, dx, dy, istouch)
 	local event = {x=x, y=y, dx=dx, dy=dy, istouch=istouch}
 	for _,v in ipairs(items) do 
 		if v.enabled then
-			for _,i in ipairs(v.items) do 
+			for _,i in self:sort(v.items) do 
 				if not i.hidden then 
 					if i.mousemoved then i:mousemoved(event) end
 					if i.held then
@@ -1693,7 +1688,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 					return a.pos.z > b.pos.z
 				end
 			end)
-			for _,i in ipairs(o.items) do
+			for _,i in self:sort(o.items) do
 				if self:child(i.name) and not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
 					if i.moveable then
 						i.held = true
@@ -1874,7 +1869,7 @@ function gui:mousereleased(x, y, button, istouch, presses)
 	if not self.enabled then return false end
 	for _,v in ipairs(items) do
 		if v.enabled then
-			for _,i in ipairs(v.items) do
+			for _,i in self:sort(v.items) do
 				if i.held then 
 					i.held = false
 					for k,h in ipairs(self.held) do
@@ -1892,7 +1887,7 @@ function gui:touchmoved(id, x, y, dx, dy, pressure)
 	if not self.enabled then return false end
 	for _,v in ipairs(items) do 
 		if v.enabled then
-			for _,i in ipairs(v.items) do 
+			for _,i in self:sort(v.items) do 
 				if not i.hidden then 
 					if i.touchmoved then i:touchmoved({id, x, y, dx, dy, pressure}) end
 				end
@@ -1939,7 +1934,7 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 					return a.pos.z > b.pos.z
 				end
 			end)
-			for _,v in ipairs(o.items) do
+			for _,v in self:sort(o.items) do
 				if not hitTarget and v.hovered and v.clickable and not v.hidden and not v.faded then
 					if v.moveable then
 						v.held = true
@@ -2113,7 +2108,7 @@ function gui:hardRemove(n)
 	assert(type(n) == "string" or type(n) == "number", "FAILURE: gui:hardRemove() :: Incorrect param[name] - expecting string or number and got " .. type(n))
 	
 	for _,v in ipairs(items) do
-		for k,e in ipairs(v.items) do
+		for k,e in self:sort(v.items) do
 			if type(n) == "number" then
 				if e.id == n then
 					e = nil 
@@ -2139,14 +2134,14 @@ function gui:remove(n)
 	end
 
 	if type(n) == "string" then
-		for k,t in ipairs(self.items) do
-			if t.name == n then 
+		self.items[n] = nil
+	else
+		for k,t in self:sort(self.items) do
+			if t.id == n then 
 				t = nil
 				return self
 			end
 		end
-	else
-		self.items[n] = nil
 	end
 	self.needToSort = true
 	return self
@@ -2167,6 +2162,23 @@ end
 
 function gui:dist(x1,y1,x2,y2)
 	sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
+end
+
+function gui:sort(t)
+	local a = {}
+	for n in pairs(t) do table.insert(a, n) end
+	table.sort(a, f)
+	local i = 0 
+	local iter = function ()
+		i = i + 1
+		
+		if a[i] == nil then 
+			return nil
+		else 
+			return a[i], t[a[i]]
+		end
+	end
+	return iter
 end
 
 return gui
