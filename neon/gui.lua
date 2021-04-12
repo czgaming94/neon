@@ -877,31 +877,26 @@ end
 
 function gui:draw()
 	if not self.enabled then return false end
-	--if self.needToSort then
-		--table.sort(self.items, function(a,b)
-		toDraw = self:sort(self.items, function(a,b)
-			if not a or not b then return false end
-			if a.pos.z == b.pos.z then
-				if a.id == b.id then
-					if a.pos.x == b.pos.x then
-						if a.pos.y == b.pos.y then
-							return false
-						else
-							return a.pos.y > b.pos.y
-						end
+	toDraw = self:sort(self.items, function(a,b)
+		if not a or not b then return false end
+		if a.pos.z == b.pos.z then
+			if a.id == b.id then
+				if a.pos.x == b.pos.x then
+					if a.pos.y == b.pos.y then
+						return false
 					else
-						return a.pos.x < b.pos.x
+						return a.pos.y > b.pos.y
 					end
 				else
-					return a.id > b.id
+					return a.pos.x < b.pos.x
 				end
 			else
-				return a.pos.z < b.pos.z
+				return a.id > b.id
 			end
-		end)
-	--	self.needToSort = false
-	--end
-	--local toDraw = self:sort(self.items)
+		else
+			return a.pos.z < b.pos.z
+		end
+	end)
 	for _,i in toDraw do
 		lg.push("all")
 		if not i.hidden then
@@ -1474,7 +1469,7 @@ function gui:keypressed(key, scan, isRepeat)
 	for _,v in ipairs(items) do
 		if v.enabled then
 			for _,e in self:sort(v.items) do
-				local i = self:item(e.name)
+				local i = self:child(e.name)
 				if i.keypressed then i:keypressed(event) end
 				-- BOX KEYPRESS
 				if i:is("box") then
@@ -1674,27 +1669,23 @@ function gui:mousepressed(x, y, button, istouch, presses)
 	local hitTarget = false
 	for _,o in ipairs(items) do
 		if o.enabled then
-			table.sort(o.items, function(a,b) 
+			local elements = self:sort(o.items, function(a,b) 
 				if not a or not b then return false end
-				if a.pos.z == b.pos.z then
-					if a.id == b.id then
-						if a.pos.x == b.pos.x then
-							if a.pos.y == b.pos.y then
-								return false
-							else
-								return a.pos.y < b.pos.y
-							end
-						else
-							return a.pos.x > b.pos.x
-						end
-					else
-						return a.id < b.id
-					end
-				else
-					return a.pos.z > b.pos.z
+				if a.pos.z ~= b.pos.z then 
+					return a.pos.z > b.pos.z 
 				end
+				if a.id ~= b.id then
+					return a.id < b.id
+				end
+				if a.pos.x ~= b.pos.x then
+					return a.pos.x > b.pos.x
+				end
+				if a.pos.y ~= b.pos.y then
+					return a.pos.y < b.pos.y
+				end
+				return false
 			end)
-			for _,v in self:sort(o.items) do
+			for _,v in elements do
 				local i = self:child(v.name)
 				print(1, v.name)
 				if self:child(v.name) and not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
@@ -1837,26 +1828,6 @@ function gui:mousepressed(x, y, button, istouch, presses)
 					i.active = false
 				end
 			end
-			table.sort(o.items, function(a,b) 
-				if not a or not b then return false end
-				if a.pos.z == b.pos.z then
-					if a.id == b.id then
-						if a.pos.x == b.pos.x then
-							if a.pos.y == b.pos.y then
-								return false
-							else
-								return a.pos.y > b.pos.y
-							end
-						else
-							return a.pos.x < b.pos.x
-						end
-					else
-						return a.id > b.id
-					end
-				else
-					return a.pos.z < b.pos.z
-				end
-			end)
 		end
 	end
 	table.sort(items, function(a,b) 
@@ -1922,7 +1893,7 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 	local hitTarget = false
 	for _,o in ipairs(items) do
 		if o.enabled then
-			table.sort(o.items, function(a,b) 
+			local elements = self:sort(o.items, function(a,b) 
 				if not a or not b then return false end
 				if a.pos.z == b.pos.z then
 					if a.id == b.id then
@@ -1942,7 +1913,7 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 					return a.pos.z > b.pos.z
 				end
 			end)
-			for _,i in self:sort(o.items) do
+			for _,i in elements do
 				local v = self:child(i.name)
 				if not hitTarget and v.hovered and v.clickable and not v.hidden and not v.faded then
 					if v.moveable then
@@ -2075,26 +2046,6 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 					v.active = false
 				end
 			end
-			table.sort(o.items, function(a,b) 
-				if not a or not b then return false end
-				if a.pos.z == b.pos.z then
-					if a.id == b.id then
-						if a.pos.x == b.pos.x then
-							if a.pos.y == b.pos.y then
-								return false
-							else
-								return a.pos.y > b.pos.y
-							end
-						else
-							return a.pos.x < b.pos.x
-						end
-					else
-						return a.id > b.id
-					end
-				else
-					return a.pos.z < b.pos.z
-				end
-			end)
 		end
 	end
 	table.sort(items, function(a,b) 
