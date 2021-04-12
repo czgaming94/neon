@@ -350,7 +350,8 @@ function gui:update(dt)
 	if not self.enabled then return false end
 	for _,v in ipairs(items) do 
 		if v.enabled and v.allowUpdate then
-			for _,i in self:sort(v.items) do 
+			for _,e in self:sort(v.items) do 
+				local i = self:child(e.name)
 				if not i.hidden then 
 					local x,y = lm.getPosition()
 					local hover = (x >= i.pos.x + i.paddingLeft and x <= i.pos.x + i.w + i.paddingRight) and (y >= i.pos.y + i.paddingTop and y <= i.pos.y + i.h + i.paddingBottom)
@@ -686,7 +687,7 @@ function gui:update(dt)
 					end
 					-- SLIDER UPDATE
 					if i:is("slider") then
-						if (x >= i.sX - (i.h / 2) and x <= i.sX + (i.h / 2)) and (y >= i.sY and y <= i.sY + i.h) or i.sliderHeld then
+						if (x >= i.sX - i.h and x <= i.sX + i.h) and (y >= i.sY and y <= i.sY + i.h) or i.sliderHeld then
 							if not i.sliderHovered then i.sliderHovered = true end
 							if lm.isDown(1) then
 								if not i.sliderHeld then 
@@ -876,8 +877,9 @@ end
 
 function gui:draw()
 	if not self.enabled then return false end
-	if self.needToSort then
-		table.sort(self.items, function(a,b)
+	--if self.needToSort then
+		--table.sort(self.items, function(a,b)
+		toDraw = self:sort(self.items, function(a,b)
 			if not a or not b then return false end
 			if a.pos.z == b.pos.z then
 				if a.id == b.id then
@@ -897,9 +899,10 @@ function gui:draw()
 				return a.pos.z < b.pos.z
 			end
 		end)
-		self.needToSort = false
-	end
-	for _,i in self:sort(self.items) do
+	--	self.needToSort = false
+	--end
+	--local toDraw = self:sort(self.items)
+	for _,i in toDraw do
 		lg.push("all")
 		if not i.hidden then
 			lg.setColor(1,1,1,1)
@@ -1331,15 +1334,17 @@ function gui:child(n, i)
 	assert(type(n) == "string" or type(n) == "number", "FAILURE: gui:child() :: Incorrect param[name] - expecting string and got " .. type(n))
 	if type(n) == "string" then
 		if self.items[n] then return self.items[n] end
-		if i then
+		if not i then
 			for _,v in ipairs(items) do
-				if v[n] then return v[n] end
+				if v.items[n] and type(v.items[n]) == "table" then 
+					return v.items[n]
+				end
 			end
 		end
 	else
-		for i,v in ipairs(items) do
-			for k,e in self:sort(v.items) do
-				if e.id == n then return items[i][k] end
+		for k,v in ipairs(items) do
+			for i,e in self:sort(v.items) do
+				if e.id == n then return v.items[e.name] end
 			end
 		end
 	end
@@ -1374,7 +1379,7 @@ function gui:enableAll()
 	for _,v in ipairs(items) do
 		if not v.enabled then v.enabled = true end
 		for _,i in self:sort(v.items) do
-			if i.hidden then i.hidden = false end
+			if self:child(i.name).hidden then self:child(i.name).hidden = false end
 		end
 	end
 	return self
@@ -1388,7 +1393,7 @@ function gui:enableAllElements(only)
 	else
 		for _,v in ipairs(items) do
 			for _,i in self:sort(v.items) do
-				if not i.hidden then i.hidden = false end
+				if not self:child(i.name).hidden then self:child(i.name).hidden = false end
 			end
 		end
 	end
@@ -1403,7 +1408,7 @@ function gui:disableAllElements(only)
 	else
 		for _,v in ipairs(items) do
 			for _,i in self:sort(v.items) do
-				if not i.hidden then i.hidden = true end
+				if not self:child(i.name).hidden then self:child(i.name).hidden = true end
 			end
 		end
 	end
@@ -1468,7 +1473,8 @@ function gui:keypressed(key, scan, isRepeat)
 	local event = {key=key, scancode=scan, isRepeat=isRepeat}
 	for _,v in ipairs(items) do
 		if v.enabled then
-			for _,i in self:sort(v.items) do
+			for _,e in self:sort(v.items) do
+				local i = self:item(e.name)
 				if i.keypressed then i:keypressed(event) end
 				-- BOX KEYPRESS
 				if i:is("box") then
@@ -1688,8 +1694,10 @@ function gui:mousepressed(x, y, button, istouch, presses)
 					return a.pos.z > b.pos.z
 				end
 			end)
-			for _,i in self:sort(o.items) do
-				if self:child(i.name) and not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
+			for _,v in self:sort(o.items) do
+				local i = self:child(v.name)
+				print(1, v.name)
+				if self:child(v.name) and not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
 					if i.moveable then
 						i.held = true
 						local heldID = #self.held + 1
@@ -1934,7 +1942,8 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 					return a.pos.z > b.pos.z
 				end
 			end)
-			for _,v in self:sort(o.items) do
+			for _,i in self:sort(o.items) do
+				local v = self:child(i.name)
 				if not hitTarget and v.hovered and v.clickable and not v.hidden and not v.faded then
 					if v.moveable then
 						v.held = true
@@ -2164,10 +2173,17 @@ function gui:dist(x1,y1,x2,y2)
 	sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
 end
 
-function gui:sort(t)
+function gui:sort(t, f)
 	local a = {}
-	for n in pairs(t) do table.insert(a, n) end
-	table.sort(a, f)
+	local v = {}
+	
+	for k,e in pairs(t) do 
+		table.insert(a, k) 
+		table.insert(v, e)
+	end
+	if f then
+		table.sort(v, f)
+	end
 	local i = 0 
 	local iter = function ()
 		i = i + 1
@@ -2175,7 +2191,7 @@ function gui:sort(t)
 		if a[i] == nil then 
 			return nil
 		else 
-			return a[i], t[a[i]]
+			return a[i], v[i]
 		end
 	end
 	return iter
