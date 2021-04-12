@@ -12,11 +12,11 @@
 			body {
 				background: rgb(162,162,162);
 				background: linear-gradient(143deg, rgba(162,162,162,1) 0%, rgba(218,218,218,1) 100%);
-				background-position: fixed;
+				background-position: static;
 				font-family: Open Sans;
 				font-size: 20px;
 				font-weight: bold;
-				color: #9fdf98;
+				color: #333;
 				min-height: 1080px;
 			}
 			h1 {
@@ -42,13 +42,13 @@
 				height: 100%;
 				border-right: 1px solid #333;
 				padding: 15px;
-				background: rgba(150,150,150,.5)
+				background: rgba(5,5,5,.25)
 			}
 			div#content {
 				margin-left: 211px;
 				border-left: 1px solid #fefefe;
 				width: auto;
-				background: rgba(200,200,200,.5)
+				background: rgba(200,200,200,.75)
 			}
 			div#wrapper {
 				padding: 30px 60px;
@@ -99,7 +99,16 @@
 				text-decoration: none;
 			}
 			.clr {
-				float: unset;
+				clear: both;
+			}
+			div#handles {
+				padding: 30px 70px 30px 30px;
+			}
+			h4 {
+				font-size: 50px;
+				padding: 0 0 10px 0;
+				margin: 0 0 20px 0;
+				border-bottom: 5px dashed #666;
 			}
 		</style>
 		<script type="text/javscript">
