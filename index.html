@@ -20,17 +20,17 @@
 				min-height: 1080px;
 			}
 			h1 {
-				font-size: 60px;
-				padding: 40px 40px 120px 40px;
+				font-size: 100;
+				padding: 40px 40px 70px 40px;
 				background: rgb(231,231,231);
 				background: linear-gradient(180deg, rgba(231,231,231,0.5046219171262255) 0%, rgba(143,143,143,0.499019676229867) 100%);  	 
 				text-shadow: 0 0 10px rgba(0,0,0,.25), 1px 1px rgba(0,0,0,.5);
 				border-bottom: 1px solid #999;
 			}
 			h1 span {
-				font-size: 40px;
+				font-size: 50px;
 				position: relative;
-				top: -7px;
+				top: -18px;
 			}
 			div#body {
 				height: 100%;
@@ -59,7 +59,7 @@
 			}
 			div#buttons  {
 				position: absolute;
-				top: 181px;
+				top: 179px;
 				left: 252px;
 			}
 			div#buttons a {
@@ -235,13 +235,13 @@
 					<div class="method">
 						<h5>:new(item)</h5>
 						<span class="codestrip">var item</span>
-						<p>Create a new instance of the GUI. This is used for when you do not want every element in one GUI.</p>
-						<p>An example of two GUIs would be a <span class="codestrip">mainMenu</span> and <span class="codestrip">pauseMenu</span>
 						<div class="codeblock">
 							<span>local Neon = require("neon")</span>
 							<span>local Game = {}</span>
 							<span>Game.mainMenu = Neon:new()</span>
 						</div>
+						<p>Create a new instance of the GUI. This is used for when you do not want every element in one GUI.</p>
+						<p>An example of two GUIs would be a <span class="codestrip">mainMenu</span> and <span class="codestrip">pauseMenu</span>
 						<p>Can also be used to create a new instance of any table or variable.</p>
 					</div>
 				</div>
