@@ -73,10 +73,11 @@ function gui.color(c)
 	return gui:copy(colors[c])
 end
 
-function gui:new(item)
+function gui:new(item, skip)
 	if not self.enabled then return false end
 	item = item or self
-	local new = self:copy(item, "items")
+	skip = skip or "items"
+	local new = self:copy(item, skip)
 	new.__index = gui
 	setmetatable(new, new)
 	new.id = #items + 1
@@ -110,7 +111,7 @@ function gui:duplicate(i)
 		return self:copy(self:child(i))
 	else
 		for _,v in ipairs(items) do
-			for k,t in self:sort(v.items) do
+			for k,t in pairs(v.items) do
 				if t.id == i then
 					return self:copy(v[k])
 				end
@@ -1687,59 +1688,41 @@ function gui:mousepressed(x, y, button, istouch, presses)
 			end)
 			for _,v in elements do
 				local i = self:child(v.name)
-				print(1, v.name)
-				if self:child(v.name) and not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
-					if i.moveable then
-						i.held = true
-						local heldID = #self.held + 1
-						self.held[heldID] = {id = heldID, obj = i}
-					end
-					if i.mousepressed then i:mousepressed(event) end
-					-- BOX CLICK
-					if i:is("box") then
-					
-					end
-					-- CHECKBOX CLICK
-					if i:is("checkbox") then
-						if button == 1 then
-							local oneIsSelected = false
-							for k,v in ipairs(i.options) do
-								if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
-									if i.single then
-										for _,o in ipairs(i.options) do
-											o.selected = false
-										end
-									end
-									v.selected = not v.selected
-									if i.forceOption then
-										local haveSelected = false
-										for _,o in ipairs(i.options) do
-											if o.selected then 
-												haveSelected = true 
+				if i then
+					if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
+						if i.moveable then
+							i.held = true
+							local heldID = #self.held + 1
+							self.held[heldID] = {id = heldID, obj = i}
+						end
+						if i.mousepressed then i:mousepressed(event) end
+						-- BOX CLICK
+						if i:is("box") then
+						
+						end
+						-- CHECKBOX CLICK
+						if i:is("checkbox") then
+							if button == 1 then
+								local oneIsSelected = false
+								for k,v in ipairs(i.options) do
+									if x >= v.x and x <= v.x + v.w and y >= v.y and y <= v.y + v.h then
+										if i.single then
+											for _,o in ipairs(i.options) do
+												o.selected = false
 											end
 										end
-										if not haveSelected then
-											v.selected = true
+										v.selected = not v.selected
+										if i.forceOption then
+											local haveSelected = false
+											for _,o in ipairs(i.options) do
+												if o.selected then 
+													haveSelected = true 
+												end
+											end
+											if not haveSelected then
+												v.selected = true
+											end
 										end
-									end
-									if i.events.onOptionClick then 
-										for _,e in ipairs(i.events.onOptionClick) do
-											e.fn(i, i.options[k], e.t, event)
-										end
-									end
-								end
-							end
-						end
-					end
-					-- DROPDOWN CLICK
-					if i:is("dropdown") then
-						if button == 1 then
-							if i.open then
-								local hitTarget = false
-								for k,v in ipairs(i.options) do
-									if v.hovered then
-										v.selected = k
-										hitTarget = true
 										if i.events.onOptionClick then 
 											for _,e in ipairs(i.events.onOptionClick) do
 												e.fn(i, i.options[k], e.t, event)
@@ -1747,85 +1730,104 @@ function gui:mousepressed(x, y, button, istouch, presses)
 										end
 									end
 								end
-								if not hitTarget then
-									i.open = false
-								end
-							else
-								i.open = true
 							end
 						end
-					end
-					-- SLIDER CLICK
-					if i:is("slider") then
-					
-					end
-					-- RADIAL CLICK
-					if i:is("radial") then
-						if button == 1 then
-							for k,v in ipairs(i.options) do
-								v.selected = false
-								if v.hovered then
-									v.selected = true
-									if i.events.onOptionClick then 
-										for _,e in ipairs(i.events.onOptionClick) do
-											e.fn(i, i.options[k], e.t, event)
+						-- DROPDOWN CLICK
+						if i:is("dropdown") then
+							if button == 1 then
+								if i.open then
+									local hitTarget = false
+									for k,v in ipairs(i.options) do
+										if v.hovered then
+											v.selected = k
+											hitTarget = true
+											if i.events.onOptionClick then 
+												for _,e in ipairs(i.events.onOptionClick) do
+													e.fn(i, i.options[k], e.t, event)
+												end
+											end
+										end
+									end
+									if not hitTarget then
+										i.open = false
+									end
+								else
+									i.open = true
+								end
+							end
+						end
+						-- SLIDER CLICK
+						if i:is("slider") then
+						
+						end
+						-- RADIAL CLICK
+						if i:is("radial") then
+							if button == 1 then
+								for k,v in ipairs(i.options) do
+									v.selected = false
+									if v.hovered then
+										v.selected = true
+										if i.events.onOptionClick then 
+											for _,e in ipairs(i.events.onOptionClick) do
+												e.fn(i, i.options[k], e.t, event)
+											end
 										end
 									end
 								end
 							end
 						end
-					end
-					-- TEXT CLICK
-					if i:is("text") then
-					
-					end
-					-- TEXTFIELD CLICK
-					if i:is("textfield") then
+						-- TEXT CLICK
+						if i:is("text") then
+						
+						end
+						-- TEXTFIELD CLICK
+						if i:is("textfield") then
+							if button == 1 then
+								if not i.active then
+									i.active = true
+								end
+							end
+						end
+						
 						if button == 1 then
-							if not i.active then
-								i.active = true
-							end
-						end
-					end
-					
-					if button == 1 then
-						if i.events.onClick then 
-							for j,e in ipairs(i.events.onClick) do
-								e.fn(i, e.target, event)
-							end
-						end
-						if events.onClick then
-							for _,e in ipairs(events.onClick) do
-								if i:is(e.o) then
+							if i.events.onClick then 
+								for j,e in ipairs(i.events.onClick) do
 									e.fn(i, e.target, event)
 								end
 							end
-						end
-					else
-						if i.events.onRightClick then 
-							for j,e in ipairs(i.events.onRightClick) do
-								e.fn(i, e.target, event)
+							if events.onClick then
+								for _,e in ipairs(events.onClick) do
+									if i:is(e.o) then
+										e.fn(i, e.target, event)
+									end
+								end
 							end
-						end
-						if events.onRightClick then
-							for _,e in ipairs(events.onRightClick) do
-								if i:is(e.o) then
+						else
+							if i.events.onRightClick then 
+								for j,e in ipairs(i.events.onRightClick) do
 									e.fn(i, e.target, event)
 								end
 							end
+							if events.onRightClick then
+								for _,e in ipairs(events.onRightClick) do
+									if i:is(e.o) then
+										e.fn(i, e.target, event)
+									end
+								end
+							end
 						end
+						if not i.hollow then hitTarget = true end
 					end
-					if not i.hollow then hitTarget = true end
-				end
-				if i.type == "dropdown" and i.open and not i.hovered then
-					local optionHit = false
-					for _,v in ipairs(i.options) do
-						if i.hovered then optionHit = true end
+					if i.type == "dropdown" and i.open and not i.hovered then
+						local optionHit = false
+						for _,v in ipairs(i.options) do
+							if i.hovered then optionHit = true end
+						end
+						if not optionHit then i.open = false end
 					end
-					if not optionHit then i.open = false end
-				end
-				if i.type == "textfield" and i.active and not i.hovered then
-					i.active = false
+					if i.type == "textfield" and i.active and not i.hovered then
+						i.active = false
+					end
 				end
 			end
 		end
