@@ -169,9 +169,20 @@
 			}
 		</style>
 		<script type="text/javscript">
+			function convertToSlug(Text)
+				return Text
+					.toLowerCase()
+					.replace(/ /g,'-')
+					.replace(/[^\w-]+/g,'')
+					;
+			}
 			$(document).ready(function(){
 				$("h4").each(function(){
-					
+					var id = convertToSlug($(this).text())
+					$("#list").append("<ul class='section' id='" + id + "'></ul>")
+					$(".gui").each(function(){ 
+						$("#" + id).append("<li class='item' id='" + convertToSlug($(this + " h5").text()) + "'>" + $(this + " h5").text() + "</li>
+					});
 				});
 			});
 		</script>
@@ -241,7 +252,7 @@
 				<div id="handles">
 					<h4>GUI Handles</h4>
 					<p>The GUI lib brings a few handles and callbacks that allow the user to have full control.</p>
-					<div class="method">
+					<div class="gui method">
 						<h5>:new(item)</h5>
 						<span class="codestrip">var item</span>
 						<div class="codeblock">
