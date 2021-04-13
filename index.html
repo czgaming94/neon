@@ -68,10 +68,11 @@
 				font-size: 30px;
 				color: #d0d0d0;
 				text-decoration: none;
+				border: 1px solid rgba(0,0,0,0);
 			}
 			div#buttons a:hover {
 				background-color: #cecece;
-				padding: 10px 18px;
+				padding: 10px 20px;
 				border: 1px solid #999;
 				color: #fff;
 				text-shadow: -1px -1px 1px rgba(40,40,40,.5);
@@ -141,7 +142,7 @@
 				font-size: .8em;
 			}
 			div.method p {
-				width: 65%;
+				width: 62%;
 				margin: 0 0 20px 0;
 				font-size: 18px;
 				line-height: 1.1em;
@@ -168,7 +169,11 @@
 			}
 		</style>
 		<script type="text/javscript">
-		
+			$(document).ready(function(){
+				$("h4").each(function(){
+					
+				});
+			});
 		</script>
 	</head>
 	<div id="body">
@@ -230,7 +235,7 @@
 				<a href="#">Download ZIP</a><a href="#">View Source On Github</a>
 			</div>
 			<div id="wrapper">
-				<p>This API's goal is to make laying out your application GUI simple and efficient. The secondary goal of this API is to be as easy to grasp as possible for even the mediocre Lua user, as well as users coming from other scripting languages.</p>
+				<p>This API's goal is to make laying out your application GUI simple and efficient. The secondary goal of this API is to be as easy to grasp as possible for even the beginner Lua user, as well as users coming from other scripting languages.</p>
 				<a id="quickstart" href="https://github.com/czgaming94/neon/blob/main/docs/examples/StartGuide.md" title="Quickstart Guide">If you aren't quite understanding how to start using the API, <span>check out this quick starters guide!</span></a>
 				<div class="clr"></div>
 				<div id="handles">
