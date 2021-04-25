@@ -123,4 +123,5 @@ function love.touchmoved(id, x, y, dx, dy, pressure)
 end
 ```
 Once you have run this code, you should get a result like this!<br><br>
-![Example](https://github.com/czgaming94/neon/blob/main/docs/examples/example.png)
+![Example](https://github.com/czgaming94/neon/blob/main/docs/examples/example.png)<br>
+Download this quick start [here](https://github.com/czgaming94/neon/raw/main/docs/examples/StartGuide.rar)
