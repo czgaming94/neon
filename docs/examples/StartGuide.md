@@ -1,14 +1,14 @@
 # Quick Start Guide
 Download this quick start [here](https://github.com/czgaming94/neon/raw/main/docs/examples/StartGuide.rar)<br><br>
+#### conf.lua
 Real quick, let's go ahead and create our configuration file so we can see our results.<br>
-`-- conf.lua`
 ```lua
 function love.conf(t)
 	t.console = true
 end
 ```
+#### main.lua
 Now, the first step to using the GUI is including it into your file.<br>
-`-- main.lua`
 ```lua
 local Neon = require("neon")
 ```
