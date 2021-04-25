@@ -1,5 +1,13 @@
 # Quick Start Guide
-The first step to using the GUI is including it into your file.
+Real quick, let's go ahead and create our configuration file so we can see our results.<br>
+`-- conf.lua`
+```lua
+function love.conf(t)
+	t.console = true
+end
+```
+Now, the first step to using the GUI is including it into your file.<br>
+`-- main.lua`
 ```lua
 local Neon = require("neon")
 ```
