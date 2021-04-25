@@ -109,15 +109,15 @@ function gui:duplicate(i)
 	assert(type(i) == "number" or type(i) == "string", "FAILURE: gui:duplicate() :: Incorrect param[item] - expecting boolean and got " .. type(i))
 	if type(i) == "string" then
 		return self:copy(self:child(i))
-	else
-		for _,v in ipairs(items) do
-			for k,t in pairs(v.items) do
-				if t.id == i then
-					return self:copy(v[k])
-				end
+	end
+	for _,v in ipairs(items) do
+		for k,t in pairs(v.items) do
+			if t.id == i then
+				return self:copy(v[k])
 			end
 		end
 	end
+	return false
 end
 
 function gui:generate(item, copies, skip)
@@ -1330,6 +1330,20 @@ function gui:child(n, i)
 	assert(type(n) == "string" or type(n) == "number", "FAILURE: gui:child() :: Incorrect param[name] - expecting string and got " .. type(n))
 	if type(n) == "string" then
 		if self.items[n] then return self.items[n] end
+	else
+		for k,v in self:sort(self.items) do
+			if e.id == n then return v end
+		end
+	end
+	return nil
+end
+
+function gui:find(n, i)
+	if not self.enabled then return false end
+	assert(n, "FAILURE: gui:child() :: Missing param[name]")
+	assert(type(n) == "string" or type(n) == "number", "FAILURE: gui:child() :: Incorrect param[name] - expecting string and got " .. type(n))
+	if type(n) == "string" then
+		if self.items[n] then return self.items[n] end
 		if not i then
 			for _,v in ipairs(items) do
 				if v.items[n] and type(v.items[n]) == "table" then 
@@ -1667,7 +1681,6 @@ function gui:mousepressed(x, y, button, istouch, presses)
 			return a.z > b.z
 		end
 	end)
-	local hitTarget = false
 	for _,o in ipairs(items) do
 		if o.enabled then
 			local elements = self:sort(o.items, function(a,b) 
@@ -1689,7 +1702,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 			for _,v in elements do
 				local i = self:child(v.name)
 				if i then
-					if not hitTarget and i.hovered and i.clickable and not i.hidden and not i.faded then
+					if i.hovered and i.clickable and not i.hidden and not i.faded then
 						if i.moveable then
 							i.held = true
 							local heldID = #self.held + 1
@@ -1746,6 +1759,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 													e.fn(i, i.options[k], e.t, event)
 												end
 											end
+											break
 										end
 									end
 									if not hitTarget then
@@ -1816,7 +1830,7 @@ function gui:mousepressed(x, y, button, istouch, presses)
 								end
 							end
 						end
-						if not i.hollow then hitTarget = true end
+						if not i.hollow then break end
 					end
 					if i.type == "dropdown" and i.open and not i.hovered then
 						local optionHit = false
@@ -1955,6 +1969,7 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 											e.fn(v, v.options[k], e.t, event)
 										end
 									end
+									break
 								end
 							end
 						end
@@ -2006,35 +2021,35 @@ function gui:touchpressed(id, x, y, dx, dy, pressure)
 								end
 							end
 						end
+					end
+					if id == 2 then
+						if v.events.onDoubleTouch then 
+							for j,e in ipairs(v.events.onDoubleTouch) do
+								e.fn(v, e.target, event)
+							end
+						end
+						if events.onDoubleTouch then
+							for _,e in ipairs(events.onDoubleTouch) do
+								if e.o == v.type then
+									e.fn(v, e.target, event)
+								end
+							end
+						end
 					else
-						if id == 2 then
-							if v.events.onDoubleTouch then 
-								for j,e in ipairs(v.events.onDoubleTouch) do
+						if v.events.onMultiTouch then 
+							for j,e in ipairs(v.events.onMultiTouch) do
+								e.fn(v, e.target, event)
+							end
+						end
+						if events.onMultiTouch then
+							for _,e in ipairs(events.onMultiTouch) do
+								if e.o == v.type then
 									e.fn(v, e.target, event)
-								end
-							end
-							if events.onDoubleTouch then
-								for _,e in ipairs(events.onDoubleTouch) do
-									if e.o == v.type then
-										e.fn(v, e.target, event)
-									end
-								end
-							end
-						else
-							if v.events.onMultiTouch then 
-								for j,e in ipairs(v.events.onMultiTouch) do
-									e.fn(v, e.target, event)
-								end
-							end
-							if events.onMultiTouch then
-								for _,e in ipairs(events.onMultiTouch) do
-									if e.o == v.type then
-										e.fn(v, e.target, event)
-									end
 								end
 							end
 						end
 					end
+					
 					if not v.hollow then hitTarget = true end
 				end
 				if v.type == "dropdown" and v.open and not v.hovered then
@@ -2097,15 +2112,16 @@ function gui:remove(n)
 
 	if type(n) == "string" then
 		self.items[n] = nil
-	else
-		for k,t in self:sort(self.items) do
-			if t.id == n then 
-				t = nil
-				return self
-			end
+		self.needToSort = true
+		return self
+	end
+	for k,t in self:sort(self.items) do
+		if t.id == n then 
+			self:find(t.name):parent().items[t.name] = nil
+			self.needToSort = true
+			return self
 		end
 	end
-	self.needToSort = true
 	return self
 end
 
@@ -2129,23 +2145,22 @@ end
 function gui:sort(t, f)
 	local a = {}
 	local v = {}
+	f = f or function() end
 	
 	for k,e in pairs(t) do 
-		table.insert(a, k) 
+		table.insert(a, k)
 		table.insert(v, e)
 	end
-	if f then
-		table.sort(v, f)
-	end
+	
+	table.sort(v, f)
 	local i = 0 
 	local iter = function ()
 		i = i + 1
 		
 		if a[i] == nil then 
 			return nil
-		else 
-			return a[i], v[i]
-		end
+		 end
+		return a[i], v[i]
 	end
 	return iter
 end

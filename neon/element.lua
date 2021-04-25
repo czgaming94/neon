@@ -2,8 +2,12 @@ local lg, lt = love.graphics, love.timer
 local floor, random, min, max = math.floor, love.math.random, math.min, math.max
 local guis = {}
 local function new(t, p)
-	if p and p.id and not guis[p.id] then guis[p.id] = p end
 	t = t or {}
+	t.parent = nil
+	if p and p.id and not guis[p.id] then 
+		guis[p.id] = p 
+		t.parent = p.id
+	end
 	t.__index = t
 	t.new = t.new or t.init or t[1] or function() end
 	t.w = 0
@@ -59,64 +63,94 @@ local function new(t, p)
 	t.paddingBottom = 0
 	
 	function t:animateToColor(c, s, f)
-		assert(c, "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToColor() :: Missing param[color]")
-		assert(type(c) == "table", "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
-		assert(#c > 2, "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
-		s = s or 2
-		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc or f then
-			self.colorToAnimateTo = c
-			self.colorAnimateSpeed = s
-			self.colorAnimateTime = 0
-			self.inAnimation = true
-			self.animateColor = true
-			self.runAnimations = true
+		if not c then
+			error("[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToColor() :: Missing param[color]")
 		end
+		if type(c) ~= "table" then
+			error("[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToColor() :: Incorrect param[color] - expecting table and got " .. type(c))
+		end
+		if #c < 2 then
+			error("[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToColor() :: Incorrect param[color] - expecting table length 3 or 4 and got " .. #c)
+		end
+		s = s or 2
+		if type(s) ~= "number" then
+			error("[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToColor() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		end
+		if self.fadedByFunc or not f then
+			return self
+		end
+		self.colorToAnimateTo = c
+		self.colorAnimateSpeed = s
+		self.colorAnimateTime = 0
+		self.inAnimation = true
+		self.animateColor = true
+		self.runAnimations = true
 		return self
 	end
 	
 	function t:animateToPosition(x, y, s, f, e)
-		assert(x, "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Missing param[x]")
-		assert(type(x) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
-		assert(y, "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Missing param[y]")
-		assert(type(y) == "number" or type(x) == "string", "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Incorrect param[y] - expecting number or 'auto' and got " .. type(y))
-		s = s or 2
-		assert(type(s) == "number", "[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
-		if not self.fadedByFunc or f then
-			if x == "auto" then
-				x = self.pos.x
-			end
-			if y == "auto" then
-				y = self.pos.y
-			end
-			if self.type == "text" then
-				for _,v in ipairs(self.typewriterText) do
-					local xDif, yDif
-					if self.pos.x - v.x ~= 0 then
-						xDif = x - (self.pos.x - v.x)
-					else
-						xDif = self.pos.x
-					end
-					if self.pos.y - v.y ~= 0 then
-						yDif = y - (self.pos.y - v.y)
-					else
-						yDif = self.pos.y
-					end
-					v.oX = v.x
-					v.tX = xDif
-					v.oY = v.y
-					v.tY = yDif
-				end
-			end
-			for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
-			self.positionToAnimateTo = {x = x, y = y}
-			self.positionAnimateSpeed = s
-			self.positionAnimateTime = 0
-			self.inAnimation = true
-			self.animatePosition = true
-			self.runAnimations = true
-			if e ~= nil then self.bouncePositionAnimation = e else self.bouncePositionAnimation = false end
+		if not x then
+			error("[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Missing param[x]")
 		end
+		
+		if type(x) ~= "number" and type(x) ~= "string" then
+			error("[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Incorrect param[x] - expecting number or 'auto' and got " .. type(x))
+		end
+		
+		if not y then
+			error("[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Missing param[y]")
+		end
+		
+		if type(y) ~= "number" and type(y) ~= "string" then
+			error("[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Incorrect param[y] - expecting number or 'auto' and got " .. type(y))
+		end
+		
+		s = s or 2
+		
+		if type(s) ~= "number" then
+			error("[" .. self.name .. "] FAILURE: " .. self.type .. ":animateToPosition() :: Incorrect param[speed] - expecting number and got " .. type(s))
+		end
+		
+		if self.fadedByFunc or not f then
+			return self
+		end
+		
+		if x == "auto" then
+			x = self.pos.x
+		end
+		
+		if y == "auto" then
+			y = self.pos.y
+		end
+		
+		if self.type == "text" then
+			for _,v in ipairs(self.typewriterText) do
+				local xDif, yDif
+				if self.pos.x - v.x ~= 0 then
+					xDif = x - (self.pos.x - v.x)
+				else
+					xDif = self.pos.x
+				end
+				if self.pos.y - v.y ~= 0 then
+					yDif = y - (self.pos.y - v.y)
+				else
+					yDif = self.pos.y
+				end
+				v.oX = v.x
+				v.tX = xDif
+				v.oY = v.y
+				v.tY = yDif
+			end
+		end
+		for k,v in pairs(self.pos) do self.positionToAnimateFrom[k] = v end
+		self.positionToAnimateTo = {x = x, y = y}
+		self.positionAnimateSpeed = s
+		self.positionAnimateTime = 0
+		self.inAnimation = true
+		self.animatePosition = true
+		self.runAnimations = true
+		self.bouncePositionAnimation = false
+		if e ~= nil then self.bouncePositionAnimation = e end
 		return self
 	end
 
@@ -393,9 +427,6 @@ local function new(t, p)
 							w = self.paddingLeft + self.uW + self.font:getWidth(v) + self.paddingRight,
 							h = self.paddingTop + self.uH + self.paddingBottom
 						}
-						if self.fixPadding then
-							self.options[k].x = self.pos.x
-						end
 					else
 						self.options[k] = {
 							text = v, 
@@ -774,6 +805,10 @@ local function new(t, p)
 			end
 		end
 		return d
+	end
+	
+	function t:parent()
+		return guis[self.parent]
 	end
 
 	function t:registerEvent(n, f, trg, i)

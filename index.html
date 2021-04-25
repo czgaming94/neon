@@ -81,7 +81,7 @@
 			a#quickstart {
 				float: right;
 				width: 45%;
-				font-size: 23px;
+				font-size: 18px;
 				padding: 22px 2.5%;
 				position: relative;
 				color: #333;
@@ -105,7 +105,7 @@
 				clear: both;
 			}
 			div#handles {
-				padding: 30px 70px 30px 30px;
+				padding: 30px 70px 30px 0;
 			}
 			h4 {
 				font-size: 50px;
@@ -120,7 +120,7 @@
 				display: inline-block;
 				padding: 4px 14px;
 				background-color: rgba(0,0,0,.5);
-				font-size: 16px;
+				font-size: 18px;
 			}
 			h5 {
 				font-size: 25px;
@@ -153,7 +153,7 @@
 				width: 30%;
 				padding: 20px 2.5%;
 				background-color: rgba(255,255,255,.75);
-				font-size: 15px;
+				font-size: 16px;
 				border-radius: 20px;
 			}
 			.codeblock span {
@@ -246,12 +246,16 @@
 				<a href="#">Download ZIP</a><a href="#">View Source On Github</a>
 			</div>
 			<div id="wrapper">
-				<p>This API's goal is to make laying out your application GUI simple and efficient. The secondary goal of this API is to be as easy to grasp as possible for even the beginner Lua user, as well as users coming from other scripting languages.</p>
-				<a id="quickstart" href="https://github.com/czgaming94/neon/blob/main/docs/examples/StartGuide.md" title="Quickstart Guide">If you aren't quite understanding how to start using the API, <span>check out this quick starters guide!</span></a>
+				<div id="cta">
+					<p>This API's goal is to make laying out your application GUI simple and efficient. The secondary goal of this API is to be as easy to grasp as possible for even the beginner Lua user, as well as users coming from other scripting languages.</p>
+					<a id="quickstart" href="https://github.com/czgaming94/neon/blob/main/docs/examples/StartGuide.md" title="Quickstart Guide">If you aren't quite understanding how to start using the API, <span>check out this quick starters guide!</span></a>
+				</div>
 				<div class="clr"></div>
 				<div id="handles">
-					<h4>GUI Handles</h4>
-					<p>The GUI lib brings a few handles and callbacks that allow the user to have full control.</p>
+					<div class="blocktop">
+						<h4>GUI Handles</h4>
+						<p>The GUI lib brings a few handles and callbacks that allow the user to have full control.</p>
+					</div>
 					<div class="gui method">
 						<h5>:new(item)</h5>
 						<span class="codestrip">var item</span>
@@ -260,9 +264,18 @@
 							<span>local Game = {}</span>
 							<span>Game.mainMenu = Neon:new()</span>
 						</div>
-						<p>Create a new instance of the GUI. This is used for when you do not want every element in one GUI.</p>
+						<p>Create a new instance of the GUI, if no item is provided. This is used for when you do not want every element in one GUI.</p>
 						<p>An example of two GUIs would be a <span class="codestrip">mainMenu</span> and <span class="codestrip">pauseMenu</span>
 						<p>Can also be used to create a new instance of any table or variable.</p>
+					</div>
+					<div class="gui method">
+						<h5>:setUse255(use255)</h5>
+						<span class="codestrip">boolean use255</span>
+						<div class="codeblock">
+							<span>local Neon = require("neon")</span>
+							<span>Neon:setUse255(true)</span>
+							<span>Neon:addColor({250,140,90}, "newColor")</span>
+						</div>
 					</div>
 				</div>
 			</div>
