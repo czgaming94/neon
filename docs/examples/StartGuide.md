@@ -1,4 +1,5 @@
 # Quick Start Guide
+Download this quick start [here](https://github.com/czgaming94/neon/raw/main/docs/examples/StartGuide.rar)<br><br>
 Real quick, let's go ahead and create our configuration file so we can see our results.<br>
 `-- conf.lua`
 ```lua
