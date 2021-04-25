@@ -1,4 +1,5 @@
 # Quick Start Guide
+`Guide based on April 2021 Build`<br>
 Download this quick start [here](https://github.com/czgaming94/neon/raw/main/docs/examples/StartGuide.rar)<br><br>
 #### conf.lua
 Real quick, let's go ahead and create our configuration file so we can see our results.<br>
